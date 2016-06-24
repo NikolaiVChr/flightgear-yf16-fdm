@@ -1,0 +1,322 @@
+<?xml version="1.0"?>
+
+<flight_control name="FC">
+
+    <channel execrate="1" name="Pitch">
+
+    	<lag_filter name="fcs/fly-by-wire/pitch/elevator-cmd-lagged">
+  			<input> fcs/elevator-cmd-norm </input>
+			<c1> 60 </c1>
+		</lag_filter>
+
+    	<fcs_function name="fcs/fly-by-wire/pitch/stick-force-N">
+            <function>
+                <table>
+                    <independentVar lookup="row">fcs/elevator-cmd-lagged</independentVar>
+                    <tableData>
+                       -1  180
+                        0    0
+                        1  -80
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
+    	<fcs_function name="fcs/fly-by-wire/pitch/command-g">
+            <function>
+                <table>
+                    <independentVar lookup="row">fcs/fly-by-wire/pitch/stick-force-N</independentVar>
+                    <tableData>
+                        -80  -4.0
+                        -35  -0.5
+                         -8   0.0
+                          8   0.0
+                         35   0.5 
+                        180  11.0
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
+        <aerosurface_scale name="fcs/fly-by-wire/pitch/trim-scaled">
+            <input>fcs/pitch-trim-cmd-norm</input>
+            <zero_centered> true </zero_centered>
+            <domain>
+                <min> -1.0 </min>
+                <max>  1.0 </max>
+            </domain>
+            <range>
+                <min> -2.4 </min>
+                <max>  2.4 </max>
+            </range>
+        </aerosurface_scale>
+
+        <summer name="fcs/fly-by-wire/pitch/command-sum">
+            <input>fcs/fly-by-wire/pitch/trim-scaled</input>
+            <input>fcs/fly-by-wire/pitch/command-g</input>
+        </summer>
+
+        <summer name="fcs/fly-by-wire/pitch/positive-g-limit">
+            <input>fcs/fly-by-wire/pitch/command-sum</input>
+            <clipto>
+                <max>8.0</max>
+            </clipto>
+        </summer>
+
+        <fcs_function name="fcs/fly-by-wire/pitch/negative-g-limit">
+            <function>
+            	<product>
+	            	<property>fcs/fly-by-wire/pitch/command-sum</property>
+	                <table>
+	                    <independentVar lookup="row">aero/qbar-psf</independentVar>
+	                    <tableData>
+	                        0.0      -1
+	                        31.32815 -1
+	                        187.9689 -4
+	                        208.8543 -4
+	                    </tableData>
+	                </table>
+	            </product>
+            </function>
+        </fcs_function>
+
+        <summer name="fcs/fly-by-wire/pitch/command-sum-limit">
+            <input>fcs/fly-by-wire/pitch/negative-g-limit</input>
+            <input>fcs/fly-by-wire/pitch/command-g-limit</input>
+        </summer>
+
+        <lag_filter name="fcs/fly-by-wire/pitch/command-sum-limit-lagged">
+  			<input> fcs/fly-by-wire/pitch/command-sum-limit </input>
+			<c1> 8.3 </c1>
+		</lag_filter>
+
+        <summer name="fcs/fly-by-wire/pitch/alpha-indicated-clamp">
+            <input>aero/alpha-deg</input><!-- should really be indicated -->
+            <clipto>
+            	<min>-5</min>
+                <max>30</max>
+            </clipto>
+        </summer>
+
+        <lag_filter name="fcs/fly-by-wire/pitch/alpha-indicated-lagged">
+  			<input> fcs/fly-by-wire/pitch/alpha-indicated-clamp </input>
+			<c1> 10 </c1>
+		</lag_filter>
+
+		<summer name="fcs/fly-by-wire/pitch/alpha-indicated-sum">
+            <input> fcs/fly-by-wire/pitch/alpha-indicated-lagged </input>
+            <input> -20.4 </input>
+            <input> fcs/fly-by-wire/pitch/pitch-rate-gain </input>
+        </summer>
+
+        <pure_gain name="fcs/fly-by-wire/pitch/alpha-indicated-gain">
+            <input>fcs/fly-by-wire/pitch/alpha-indicated-sum</input>
+            <gain> 1 </gain>
+            <clipto>
+            	<min> 0 </min>
+            </clipto>
+        </pure_gain>
+
+		<summer name="fcs/fly-by-wire/pitch/command-sum-limit-alpha">
+            <input> -fcs/fly-by-wire/pitch/command-sum-limit-lagged </input>
+            <input> fcs/fly-by-wire/pitch/alpha-indicated-gain </input>
+        </summer>
+
+        <summer name="fcs/fly-by-wire/pitch/command-sum-limit-alpha-pitch">
+            <input> fcs/fly-by-wire/pitch/command-sum-limit-alpha </input>
+            <input> fcs/fly-by-wire/pitch/pitch-rate-lead </input>
+        </summer>
+
+		<pure_gain name="fcs/fly-by-wire/pitch/command-sum-limit-alpha-pitch-gain">
+            <input>fcs/fly-by-wire/pitch/command-sum-limit-alpha-pitch</input>
+            <gain> 1.5 </gain>
+        </pure_gain>
+
+		<fcs_function name="fcs/fly-by-wire/pitch/pitch-loop-gain">
+            <function>
+            	<product>
+	            	<property>fcs/fly-by-wire/pitch/command-sum-limit-alpha-pitch-gain</property>
+	                <table>
+	                    <independentVar lookup="row">aero/qbar-psf</independentVar>
+	                    <tableData>
+	                        0.0       1.0
+	                        250.6252  1.0
+	                        898.0737  0.4
+	                        1169.584  0.4
+	                    </tableData>
+	                </table>
+	            </product>
+            </function>
+        </fcs_function>
+
+        <summer name="fcs/fly-by-wire/pitch/pitch-loop-gain-sum">
+            <input> fcs/fly-by-wire/pitch/pitch-loop-gain </input>
+            <input> -fcs/fly-by-wire/pitch/pitch-loop-gain-feedback-gain </input>
+        </summer>
+
+        <integrator name="fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int">
+  			<input> fcs/fly-by-wire/pitch/pitch-loop-gain-sum </input>
+  			<c1> 5 </c1>
+			<clipto>
+				<min> -25 </min>
+			    <max>  25 </max>
+			</clipto>
+		</integrator>
+
+		<summer name="fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum">
+            <input> fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int </input>
+            <input> fcs/fly-by-wire/pitch/pitch-loop-gain </input>
+        </summer>
+
+        <summer name="fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum-sum">
+            <input> fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum </input>
+            <input> fcs/fly-by-wire/pitch/alpha-feedback </input>
+        </summer>
+
+        <switch name="fcs/fly-by-wire/pitch/pitch-loop-gain-feedback-math">
+            <default value="fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum-sum"/>
+            <test logic="AND" value="0">
+                fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum-sum lt  25
+                fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum-sum gt -25
+            </test>
+        </switch>
+
+        <pure_gain name="fcs/fly-by-wire/pitch/pitch-loop-gain-feedback-gain">
+            <input>fcs/fly-by-wire/pitch/pitch-loop-gain-feedback-math</input>
+            <gain> 5 </gain>
+        </pure_gain>
+
+        <pure_gain name="fcs/fly-by-wire/pitch/alpha-feedback">
+            <input>fcs/fly-by-wire/pitch/alpha-indicated-lagged</input>
+            <gain> 0.5 </gain>
+        </pure_gain>
+
+        <summer name="fcs/fly-by-wire/pitch/pitch-loop-gain-final">
+            <input> fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum </input>
+            <input> fcs/fly-by-wire/pitch/alpha-feedback </input>
+        </summer>
+
+        <washout_filter name="fcs/fly-by-wire/pitch/q-washout">
+		  <input> velocities/q-aero-rad_sec </input>
+		  <c1> 1 </c1>
+		</washout_filter>
+
+		<pure_gain name="fcs/fly-by-wire/pitch/q-gain-1">
+            <input>fcs/fly-by-wire/pitch/q-washout</input>
+            <gain> 0.7 </gain>
+        </pure_gain>
+
+        <scheduled_gain name="fcs/fly-by-wire/pitch/pitch-rate-gain">
+            <input>fcs/fly-by-wire/pitch/q-gain-1</input>
+            <table>
+                <independentVar lookup="row">aero/qbar-psf</independentVar>
+                <tableData>
+                	0         1.00
+                	114.8699  1.00
+                	313.2815  0.35
+                	417.7087  0.35
+                </tableData>
+            </table>
+        </scheduled_gain>
+
+        <summer name="fcs/fly-by-wire/pitch/pitch-rate-gain-sum">
+            <input> fcs/fly-by-wire/pitch/pitch-rate-gain </input>
+            <input> 15 </input>
+            <input> fcs/fly-by-wire/pitch/alpha-indicated-lagged </input>
+        </summer>
+
+        <pure_gain name="fcs/fly-by-wire/pitch/pitch-rate-gain-sum-gain">
+            <input>fcs/fly-by-wire/pitch/pitch-rate-gain-sum</input>
+            <gain> 0.322 </gain>
+            <clipto>
+				<min> 0 </min>
+			</clipto>
+        </pure_gain>
+
+        <summer name="fcs/fly-by-wire/pitch/pitch-rate-gain-sum-gain-sum">
+            <input> fcs/fly-by-wire/pitch/pitch-rate-gain-sum-gain </input>
+            <input> fcs/fly-by-wire/pitch/pitch-rate-gain-2-sum </input>
+        </summer>
+
+        <summer name="fcs/fly-by-wire/pitch/normal-1">
+            <input> accelerations/Nz </input>
+            <input> -1 </input>
+        </summer>
+
+        <lag_filter name="fcs/fly-by-wire/pitch/normal-lagged">
+  			<input> fcs/fly-by-wire/pitch/normal-1 </input>
+			<c1> 50 </c1>
+		</lag_filter>
+
+        <summer name="fcs/fly-by-wire/pitch/pitch-rate-gain-2-sum">
+            <input> fcs/fly-by-wire/pitch/normal-lagged </input>
+            <input> fcs/fly-by-wire/pitch/pitch-rate-gain-2 </input>
+        </summer>
+
+        <pure_gain name="fcs/fly-by-wire/pitch/q-gain-2">
+            <input>fcs/fly-by-wire/pitch/q-washout</input>
+            <gain> 0.334 </gain>
+        </pure_gain>
+
+        <lead_lag_filter name="fcs/fly-by-wire/pitch/pitch-rate-lead">
+		  <input> fcs/fly-by-wire/pitch/pitch-rate-gain-sum-gain-sum </input>
+		  <c1> 3 </c1>
+		  <c2> 12 </c2>
+		  <c3> 1 </c3>
+		  <c4> 12 </c4>
+		</lead_lag_filter>
+
+        <summer name="fcs/fly-by-wire/pitch/tp-left-sum">
+            <input> fcs/fly-by-wire/pitch/pitch-loop-gain-final </input>
+            <input> fcs/fly-by-wire/roll/horz-tail-diff-cmd </input>
+        </summer>
+
+        <summer name="fcs/fly-by-wire/pitch/bt-left-sum">
+            <input> fcs/fly-by-wire/pitch/pitch-loop-gain-final </input>
+            <input> - fcs/fly-by-wire/roll/horz-tail-diff-cmd </input>   <!-- todo this input -->
+        </summer>
+
+        <lag_filter name="fcs/fly-by-wire/pitch/tp-lag">
+  			<input> fcs/fly-by-wire/pitch/tp-left-sum </input>
+			<c1> 20.2 </c1>
+			<!-- defl. limit = 25, rate limit = 60 -->
+		</lag_filter>
+
+		<lag_filter name="fcs/fly-by-wire/pitch/bt-lag">
+  			<input> fcs/fly-by-wire/pitch/bt-left-sum </input>
+			<c1> 20.2 </c1>
+			<!-- defl. limit = 25, rate limit = 60 -->
+		</lag_filter>
+
+        <summer name="fcs/fly-by-wire/pitch/tp-right-sum">
+            <input> fcs/fly-by-wire/pitch/tp-lag </input>
+            <input> fcs/fly-by-wire/pitch/bt-lag </input>
+        </summer>
+
+        <summer name="fcs/fly-by-wire/pitch/bt-right-sum">
+            <input> fcs/fly-by-wire/pitch/tp-lag </input>
+            <input> -fcs/fly-by-wire/pitch/bt-lag </input>
+        </summer>
+
+        <pure_gain name="fcs/fly-by-wire/pitch/horz-tail-deflection-deg">
+            <input>fcs/fly-by-wire/pitch/tp-right-sum</input>
+            <gain> 0.5 </gain>
+        </pure_gain>
+
+        <pure_gain name="fcs/fly-by-wire/pitch/horz-tail-diff-deflection-deg">
+            <input>fcs/fly-by-wire/pitch/bt-right-sum</input>
+            <gain> 0.5 </gain>
+        </pure_gain>
+
+    </channel>
+
+    <channel execrate="1" name="Roll">
+    </channel>
+
+    <channel execrate="1" name="Yaw">
+    </channel>
+
+    <channel execrate="1" name="Throttle">
+    </channel>
+
+<flight_control>
