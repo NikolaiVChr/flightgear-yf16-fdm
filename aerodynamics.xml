@@ -134,6 +134,143 @@
             </product>
         </function>
 
+        <function name="aero/coefficient/Cx_lef">
+            <description>
+               Cx due to leading edge flaps coefficient in body coordinate system.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>fcs/lef-norm</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <tableData>
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15
+-10
+-05
+ 00
+ 05
+ 10
+ 15
+ 20
+ 25
+ 30
+ 35
+ 40
+ 45
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cx_sb">
+            <description>
+               Cx due speed brake coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>fcs/sb-norm</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15
+-10
+-05
+ 00
+ 05
+ 10
+ 15
+ 20
+ 25
+ 30
+ 35
+ 40
+ 45
+ 50
+ 55
+ 60
+ 70
+ 80
+ 90
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cx_q">
+            <description>
+               Cx due to pitch rate coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>aero/ci2vel</property>
+                <property>velocities/q-rad_sec</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15
+-10
+-05
+ 00
+ 05
+ 10
+ 15
+ 20
+ 25
+ 30
+ 35
+ 40
+ 45
+ 50
+ 55
+ 60
+ 70
+ 80
+ 90
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cx_q-lef">
+            <description>
+               Cx due to pitch rate due to leading edge flaps coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>aero/ci2vel</property>
+                <property>velocities/q-rad_sec</property>
+                <property>fcs/lef-norm</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15
+-10
+-05
+ 00
+ 05
+ 10
+ 15
+ 20
+ 25
+ 30
+ 35
+ 40
+ 45
+                     </tableData>
+                </table>
+            </product>
+        </function>        
+
     </axis>
 
 </aerodynamics>
