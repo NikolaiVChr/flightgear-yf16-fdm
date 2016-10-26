@@ -141,7 +141,7 @@
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <property>fcs/lef-norm</property>
+                <property>fcs/lef-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
@@ -273,6 +273,48 @@
 
     </axis>
 
+
+
+
+
+
+    <axis name="Z">
+
+        <function name="aero/coefficient/Cz">
+            <description>
+               Cz coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <independentVar lookup="table">fcs/elevator-pos-deg</independentVar>
+                    <tableData breakPoint="-25.0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                    <tableData breakPoint="-10.0">
        -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
 -20 
 -15 
@@ -295,5 +337,1756 @@
  80 
  90 
                      </tableData>
+                    <tableData breakPoint="0.0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                    <tableData breakPoint="10.0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                    <tableData breakPoint="25.0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cz_lef">
+            <description>
+               Cz due to leading edge flaps coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>fcs/lef-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <tableData>
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cz_sb">
+            <description>
+               Cz due speed brake coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>fcs/sb-norm</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cz_q">
+            <description>
+               Cz due to pitch rate coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>aero/ci2vel</property>
+                <property>velocities/q-rad_sec</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cz_q-lef">
+            <description>
+               Cz due to pitch rate due to leading edge flaps coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>aero/ci2vel</property>
+                <property>velocities/q-rad_sec</property>
+                <property>fcs/lef-norm</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+                     </tableData>
+                </table>
+            </product>
+        </function>        
+
+    </axis>
+
+
+
+
+
+
+
+
+
+
+
+    <function name="aero/function/n_dh">
+        <description>
+           Elevator effectiveness factor.
+           Page 71. Todo: Investigate consequenses..
+        </description>
+        <product>
+            <table>
+                <independentVar lookup="row">fcs/elevator-pos-deg</independentVar>
+                <tableData>
+-25 
+-10 
+ 00 
+ 10 
+ 25 
+                 </tableData>
+            </table>
+        </product>
+    </function>
+
+    <axis name="PITCH">
+
+        <function name="aero/coefficient/Cm">
+            <description>
+               Cm coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/cbarw-ft</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <independentVar lookup="table">fcs/elevator-pos-deg</independentVar>
+                    <tableData breakPoint="-25.0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                    <tableData breakPoint="-10.0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                     </tableData>
+                    <tableData breakPoint="0.0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                    <tableData breakPoint="10.0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                    <tableData breakPoint="25.0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cm_lef">
+            <description>
+               Cm due to leading edge flaps coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/cbarw-ft</property>
+                <property>fcs/lef-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <tableData>
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cm_sb">
+            <description>
+               Cm due speed brake coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/cbarw-ft</property>
+                <property>fcs/sb-norm</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cm_alpha">
+            <description>
+               Cm due to alpha coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/cbarw-ft</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cm_q">
+            <description>
+               Cm due to pitch rate coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/cbarw-ft</property>
+                <property>aero/ci2vel</property>
+                <property>velocities/q-rad_sec</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cm_q-lef">
+            <description>
+               Cm due to pitch rate due to leading edge flaps coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/cbarw-ft</property>
+                <property>aero/ci2vel</property>
+                <property>velocities/q-rad_sec</property>
+                <property>fcs/lef-norm</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cm_ds">
+            <description>
+               Cm due to deep stall coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/cbarw-ft</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">fcs/elevator-pos-deg</independentVar>
+                    <tableData>
+       -25    -10      0     10     15     20     25
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                </table>
+            </product>
+        </function>        
+
+    </axis>
+
+
+
+
+
+
+
+
+
+
+
+
+    <axis name="Y">
+
+        <function name="aero/coefficient/Cy">
+            <description>
+               Cy coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <tableData>
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cy_lef">
+            <description>
+               Cy due to leading edge flaps coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>fcs/lef-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <tableData>
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cy_a">
+            <description>
+               Cy due to aileron due to leading edge flaps coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <independentVar lookup="table">fcs/aileron-pos-norm</independentVar><!-- 1 = 20 degs (should it rely on absolute norm instead? [maybe]) -->
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <independentVar lookup="table">fcs/lef-pos-norm</independentVar>
+                    <tableData breakPoint="0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                    <tableData breakPoint="1">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cy_rudder">
+            <description>
+               Cy due to rudder coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <independentVar lookup="table">fcs/rudder-pos-norm</independentVar><!-- 1 = 30 degs (should it rely on absolute norm instead? [probably]) -->
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <tableData>
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                </table>
+            </product>
+        </function>        
+
+        <function name="aero/coefficient/Cy_r">
+            <description>
+               Cy due to yaw rate coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>aero/ci2vel</property>
+                <property>velocities/r-rad_sec</property>
+                <property>fcs/lef-norm</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cy_r-lef">
+            <description>
+               Cy due to yaw rate due to leading edge flaps coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>aero/ci2vel</property>
+                <property>velocities/r-rad_sec</property>
+                <property>fcs/lef-norm</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+                     </tableData>
+                </table>
+            </product>
+        </function>        
+
+        <function name="aero/coefficient/Cy_p">
+            <description>
+               Cy due to roll rate coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>aero/ci2vel</property>
+                <property>velocities/p-rad_sec</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cy_p-lef">
+            <description>
+               Cy due to roll rate due to leading edge flaps coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>aero/ci2vel</property>
+                <property>velocities/p-rad_sec</property>
+                <property>fcs/lef-norm</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+                     </tableData>
+                </table>
+            </product>
+        </function>        
+
+    </axis>
+
+
+
+
+
+
+
+
+    <axis name="YAW">
+
+        <function name="aero/coefficient/Cn">
+            <description>
+               Cn coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <independentVar lookup="table">fcs/elevator-pos-deg</independentVar>
+                    <tableData breakPoint="-25.0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                    <tableData breakPoint="0.0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                    <tableData breakPoint="25.0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cn_lef">
+            <description>
+               Cn due to leading edge flaps coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>fcs/lef-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <tableData>
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cn_a">
+            <description>
+               Cn due to aileron due to leading edge flaps coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <independentVar lookup="table">fcs/aileron-pos-norm</independentVar><!-- 1 = 20 degs -->
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <independentVar lookup="table">fcs/lef-pos-norm</independentVar>
+                    <tableData breakPoint="0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                    <tableData breakPoint="1">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                     </tableData>
+                </table>
+            </product>
+        </function>        
+
+        <function name="aero/coefficient/Cn_rudder">
+            <description>
+               Cn due to rudder coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <independentVar lookup="table">fcs/rudder-pos-norm</independentVar><!-- 1 = 30 degs -->
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <tableData>
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                </table>
+            </product>
+        </function>   
+
+        <function name="aero/coefficient/Cn_r">
+            <description>
+               Cn due to yaw rate coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/bi2vel</property>
+                <property>velocities/r-rad_sec</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cn_b">
+            <description>
+               Cn due to beta coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/beta-rad</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cn_a">
+            <description>
+               Cn due to aileron coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>fcs/aileron-pos-rad</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                     </tableData>
+                </table>
+            </product>
+        </function>        
+
+        <function name="aero/coefficient/Cn_r-lef">
+            <description>
+               Cn due to yaw rate due to leading edge flaps coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/bi2vel</property>
+                <property>velocities/r-rad_sec</property>
+                <property>fcs/lef-norm</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cn_p">
+            <description>
+               Cn due to roll rate coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/bi2vel</property>
+                <property>velocities/p-rad_sec</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cn_p-lef">
+            <description>
+               Cn due to roll rate due to leading edge flaps coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/bi2vel</property>
+                <property>velocities/p-rad_sec</property>
+                <property>fcs/lef-pos-norm</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+                     </tableData>
+                </table>
+            </product>
+        </function>                        
+
+    </axis>
+
+
+
+
+
+
+
+
+
+    <axis name="ROLL">
+
+        <function name="aero/coefficient/Cl">
+            <description>
+               Cl coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <independentVar lookup="table">fcs/elevator-pos-deg</independentVar>
+                    <tableData breakPoint="-25.0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                    <tableData breakPoint="0.0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                    <tableData breakPoint="25.0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cl_lef">
+            <description>
+               Cl due to leading edge flaps coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>fcs/lef-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <tableData>
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cl_a">
+            <description>
+               Cl due to aileron due to leading edge flaps coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <independentVar lookup="table">fcs/aileron-pos-norm</independentVar><!-- 1 = 20 degs -->
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <independentVar lookup="table">fcs/lef-pos-norm</independentVar>
+                    <tableData breakPoint="0">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+                    </tableData>
+                    <tableData breakPoint="1">
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+                     </tableData>
+                </table>
+            </product>
+        </function>        
+
+        <function name="aero/coefficient/Cl_rudder">
+            <description>
+               Cl due to rudder coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <independentVar lookup="table">fcs/rudder-pos-norm</independentVar><!-- 1 = 30 degs -->
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <tableData>
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                </table>
+            </product>
+        </function>   
+
+        <function name="aero/coefficient/Cl_r">
+            <description>
+               Cl due to yaw rate coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/bi2vel</property>
+                <property>velocities/r-rad_sec</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cl_b">
+            <description>
+               Cl due to beta coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/beta-rad</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cl_r-lef">
+            <description>
+               Cl due to yaw rate due to leading edge flaps coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/bi2vel</property>
+                <property>velocities/r-rad_sec</property>
+                <property>fcs/lef-norm</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cl_p">
+            <description>
+               Cl due to roll rate coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/bi2vel</property>
+                <property>velocities/p-rad_sec</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+                     </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/Cl_p-lef">
+            <description>
+               Cl due to roll rate due to leading edge flaps coefficient.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/bi2vel</property>
+                <property>velocities/p-rad_sec</property>
+                <property>fcs/lef-pos-norm</property>
+                <table>
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+                     </tableData>
+                </table>
+            </product>
+        </function>                        
+
+    </axis>    
 
 </aerodynamics>
