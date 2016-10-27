@@ -2,6 +2,89 @@
 
 <flight_control name="FC">
 
+    <channel execrate="1" name="Leading edge flaps">
+
+        <fcs_function name="fcs/fly-by-wire/lef/input-factor">
+            <function>
+                <value>1.38</value>
+            </function>
+        </fcs_function>
+
+        <lead_lag_filter name="fcs/fly-by-wire/lef/lead-lag">
+          <input> fcs/fly-by-wire/lef/input-factor </input>
+          <c1> 2 </c1>
+          <c2> 7.25 </c2>
+          <c3> 1 </c3>
+          <c4> 7.25 </c4>
+        </lead_lag_filter>
+
+        <pure_gain name="fcs/fly-by-wire/lef/alpha-gain">
+            <input>fcs/fly-by-wire/lef/lead-lag</input>
+            <gain>aero/alpha-deg</gain>
+        </pure_gain>
+
+        <fcs_function name="fcs/fly-by-wire/lef/cmd-pos">
+            <function>
+                <difference>
+                    <p>fcs/fly-by-wire/lef/alpha-gain</p>
+                    <sum>
+                        <product>
+                            <value>9.05</value>
+                            <quotient>
+                                <p>aero/qbar-psf</p><!-- dynamic pressure -->
+                                <p>atmosphere/P-psf</p><!-- static pressure -->
+                            </quotient>
+                        </product>
+                        <v>1.45</v>
+                    </sum>
+                </difference>
+            </function>
+        </fcs_function>
+
+        <lag_filter name="fcs/fly-by-wire/lef/pos-direct">
+            <input> fcs/fly-by-wire/lef/cmd-pos </input>
+            <c1> 0.136 </c1>
+        </lag_filter>
+
+        <kinematic name="fcs/lef-pos-deg">
+            <input>fcs/fly-by-wire/lef/pos-direct</input>
+            <noscale/>
+            <traverse>
+                <setting>
+                    <position>0</position>
+                    <time>0.0</time>
+                </setting>
+                <setting>
+                    <position>25</position>
+                    <time>1</time><!-- 25 degs per second -->
+                </setting>
+            </traverse>
+            <clipto>
+                <min>0</min>
+                <max>25</max>
+            </clipto>
+        </kinematic>
+
+        <pure_gain name="fcs/lef-pos-rad">
+            <input>fcs/lef-pos-deg</input>
+            <gain>0.017453</gain>
+        </pure_gain>
+
+        <aerosurface_scale name="fcs/lef-pos-norm">
+            <input>fcs/lef-pos-deg</input>
+            <zero_centered> true </zero_centered>
+            <domain>
+                <min> 0 </min>
+                <max> 25 </max>
+            </domain>
+            <range>
+                <min>0</min>                
+                <max>1</max>
+            </range>
+        </aerosurface_scale>
+
+    </channel>
+
     <channel execrate="1" name="Pitch">
 
     	<lag_filter name="fcs/fly-by-wire/pitch/elevator-cmd-lagged">
