@@ -141,7 +141,7 @@
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <property>fcs/lef-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
+                <property>fcs/lef-pos-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
@@ -248,7 +248,7 @@
                 <property>metrics/Sw-sqft</property>
                 <property>aero/ci2vel</property>
                 <property>velocities/q-rad_sec</property>
-                <property>fcs/lef-norm</property>
+                <property>fcs/lef-pos-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -342,12 +342,12 @@
 -20 
 -15 
 -10 
--05 
- 00 
- 05 
- 10 
- 15 
- 20 
+-05 0.2650 0.2650 0.2700 0.2750 0.2880 0.3050 0.3060 0.3110 0.2850 0.2870 0.2860 0.2850 0.2800 0.2710 0.2600 0.2510 0.2510 0.2340 0.2470
+ 00 -0.006 -0.030 -0.050 -0.050 -0.036 -0.035 -0.028 -0.027 -0.027 -0.025 -0.028 -0.028 -0.029 -0.031 -0.034 -0.048 -0.037 -0.033 -0.006
+ 05 -0.275 -0.315 -0.345 -0.360 -0.359 -0.364 -0.362 -0.368 -0.368 -0.367 -0.368 -0.372 -0.368 -0.370 -0.373 -0.377 -0.360 -0.335 -0.292
+ 10 -0.550 -0.620 -0.670 -0.705 -0.719 -0.727 -0.737 -0.741 -0.747 -0.750 -0.750 -0.746 -0.744 -0.736 -0.735 -0.725 -0.689 -0.626 -0.564
+ 15 -0.825 -0.910 -0.980 -1.035 -1.069 -1.089 -1.105 -1.111 -1.111 -1.112 -1.112 -1.108 -1.106 -1.098 -1.083 -1.053 -0.999 -0.924 -0.840
+ 20 -1.115 -1.200 -1.280 -1.340 -1.379 -1.405 -1.421 -1.431 -1.422 -1.418 -1.408 -1.405 -1.403 -1.396 -1.382 -1.336 -1.271 -1.210 -1.113
  25 
  30 
  35 
@@ -388,12 +388,12 @@
 -20 
 -15 
 -10 
--05 
+-05 0.1000 0.0900 0.0900 0.0950 0.1110 0.1220 0.1220 0.1220 0.1210 0.1250 0.1210 0.1140 0.1070 0.0970 0.1010 0.0810 0.0770 0.0770 0.0930
  00 
  05 
  10 
  15 
- 20 
+ 20 -1.055 -1.195 -1.320 -1.430 -1.519 -1.550 -1.564 -1.558 -1.555 -1.554 -1.563 -1.549 -1.577 -1.578 -1.563 -1.453 -1.358 -1.241 -1.097
  25 
  30 
  35 
@@ -417,7 +417,7 @@
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <property>fcs/lef-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
+                <property>fcs/lef-pos-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
@@ -426,12 +426,12 @@
 -20 
 -15 
 -10 
--05 
+-05 0.2220 0.2160 0.2310 0.2270 0.2400 0.2430 0.2440 0.2490 0.2490 0.2480 0.2480 0.2420 0.2390 0.2350 0.2290 0.2160 0.2200 0.2050 0.2110
  00 
  05 
  10 
  15 
- 20 
+ 20 -1.106 -1.168 -1.228 -1.314 -1.348 -1.359 -1.362 -1.352 -1.357 -1.355 -1.371 -1.376 -1.370 -1.379 -1.399 -1.365 -1.279 -1.219 -1.157
  25 
  30 
  35 
@@ -524,7 +524,7 @@
                 <property>metrics/Sw-sqft</property>
                 <property>aero/ci2vel</property>
                 <property>velocities/q-rad_sec</property>
-                <property>fcs/lef-norm</property>
+                <property>fcs/lef-pos-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -597,12 +597,12 @@
 -20 
 -15 
 -10 
--05 
+-05 .1620 .1770 .1530 .1450 .1380 .1365 .1329 .1269 .1242 .1216 .1183 .1212 .1236 .1267 .1303 .1373 .1444 .1679 .1538
  00 
  05 
  10 
  15 
- 20 
+ 20 .1510 .1700 .1900 .2020 .2073 .2098 .2122 .2129 .2137 .2152 .2133 .2118 .2109 .2082 .2061 .1991 .1878 .1618 .1479
  25 
  30 
  35 
@@ -643,12 +643,12 @@
 -20 
 -15 
 -10 
--05 
+-05 -.0240 -.0240 -.0390 -.0550 -.0750 -.0773 -.0802 -.0802 -.0774 -.0744 -.0774 -.0782 -.0784 -.0782 -.0770 -.0572 -.0400 -.0251 -.0260
  00 
  05 
  10 
  15 
- 20 
+ 20 -.0570 -.0710 -.0620 -.0520 -.0478 -.0518 -.0498 -.0463 -.0384 -.0342 -.0329 -.0366 -.0426 -.0532 -.0555 -.0620 -.0705 -.0800 -.0660
  25 
  30 
  35 
@@ -689,12 +689,12 @@
 -20 
 -15 
 -10 
--05 
+-05 -.1770 -.2000 -.2370 -.2520 -.2630 -.2698 -.2734 -.2737 -.2738 -.2741 -.2761 -.2782 -.2785 -.2756 -.2632 -.2527 -.2370 -.2002 -.1772
  00 
  05 
  10 
  15 
- 20 
+ 20 -.0680 -.0930 -.1240 -.1540 -.2203 -.2311 -.2272 -.2205 -.2205 -.2165 -.2182 -.2138 -.2589 -.2705 -.2751 -.2111 -.1811 -.1482 -.1227
  25 
  30 
  35 
@@ -719,7 +719,7 @@
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/cbarw-ft</property>
-                <property>fcs/lef-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
+                <property>fcs/lef-pos-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
@@ -728,12 +728,12 @@
 -20 
 -15 
 -10 
--05 
+-05 -.0006 -.0193 -.0234 -.0321 -.0376 -.0389 -.0385 -.0386 -.0388 -.0387 -.0389 -.0387 -.0388 -.0392 -.0386 -.0321 -.0234 -.0193 -.0006
  00 
  05 
  10 
  15 
- 20 
+ 20 -.0947 -.0851 -.0642 -.0536 -.0308 -.0293 -.0275 -.0234 -.0188 -.0161 -.0141 -.0136 -.0154 -.0180 -.0273 -.0501 -.0607 -.0816 -.0912
  25 
  30 
  35 
@@ -865,7 +865,7 @@
                 <property>metrics/cbarw-ft</property>
                 <property>aero/ci2vel</property>
                 <property>velocities/q-rad_sec</property>
-                <property>fcs/lef-norm</property>
+                <property>fcs/lef-pos-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -985,7 +985,7 @@
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <property>fcs/lef-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
+                <property>fcs/lef-pos-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
@@ -1113,7 +1113,7 @@
                 <property>metrics/Sw-sqft</property>
                 <property>aero/ci2vel</property>
                 <property>velocities/r-rad_sec</property>
-                <property>fcs/lef-norm</property>
+                <property>fcs/lef-pos-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -1151,7 +1151,7 @@
                 <property>metrics/Sw-sqft</property>
                 <property>aero/ci2vel</property>
                 <property>velocities/r-rad_sec</property>
-                <property>fcs/lef-norm</property>
+                <property>fcs/lef-pos-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -1220,7 +1220,7 @@
                 <property>metrics/Sw-sqft</property>
                 <property>aero/ci2vel</property>
                 <property>velocities/p-rad_sec</property>
-                <property>fcs/lef-norm</property>
+                <property>fcs/lef-pos-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -1345,7 +1345,7 @@
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <property>fcs/lef-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
+                <property>fcs/lef-pos-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
@@ -1442,12 +1442,12 @@
 -20 
 -15 
 -10 
--05 
+-05 -.1422 -.1270 -.1170 -.0932 -.0774 -.0745 -.0671 -.0599 -.0522 -.0449 -.0410 -.0337 -.0258 -.0147 -.0045 -.0152 -.0352 -.0498 -.0598
  00 
  05 
  10 
  15 
- 20 
+ 20 -.1271 -.1071 -.0866 -.0836 -.0677 -.0685 -.0676 -.0628 -.0543 -.0475 -.0431 -.0404 -.0321 -.0230 -.0047 -.0012 -.0043 -.0249 -.0447
  25 
  30 
  35 
@@ -1586,7 +1586,7 @@
                 <property>metrics/bw-ft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/r-rad_sec</property>
-                <property>fcs/lef-norm</property>
+                <property>fcs/lef-pos-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -1783,7 +1783,7 @@
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <property>fcs/lef-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
+                <property>fcs/lef-pos-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
@@ -1825,12 +1825,12 @@
 -20 
 -15 
 -10 
--05 
+-05 -.0343 -.0302 -.0257 -.0229 -.0241 -.0269 -.0300 -.0333 -.0367 -.0401 -.0439 -.0479 -.0510 -.0540 -.0554 -.0566 -.0538 -.0493 -.0452
  00 
  05 
  10 
  15 
- 20 
+ 20 0.0072 0.0043 0.0036 0.0061 0.0024 -.0055 -.0139 -.0230 -.0324 -.0418 -.0517 -.0608 -.0691 -.0786 -.0865 -.0902 -.0877 -.0884 -.0913
  25 
  30 
  35 
@@ -1848,12 +1848,12 @@
 -20 
 -15 
 -10 
--05 
+-05 -.0413 -.0441 -.0422 -.0401 -.0440 -.0452 -.0463 -.0487 -.0502 -.0518 -.0527 -.0531 -.0544 -.0560 -.0572 -.0608 -.0585 -.0573 -.0597
  00 
  05 
  10 
  15 
- 20 
+ 20 0.0088 -.0020 -.0015 -.0031 -.0133 -.0143 -.0168 -.0216 -.0258 -.0297 -.0350 -.0413 -.0437 -.0473 -.0483 -.0584 -.0595 -.0589 -.0702
  25 
  30 
  35 
@@ -1880,12 +1880,12 @@
 -20 
 -15 
 -10 
--05 
+-05 0.0261 0.0317 0.0343 0.0331 0.0311 0.0312 0.0290 0.0253 0.0205 0.0154 0.0112 0.0073 0.0032 -.0009 -.0046 -.0067 -.0078 -.0049 0.0007
  00 
  05 
  10 
  15 
- 20 
+ 20 0.1088 0.0928 0.0808 0.0708 0.0530 0.0474 0.0412 0.0313 0.0225 0.0137 0.0056 -.0032 -.0122 -.0233 -.0326 -.0503 -.0600 -.0721 -.0801
  25 
  30 
  35 
@@ -1987,7 +1987,7 @@
                 <property>metrics/bw-ft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/r-rad_sec</property>
-                <property>fcs/lef-norm</property>
+                <property>fcs/lef-pos-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
