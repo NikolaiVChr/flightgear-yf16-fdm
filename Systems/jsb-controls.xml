@@ -83,6 +83,15 @@
             </range>
         </aerosurface_scale>
 
+        <fcs_function name="fcs/lef-pos-r-norm">
+            <function>
+                <difference>
+                    <v>1</v>
+                    <p>fcs/lef-pos-norm</p>
+                </difference>
+            </function>
+        </fcs_function>
+
     </channel>
 
     <channel execrate="1" name="Pitch">
