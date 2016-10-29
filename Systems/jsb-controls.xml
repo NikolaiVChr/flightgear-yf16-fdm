@@ -94,7 +94,7 @@
 
     </channel>
 
-    <channel execrate="1" name="Pitch">
+    <channel execrate="1" name="Pitch A">
 
     	<lag_filter name="fcs/fly-by-wire/pitch/elevator-cmd-lagged">
             <input> fcs/elevator-cmd-norm </input>
@@ -148,34 +148,30 @@
             <input>fcs/fly-by-wire/pitch/command-g</input>
         </summer>
 
-        <summer name="fcs/fly-by-wire/pitch/positive-g-limit">
+        <fcs_function name="fcs/fly-by-wire/pitch/negative-g-limit">
+            <function>
+                <table>
+                    <independentVar lookup="row">aero/qbar-psf</independentVar>
+                    <tableData>
+                        0.0      -1
+                        31.32815 -1
+                        187.9689 -4
+                        208.8543 -4
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
+        <summer name="fcs/fly-by-wire/pitch/g-limit">
             <input>fcs/fly-by-wire/pitch/command-sum</input>
             <clipto>
-                <min>-10000</min>
+                <min>fcs/fly-by-wire/pitch/negative-g-limit</min>
                 <max>8.0</max>
             </clipto>
         </summer>
 
-        <scheduled_gain name="fcs/fly-by-wire/pitch/negative-g-limit">
-            <input>-fcs/fly-by-wire/pitch/command-sum</input>
-            <table>
-                <independentVar lookup="row">aero/qbar-psf</independentVar>
-                <tableData>
-                    0.0      -1
-                    31.32815 -1
-                    187.9689 -4
-                    208.8543 -4
-                </tableData>
-            </table>
-        </scheduled_gain>
-
-        <summer name="fcs/fly-by-wire/pitch/command-sum-limit">
-            <input>fcs/fly-by-wire/pitch/negative-g-limit</input>
-            <input>fcs/fly-by-wire/pitch/positive-g-limit</input>
-        </summer>
-
         <lag_filter name="fcs/fly-by-wire/pitch/command-sum-limit-lagged">
-            <input> fcs/fly-by-wire/pitch/command-sum-limit </input>
+            <input> fcs/fly-by-wire/pitch/g-limit </input>
             <c1> 8.3 </c1>
         </lag_filter>
 
@@ -196,7 +192,7 @@
             <function>
                 <sum>
                     <property> fcs/fly-by-wire/pitch/alpha-indicated-lagged </property>
-                    <value> -20.4 </value><!-- this could be positive, the minus on diagram could be a random line -->
+                    <value> -20.4 </value><!-- this could be positive, the minus on diagram could be a random line. YF suggest negative. -->
                     <property> fcs/fly-by-wire/pitch/pitch-rate-gain </property>
                 </sum>
             </function>
@@ -338,7 +334,7 @@
             <function>
                 <sum>
                     <property> fcs/fly-by-wire/pitch/pitch-rate-gain </property>
-                    <value> -15 </value> <!-- not sure if should be positive or negative 15 -->
+                    <value> -15 </value> <!-- not sure if should be positive or negative 15, YF suggest -15 -->
                     <property> fcs/fly-by-wire/pitch/alpha-indicated-lagged </property>
                 </sum>
             </function>
