@@ -1,5 +1,16 @@
 <?xml version="1.0"?>
 
+
+<!--
+
+ Todo:
+======
+Make all coefficients functions
+Rename all coefficients that should be delta
+Redo formulas for Cn and Cl
+Punch in remaining numbers
+-->
+
 <aerodynamics>
 
     <aero_ref_pt_shift_x>
@@ -792,7 +803,7 @@
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/cbarw-ft</property>
-                <property>fcs/lef-pos-r-norm</property><!-- should this be multiplied only to first table? -->
+                <property>fcs/lef-pos-r-norm</property>
                 <difference>
                     <table>
                         <independentVar lookup="row">aero/alpha-deg</independentVar>
@@ -967,7 +978,7 @@
                 <property>metrics/cbarw-ft</property>
                 <property>aero/ci2vel</property>
                 <property>velocities/q-rad_sec</property>
-                <property>fcs/lef-pos-r-norm</property><!-- document seems to indicate reversed normalization: 0 = full deflection -->
+                <property>fcs/lef-pos-r-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -1039,7 +1050,170 @@
 
 
 
+    <function name="aero/coefficient/Cy">
+        <description>
+           Cy coefficient
+        </description>                
+        <table>
+            <independentVar lookup="row">aero/alpha-deg</independentVar>
+            <independentVar lookup="column">aero/beta-deg</independentVar>
+            <tableData>
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+            </tableData>
+        </table>
+    </function>
 
+    <function name="aero/coefficient/Cy_rudder">
+        <description>
+           Cy due to rudder coefficient
+        </description>                
+        <table>
+            <independentVar lookup="row">aero/alpha-deg</independentVar>
+            <independentVar lookup="column">aero/beta-deg</independentVar>
+            <tableData>
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+            </tableData>
+        </table>
+    </function>
+
+    <function name="aero/coefficient/Cy_lef">
+        <description>
+           Cy due to rudder coefficient
+        </description>                
+        <table>
+            <independentVar lookup="row">aero/alpha-deg</independentVar>
+            <independentVar lookup="column">aero/beta-deg</independentVar>
+            <tableData>
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+            </tableData>
+        </table>
+    </function>
+
+    <function name="aero/coefficient/Cy_a">
+        <description>
+           Cy due to aileron coefficient
+        </description>                
+        <table>
+            <independentVar lookup="row">aero/alpha-deg</independentVar>
+            <independentVar lookup="column">aero/beta-deg</independentVar>
+            <tableData>
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+            </tableData>
+        </table>
+    </function>
+
+    <function name="aero/coefficient/Cy_a-lef">
+        <description>
+           Cy due to aileron and leading edge flaps coefficient
+        </description>                
+        <table>
+            <independentVar lookup="row">aero/alpha-deg</independentVar>
+            <independentVar lookup="column">aero/beta-deg</independentVar>
+            <tableData>
+       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
+-20 
+-15 
+-10 
+-05 
+ 00 
+ 05 
+ 10 
+ 15 
+ 20 
+ 25 
+ 30 
+ 35 
+ 40 
+ 45 
+ 50 
+ 55 
+ 60 
+ 70 
+ 80 
+ 90 
+            </tableData>
+        </table>
+    </function>
 
     <axis name="Y">
 
@@ -1050,107 +1224,26 @@
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <table>
-                    <independentVar lookup="row">aero/alpha-deg</independentVar>
-                    <independentVar lookup="column">aero/beta-deg</independentVar>
-                    <tableData>
-       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
--20 
--15 
--10 
--05 
- 00 
- 05 
- 10 
- 15 
- 20 
- 25 
- 30 
- 35 
- 40 
- 45 
- 50 
- 55 
- 60 
- 70 
- 80 
- 90 
-                    </tableData>
-                </table>
+                <p>aero/coefficient/Cy</p>
             </product>
         </function>
 
-        <function name="aero/coefficient/Cy_lef">
+        <function name="aero/coefficient/delta-Cy_lef">
             <description>
                Cy due to leading edge flaps coefficient.
             </description>
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <property>fcs/lef-pos-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
-                <table>
-                    <independentVar lookup="row">aero/alpha-deg</independentVar>
-                    <independentVar lookup="column">aero/beta-deg</independentVar>
-                    <tableData>
-       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
--20 
--15 
--10 
--05 
- 00 
- 05 
- 10 
- 15 
- 20 
- 25 
- 30 
- 35 
- 40 
- 45 
-                     </tableData>
-                </table>
+                <property>fcs/lef-pos-r-norm</property>
+                <difference>
+                    <p>aero/coefficient/Cy_lef</p>
+                    <p>aero/coefficient/Cy</p>
+                </difference>
             </product>
         </function>
 
-        <function name="aero/coefficient/Cy_a">
-            <description>
-               Cy due to aileron coefficient
-            </description>
-            <product>
-                <property>aero/qbar-psf</property>
-                <property>metrics/Sw-sqft</property>
-                <p>fcs/aileron-pos-norm</p><!-- 1 = 20 degs (should it rely on absolute norm instead? [maybe]) -->
-                <table>
-                    <independentVar lookup="row">aero/alpha-deg</independentVar>
-                    <independentVar lookup="column">aero/beta-deg</independentVar>
-                    <tableData>
-       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
--20 
--15 
--10 
--05 
- 00 
- 05 
- 10 
- 15 
- 20 
- 25 
- 30 
- 35 
- 40 
- 45 
- 50 
- 55 
- 60 
- 70 
- 80 
- 90 
-                    </tableData>
-                </table>
-            </product>
-        </function>
-
-        <function name="aero/coefficient/Cy_a-lef">
+        <function name="aero/coefficient/delta-Cy_a-lef_total">
             <description>
                Cy due to aileron due to leading edge flaps coefficient
             </description>
@@ -1158,69 +1251,40 @@
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <p>fcs/aileron-pos-norm</p><!-- 1 = 20 degs (should it rely on absolute norm instead? [maybe]) -->
-                <p>fcs/lef-pos-norm</p>
-                <table>
-                    <independentVar lookup="row">aero/alpha-deg</independentVar>
-                    <independentVar lookup="column">aero/beta-deg</independentVar>
-                    <tableData>
-       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
--20 
--15 
--10 
--05 
- 00 
- 05 
- 10 
- 15 
- 20 
- 25 
- 30 
- 35 
- 40 
- 45 
-                     </tableData>
-                </table>
+                <sum>
+                    <difference>
+                        <p>aero/coefficient/Cy_a</p>
+                        <p>aero/coefficient/Cy</p>
+                    </difference>
+                    <product>
+                        <p>fcs/lef-pos-r-norm</p>
+                        <difference>
+                            <p>aero/coefficient/Cy_a-lef</p>
+                            <p>aero/coefficient/Cy_lef</p>                            
+                            <difference>
+                                <p>aero/coefficient/Cy_a</p>
+                                <p>aero/coefficient/Cy</p>
+                            </difference>
+                        </difference>
+                    </product>
+                </sum>
             </product>
-        </function>        
+        </function>
 
-        <function name="aero/coefficient/Cy_rudder">
+        <function name="aero/coefficient/delta-Cy_rudder">
             <description>
                Cy due to rudder coefficient
             </description>
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <property>metrics/bw-ft</property>
                 <p>fcs/rudder-pos-norm</p><!-- 1 = 30 degs (should it rely on absolute norm instead? [probably]) -->
-                <table>
-                    <independentVar lookup="row">aero/alpha-deg</independentVar>
-                    <independentVar lookup="column">aero/beta-deg</independentVar>
-                    <tableData>
-       -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
--20 
--15 
--10 
--05 
- 00 
- 05 
- 10 
- 15 
- 20 
- 25 
- 30 
- 35 
- 40 
- 45 
- 50 
- 55 
- 60 
- 70 
- 80 
- 90 
-                    </tableData>
-                </table>
+                <difference>
+                    <p>aero/coefficient/Cy_rudder</p>
+                    <p>aero/coefficient/Cy</p>
+                </difference>
             </product>
-        </function>        
+        </function>
 
         <function name="aero/coefficient/Cy_r">
             <description>
@@ -1229,7 +1293,7 @@
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <property>aero/ci2vel</property>
+                <property>aero/bi2vel</property>
                 <property>velocities/r-rad_sec</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
@@ -1259,16 +1323,16 @@
             </product>
         </function>
 
-        <function name="aero/coefficient/Cy_r-lef">
+        <function name="aero/coefficient/delta-Cy_r-lef">
             <description>
                Cy due to yaw rate due to leading edge flaps coefficient.
             </description>
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <property>aero/ci2vel</property>
+                <property>aero/bi2vel</property>
                 <property>velocities/r-rad_sec</property>
-                <property>fcs/lef-pos-norm</property>
+                <property>fcs/lef-pos-r-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -1298,7 +1362,7 @@
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <property>aero/ci2vel</property>
+                <property>aero/bi2vel</property>
                 <property>velocities/p-rad_sec</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
@@ -1328,16 +1392,16 @@
             </product>
         </function>
 
-        <function name="aero/coefficient/Cy_p-lef">
+        <function name="aero/coefficient/delta-Cy_p-lef">
             <description>
                Cy due to roll rate due to leading edge flaps coefficient.
             </description>
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <property>aero/ci2vel</property>
+                <property>aero/bi2vel</property>
                 <property>velocities/p-rad_sec</property>
-                <property>fcs/lef-pos-norm</property>
+                <property>fcs/lef-pos-r-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -1358,7 +1422,7 @@
                      </tableData>
                 </table>
             </product>
-        </function>        
+        </function>
 
     </axis>
 
@@ -1464,7 +1528,7 @@
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
-                <property>fcs/lef-pos-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
+                <property>fcs/lef-pos-r-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
@@ -1537,7 +1601,7 @@
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
                 <p>fcs/aileron-pos-norm</p><!-- 1 = 20 degs -->
-                <p>fcs/lef-pos-norm</p>
+                <p>fcs/lef-pos-r-norm</p>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
@@ -1723,7 +1787,7 @@
                 <property>metrics/bw-ft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/r-rad_sec</property>
-                <property>fcs/lef-pos-norm</property>
+                <property>fcs/lef-pos-r-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -1794,7 +1858,7 @@
                 <property>metrics/bw-ft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/p-rad_sec</property>
-                <property>fcs/lef-pos-norm</property>
+                <property>fcs/lef-pos-r-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -1815,7 +1879,7 @@
                      </tableData>
                 </table>
             </product>
-        </function>                        
+        </function>
 
     </axis>
 
@@ -1922,7 +1986,7 @@
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
-                <property>fcs/lef-pos-norm</property><!-- or rad/deg ? (unlikely degs, as that would make Cx magnitude very large) -->
+                <property>fcs/lef-pos-r-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
@@ -1995,7 +2059,7 @@
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
                 <p>fcs/aileron-pos-norm</p><!-- 1 = 20 degs -->
-                <p>fcs/lef-pos-norm</p>
+                <p>fcs/lef-pos-r-norm</p>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
@@ -2144,7 +2208,7 @@
                 <property>metrics/bw-ft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/r-rad_sec</property>
-                <property>fcs/lef-pos-norm</property>
+                <property>fcs/lef-pos-r-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -2215,7 +2279,7 @@
                 <property>metrics/bw-ft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/p-rad_sec</property>
-                <property>fcs/lef-pos-norm</property>
+                <property>fcs/lef-pos-r-norm</property>
                 <table>
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
