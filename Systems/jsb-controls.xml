@@ -375,15 +375,15 @@
                 <sqrt>
                     <sum>
                         <pow>
-                            <property> aero/u-fps </property>
+                            <property> velocities/u-fps </property>
                             <v>2</v>
                         </pow>
                         <pow>
-                            <property> aero/v-fps </property>
+                            <property> velocities/v-fps </property>
                             <v>2</v>
                         </pow>
                         <pow>
-                            <property> aero/w-fps </property>
+                            <property> velocities/w-fps </property>
                             <v>2</v>
                         </pow>
                     </sum>
@@ -397,13 +397,13 @@
                 <quotient>
                     <sum>
                         <product>
-                            <property> aero/q-rad_sec </property>
-                            <property> aero/u-fps </property>
+                            <property> velocities/q-rad_sec </property>
+                            <property> velocities/u-fps </property>
                         </product>
                         <product>
                             <v>-1</v>
-                            <property> aero/p-rad_sec </property>
-                            <property> aero/v-fps </property>
+                            <property> velocities/p-rad_sec </property>
+                            <property> velocities/v-fps </property>
                         </product>
                         <product>
                             <property> accelerations/gravity-ft_sec2 </property>
@@ -417,7 +417,7 @@
                         <product>
                             <v>-1</v>
                             <property> accelerations/wdot-ft_sec2 </property>
-                        <product>
+                        </product>
                     </sum>
                     <property> accelerations/gravity-ft_sec2 </property>
                 </quotient>
