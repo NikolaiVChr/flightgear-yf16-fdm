@@ -96,15 +96,10 @@
 
     <channel execrate="1" name="Pitch A">
 
-    	<lag_filter name="fcs/fly-by-wire/pitch/elevator-cmd-lagged">
-            <input> fcs/elevator-cmd-norm </input>
-            <c1> 60 </c1>
-        </lag_filter>
-
         <fcs_function name="fcs/fly-by-wire/pitch/stick-force-N">
             <function>
                 <table>
-                    <independentVar lookup="row">fcs/fly-by-wire/pitch/elevator-cmd-lagged</independentVar>
+                    <independentVar lookup="row">fcs/elevator-cmd-norm</independentVar>
                     <tableData>
                        -1  180
                         0    0
@@ -114,10 +109,15 @@
             </function>
         </fcs_function>
 
+        <lag_filter name="fcs/fly-by-wire/pitch/stick-force-N-lagged">
+            <input> fcs/fly-by-wire/pitch/stick-force-N </input>
+            <c1> 60 </c1>
+        </lag_filter>
+
         <fcs_function name="fcs/fly-by-wire/pitch/command-g">
             <function>
                 <table>
-                    <independentVar lookup="row">fcs/fly-by-wire/pitch/stick-force-N</independentVar>
+                    <independentVar lookup="row">fcs/fly-by-wire/pitch/stick-force-N-lagged</independentVar>
                     <tableData>
                         -80  -4.0
                         -35  -0.5
@@ -163,6 +163,7 @@
         </fcs_function>
 
         <summer name="fcs/fly-by-wire/pitch/g-limit">
+            <description>This deviates slightly from the diagram, but I think this is how its intended.</description>
             <input>fcs/fly-by-wire/pitch/command-sum</input>
             <clipto>
                 <min>fcs/fly-by-wire/pitch/negative-g-limit</min>
@@ -240,14 +241,28 @@
             <input> -fcs/fly-by-wire/pitch/pitch-loop-gain-feedback-gain </input>
         </summer>
 
+        <!-- usng lead-lag filter to integrate instead, as this dont work
         <integrator name="fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int">
             <input> fcs/fly-by-wire/pitch/pitch-loop-gain-sum </input>
+            <trigger> gear/gear-pos-norm </trigger>
             <c1> 5 </c1>
             <clipto>
                 <min> -25 </min>
                 <max>  25 </max>
             </clipto>
-        </integrator>
+        </integrator>-->
+
+        <lead_lag_filter name="fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int">
+           <input> fcs/fly-by-wire/pitch/pitch-loop-gain-sum </input>
+           <c1> 0 </c1>
+           <c2> 5 </c2>
+           <c3> 1 </c3>
+           <c4> 0 </c4>
+            <clipto>
+                <min> -25 </min>
+                <max>  25 </max>
+            </clipto>
+         </lead_lag_filter>
 
         <summer name="fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum">
             <input> fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int </input>
@@ -308,7 +323,7 @@
         </pure_gain>
 
         <washout_filter name="fcs/fly-by-wire/pitch/q-washout">
-          <input> velocities/q-aero-rad_sec </input>
+          <input> velocities/q-aero-rad_sec </input><!-- radians or degrees? -->
           <c1> 1 </c1>
         </washout_filter>
 
@@ -354,10 +369,65 @@
             <input> fcs/fly-by-wire/pitch/pitch-rate-gain-2-sum </input>
         </summer>
 
+        <fcs_function name="velocities/V-fps">
+            <description>Page 42: Not used.</description>
+            <function>
+                <sqrt>
+                    <sum>
+                        <pow>
+                            <property> aero/u-fps </property>
+                            <v>2</v>
+                        </pow>
+                        <pow>
+                            <property> aero/v-fps </property>
+                            <v>2</v>
+                        </pow>
+                        <pow>
+                            <property> aero/w-fps </property>
+                            <v>2</v>
+                        </pow>
+                    </sum>
+                </sqrt>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="accelerations/a_n">
+            <description>Page 43: Calc of G-force.</description>
+            <function>
+                <quotient>
+                    <sum>
+                        <product>
+                            <property> aero/q-rad_sec </property>
+                            <property> aero/u-fps </property>
+                        </product>
+                        <product>
+                            <v>-1</v>
+                            <property> aero/p-rad_sec </property>
+                            <property> aero/v-fps </property>
+                        </product>
+                        <product>
+                            <property> accelerations/gravity-ft_sec2 </property>
+                            <cos>
+                                <property> attitude/theta-rad </property>
+                            </cos>
+                            <cos>
+                                <property> attitude/phi-rad </property>
+                            </cos>
+                        </product>
+                        <product>
+                            <v>-1</v>
+                            <property> accelerations/wdot-ft_sec2 </property>
+                        <product>
+                    </sum>
+                    <property> accelerations/gravity-ft_sec2 </property>
+                </quotient>
+            </function>
+        </fcs_function>
+
         <fcs_function name="fcs/fly-by-wire/pitch/normal-1">
             <function>
                 <difference>
-                    <property> accelerations/Nz </property>
+                    <property> accelerations/a_n </property>
                     <value> 1 </value>
                 </difference>
             </function>
@@ -388,12 +458,12 @@
 
         <summer name="fcs/fly-by-wire/pitch/tp-left-sum">
             <input> fcs/fly-by-wire/pitch/pitch-loop-gain-final </input>
-            <!--<input> 0 </input> todo input from roll system-->
+            <!--<input> 0 </input> todo: input from roll system-->
         </summer>
 
         <summer name="fcs/fly-by-wire/pitch/bt-left-sum">
             <input> fcs/fly-by-wire/pitch/pitch-loop-gain-final </input>
-            <!--<input> -0 </input>-->   <!-- todo this roll input -->
+            <!--<input> -0 </input>-->   <!-- todo: roll input -->
         </summer>
 
         <lag_filter name="fcs/fly-by-wire/pitch/tp-lag">
@@ -445,6 +515,18 @@
                 <max>  25 </max>
             </clipto>
         </kinematic>
+
+        <aerosurface_scale name="fcs/fly-by-wire/pitch/horz-tail-deflection-norm">
+          <input>fcs/fly-by-wire/pitch/horz-tail-deflection-deg</input>
+          <domain>
+            <min>-25</min>
+            <max>25</max>
+          </domain>
+          <range>
+            <min>-1</min>
+            <max>1</max>
+          </range>
+        </aerosurface_scale>
 
         <kinematic name="fcs/fly-by-wire/pitch/horz-tail-diff-deflection-deg">
             <input>fcs/fly-by-wire/pitch/horz-tail-diff-deflection</input>
