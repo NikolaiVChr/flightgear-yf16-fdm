@@ -310,7 +310,7 @@
         </pure_gain>
 
         <washout_filter name="fcs/fly-by-wire/pitch/q-washout">
-          <input> velocities/q-aero-rad_sec </input><!-- radians or degrees? -->
+          <input> velocities/q-aero-deg_sec </input><!-- radians or degrees? -->
           <c1> 1 </c1>
         </washout_filter>
 
