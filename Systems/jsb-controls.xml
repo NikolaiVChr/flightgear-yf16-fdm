@@ -193,7 +193,7 @@
             <function>
                 <sum>
                     <property> fcs/fly-by-wire/pitch/alpha-indicated-lagged </property>
-                    <value> -20.4 </value><!-- this could be positive, the minus on diagram could be a random line. YF suggest negative. -->
+                    <value> -20.4 </value><!-- this could be positive, the minus on diagram could be a random line. -->
                     <property> fcs/fly-by-wire/pitch/pitch-rate-gain </property>
                 </sum>
             </function>
@@ -336,7 +336,7 @@
             <function>
                 <sum>
                     <property> fcs/fly-by-wire/pitch/pitch-rate-gain </property>
-                    <value> -15 </value> <!-- not sure if should be positive or negative 15, YF suggest -15 -->
+                    <value> -15 </value> <!-- not sure if should be positive or negative 15 -->
                     <property> fcs/fly-by-wire/pitch/alpha-indicated-lagged </property>
                 </sum>
             </function>
