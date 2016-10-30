@@ -193,7 +193,7 @@ Rename all coefficients that should be delta
  45 0.0257 0.0274 0.0266 0.0236 0.0266 0.0283 0.0236 0.0298 0.0268 0.0309 0.0307 0.0280 0.0238 0.0284 0.0254 0.0224 0.0254 0.0262 0.0245
                      </tableData>
                 </table>
-                <table name="Cx_dh=0deg">
+                <table name="Cx_dh0">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <tableData>
@@ -498,7 +498,7 @@ Rename all coefficients that should be delta
  45 -1.664 -1.783 -1.859 -1.962 -2.030 -2.129 -1.917 -2.143 -2.050 -2.208 -2.201 -2.182 -2.077 -2.209 -2.126 -2.058 -1.955 -1.879 -1.790
                      </tableData>
                 </table>
-                <table name="Cz_dh=0deg">
+                <table name="Cz_dh0">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <tableData>
@@ -829,7 +829,7 @@ Rename all coefficients that should be delta
  45 -.0023 -.0164 -.0417 -.0987 -.0985 -.0975 -.1278 -.1042 -.1156 -.0979 -.1122 -.1225 -.1444 -.1340 -.1461 -.1463 -.0893 -.0640 -.0499
                          </tableData>
                     </table>
-                    <table name="Cm_dh=0deg">
+                    <table name="Cm_dh0">
                         <independentVar lookup="row">aero/alpha-deg</independentVar>
                         <independentVar lookup="column">aero/beta-deg</independentVar>
                         <tableData>
@@ -1532,7 +1532,7 @@ Rename all coefficients that should be delta
                 </table>
     </function>
 
-    <function name="aero/coefficient/Cn_rudder">
+    <function name="aero/coefficient/Cn_dr">
         <description>
             coefficient
         </description>
@@ -1708,9 +1708,9 @@ Rename all coefficients that should be delta
                 <v>-1</v>
                 <difference>
                     <v>-193</v>
-                    <p>inertia/cg-x</p>
+                    <p>inertia/cg-x-in</p>
                 </difference>
-                <p>aero/coefficient/Cy_t</p>
+                <p>aero/coefficient/Cy_t</p> need to refactor some stuff to seperate this one out
                 <quotient>
                     <property>metrics/cbarw-ft</property>
                     <property>metrics/bw-ft</property>
@@ -1809,7 +1809,7 @@ Rename all coefficients that should be delta
             </product>
         </function>
 
-        <function name="aero/coefficient/Cn_a">
+        <function name="aero/coefficient/dCn_a">
             <description>
                Cn due to aileron coefficient.
             </description>
@@ -2253,7 +2253,7 @@ Rename all coefficients that should be delta
             </product>
         </function>
 
-        <function name="aero/coefficient/Cl_rudder">
+        <function name="aero/coefficient/dCl_dr">
             <description>
                Cl due to rudder coefficient
             </description>
