@@ -40,7 +40,7 @@ Rename all coefficients that should be delta
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <table>
+                <table name="table/Cx">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <independentVar lookup="table">fcs/elevator-pos-deg</independentVar>
@@ -163,7 +163,7 @@ Rename all coefficients that should be delta
             </product>
         </function>
 
-        <function name="aero/coefficient/delta-Cx_lef">
+        <function name="aero/coefficient/dCx_lef">
             <description>
                Cx due to leading edge flaps coefficient.
             </description>
@@ -172,7 +172,7 @@ Rename all coefficients that should be delta
                 <property>metrics/Sw-sqft</property>
                 <property>fcs/lef-pos-r-norm</property>
                 <difference>
-                  <table name="Cx_lef">
+                  <table name="table/Cx_lef">
                       <independentVar lookup="row">aero/alpha-deg</independentVar>
                       <independentVar lookup="column">aero/beta-deg</independentVar>
                       <tableData>
@@ -193,7 +193,7 @@ Rename all coefficients that should be delta
  45 0.0257 0.0274 0.0266 0.0236 0.0266 0.0283 0.0236 0.0298 0.0268 0.0309 0.0307 0.0280 0.0238 0.0284 0.0254 0.0224 0.0254 0.0262 0.0245
                      </tableData>
                 </table>
-                <table name="Cx_dh0">
+                <table name="table/Cx_dh0">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <tableData>
@@ -232,7 +232,7 @@ Rename all coefficients that should be delta
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>fcs/speedbrake-pos-norm</property>
-                <table>
+                <table name="table/Cx_sb">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -.0101
@@ -269,7 +269,7 @@ Rename all coefficients that should be delta
                 <property>metrics/Sw-sqft</property>
                 <property>aero/ci2vel</property>
                 <property>velocities/q-rad_sec</property>
-                <table>
+                <table name="table/Cx_q">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .953
@@ -307,7 +307,7 @@ Rename all coefficients that should be delta
                 <property>aero/ci2vel</property>
                 <property>velocities/q-rad_sec</property>
                 <property>fcs/lef-pos-r-norm</property>
-                <table>
+                <table name="table/Cx_q-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -1.22
@@ -345,7 +345,7 @@ Rename all coefficients that should be delta
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <table>
+                <table name="table/Cz">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <independentVar lookup="table">fcs/elevator-pos-deg</independentVar>
@@ -468,7 +468,7 @@ Rename all coefficients that should be delta
             </product>
         </function>
 
-        <function name="aero/coefficient/delta-Cz_lef">
+        <function name="aero/coefficient/dCz_lef">
             <description>
                Cz due to leading edge flaps coefficient.
             </description>
@@ -477,7 +477,7 @@ Rename all coefficients that should be delta
                 <property>metrics/Sw-sqft</property>
                 <property>fcs/lef-pos-r-norm</property>
                 <difference>
-                <table name="Cz_lef">
+                <table name="table/Cz_lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <tableData>
@@ -498,7 +498,7 @@ Rename all coefficients that should be delta
  45 -1.664 -1.783 -1.859 -1.962 -2.030 -2.129 -1.917 -2.143 -2.050 -2.208 -2.201 -2.182 -2.077 -2.209 -2.126 -2.058 -1.955 -1.879 -1.790
                      </tableData>
                 </table>
-                <table name="Cz_dh0">
+                <table name="table/Cz_dh0">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <tableData>
@@ -537,7 +537,7 @@ Rename all coefficients that should be delta
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>fcs/speedbrake-pos-norm</property>
-                <table>
+                <table name="table/Cz_sb">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -.3858
@@ -574,7 +574,7 @@ Rename all coefficients that should be delta
                 <property>metrics/Sw-sqft</property>
                 <property>aero/ci2vel</property>
                 <property>velocities/q-rad_sec</property>
-                <table>
+                <table name="table/Cz_q">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -23.9
@@ -612,7 +612,7 @@ Rename all coefficients that should be delta
                 <property>aero/ci2vel</property>
                 <property>velocities/q-rad_sec</property>
                 <property>fcs/lef-pos-r-norm</property>
-                <table>
+                <table name="table/Cz_q-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 15.1
@@ -651,7 +651,7 @@ Rename all coefficients that should be delta
            Elevator effectiveness factor.
         </description>
         <product>
-            <table>
+            <table name="table/n_dh">
                 <independentVar lookup="row">fcs/elevator-pos-deg</independentVar>
                 <tableData>
 -25 1.0
@@ -675,7 +675,7 @@ Rename all coefficients that should be delta
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/cbarw-ft</property>
                 <p>aero/function/n_dh</p>
-                <table>
+                <table name="table/Cm">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <independentVar lookup="table">fcs/elevator-pos-deg</independentVar>
@@ -808,7 +808,7 @@ Rename all coefficients that should be delta
                 <property>metrics/cbarw-ft</property>
                 <property>fcs/lef-pos-r-norm</property>
                 <difference>
-                    <table name="Cm_lef">
+                    <table name="table/Cm_lef">
                         <independentVar lookup="row">aero/alpha-deg</independentVar>
                         <independentVar lookup="column">aero/beta-deg</independentVar>
                         <tableData>
@@ -829,7 +829,7 @@ Rename all coefficients that should be delta
  45 -.0023 -.0164 -.0417 -.0987 -.0985 -.0975 -.1278 -.1042 -.1156 -.0979 -.1122 -.1225 -.1444 -.1340 -.1461 -.1463 -.0893 -.0640 -.0499
                          </tableData>
                     </table>
-                    <table name="Cm_dh0">
+                    <table name="table/Cm_dh0">
                         <independentVar lookup="row">aero/alpha-deg</independentVar>
                         <independentVar lookup="column">aero/beta-deg</independentVar>
                         <tableData>
@@ -869,7 +869,7 @@ Rename all coefficients that should be delta
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/cbarw-ft</property>
                 <property>fcs/speedbrake-pos-norm</property>
-                <table>
+                <table name="table/Cm_sb">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -.0034
@@ -905,7 +905,7 @@ Rename all coefficients that should be delta
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/cbarw-ft</property>
-                <table>
+                <table name="table/Cm_alpha">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .019
@@ -943,7 +943,7 @@ Rename all coefficients that should be delta
                 <property>metrics/cbarw-ft</property>
                 <property>aero/ci2vel</property>
                 <property>velocities/q-rad_sec</property>
-                <table>
+                <table name="table/Cm_q">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -6.84
@@ -982,7 +982,7 @@ Rename all coefficients that should be delta
                 <property>aero/ci2vel</property>
                 <property>velocities/q-rad_sec</property>
                 <property>fcs/lef-pos-r-norm</property>
-                <table>
+                <table name="table/Cm_q-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -.367
@@ -1012,7 +1012,7 @@ Rename all coefficients that should be delta
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/cbarw-ft</property>
-                <table>
+                <table name="table/Cm_ds">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">fcs/elevator-pos-deg</independentVar>
                     <tableData>
@@ -1047,7 +1047,7 @@ Rename all coefficients that should be delta
         <description>
            Cy coefficient
         </description>                
-        <table>
+        <table name="table/Cy">
             <independentVar lookup="row">aero/alpha-deg</independentVar>
             <independentVar lookup="column">aero/beta-deg</independentVar>
             <tableData>
@@ -1076,11 +1076,11 @@ Rename all coefficients that should be delta
         </table>
     </function>
 
-    <function name="aero/coefficient/Cy_rudder">
+    <function name="aero/coefficient/Cy_dr">
         <description>
            Cy due to rudder coefficient
         </description>                
-        <table>
+        <table name="table/Cy_dr">
             <independentVar lookup="row">aero/alpha-deg</independentVar>
             <independentVar lookup="column">aero/beta-deg</independentVar>
             <tableData note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
@@ -1113,7 +1113,7 @@ Rename all coefficients that should be delta
         <description>
            Cy due to rudder coefficient
         </description>                
-        <table>
+        <table name="table/Cy_lef">
             <independentVar lookup="row">aero/alpha-deg</independentVar>
             <independentVar lookup="column">aero/beta-deg</independentVar>
             <tableData note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
@@ -1136,11 +1136,11 @@ Rename all coefficients that should be delta
         </table>
     </function>
 
-    <function name="aero/coefficient/Cy_a">
+    <function name="aero/coefficient/Cy_da">
         <description>
            Cy due to aileron coefficient
         </description>                
-        <table>
+        <table name="table/Cy_da">
             <independentVar lookup="row">aero/alpha-deg</independentVar>
             <independentVar lookup="column">aero/beta-deg</independentVar>
             <tableData note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
@@ -1169,11 +1169,11 @@ Rename all coefficients that should be delta
         </table>
     </function>
 
-    <function name="aero/coefficient/Cy_a-lef">
+    <function name="aero/coefficient/Cy_da-lef">
         <description>
            Cy due to aileron and leading edge flaps coefficient
         </description>                
-        <table>
+        <table name="table/Cy_da-lef">
             <independentVar lookup="row">aero/alpha-deg</independentVar>
             <independentVar lookup="column">aero/beta-deg</independentVar>
             <tableData note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
@@ -1196,87 +1196,14 @@ Rename all coefficients that should be delta
         </table>
     </function>
 
-    <axis name="Y">
-
-        <function name="aero/coefficient/Cy-lbf">
-            <description>
-               Cy coefficient
-            </description>
-            <product>
-                <property>aero/qbar-psf</property>
-                <property>metrics/Sw-sqft</property>
-                <p>aero/coefficient/Cy</p>
-            </product>
-        </function>
-
-        <function name="aero/coefficient/dCy_lef">
-            <description>
-               Cy due to leading edge flaps coefficient.
-            </description>
-            <product>
-                <property>aero/qbar-psf</property>
-                <property>metrics/Sw-sqft</property>
-                <property>fcs/lef-pos-r-norm</property>
-                <difference>
-                    <p>aero/coefficient/Cy_lef</p>
-                    <p>aero/coefficient/Cy</p>
-                </difference>
-            </product>
-        </function>
-
-        <function name="aero/coefficient/dCy_a-lef">
-            <description>
-               Cy due to aileron due to leading edge flaps coefficient
-            </description>
-            <product>
-                <property>aero/qbar-psf</property>
-                <property>metrics/Sw-sqft</property>
-                <p>fcs/aileron-pos-norm</p><!-- 1 = 20 degs (should it rely on absolute norm instead? [maybe]) -->
-                <sum>
-                    <difference>
-                        <p>aero/coefficient/Cy_a</p>
-                        <p>aero/coefficient/Cy</p>
-                    </difference>
-                    <product>
-                        <p>fcs/lef-pos-r-norm</p>
-                        <difference>
-                            <p>aero/coefficient/Cy_a-lef</p>
-                            <p>aero/coefficient/Cy_lef</p>                            
-                            <difference>
-                                <p>aero/coefficient/Cy_a</p>
-                                <p>aero/coefficient/Cy</p>
-                            </difference>
-                        </difference>
-                    </product>
-                </sum>
-            </product>
-        </function>
-
-        <function name="aero/coefficient/dCy_dr">
-            <description>
-               Cy due to rudder coefficient
-            </description>
-            <product>
-                <property>aero/qbar-psf</property>
-                <property>metrics/Sw-sqft</property>
-                <p>fcs/rudder-pos-norm</p><!-- 1 = 30 degs (should it rely on absolute norm instead? [probably]) -->
-                <difference>
-                    <p>aero/coefficient/Cy_rudder</p>
-                    <p>aero/coefficient/Cy</p>
-                </difference>
-            </product>
-        </function>
-
         <function name="aero/coefficient/Cy_r">
             <description>
                Cy due to yaw rate coefficient.
             </description>
             <product>
-                <property>aero/qbar-psf</property>
-                <property>metrics/Sw-sqft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/r-rad_sec</property>
-                <table>
+                <table name="table/Cy_r">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 1.44
@@ -1304,17 +1231,15 @@ Rename all coefficients that should be delta
             </product>
         </function>
 
-        <function name="aero/coefficient/delta-Cy_r-lef">
+        <function name="aero/coefficient/dCy_r-lef">
             <description>
                Cy due to yaw rate due to leading edge flaps coefficient.
             </description>
             <product>
-                <property>aero/qbar-psf</property>
-                <property>metrics/Sw-sqft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/r-rad_sec</property>
                 <property>fcs/lef-pos-r-norm</property>
-                <table>
+                <table name="table/Cy_r-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -.558
@@ -1341,11 +1266,9 @@ Rename all coefficients that should be delta
                Cy due to roll rate coefficient.
             </description>
             <product>
-                <property>aero/qbar-psf</property>
-                <property>metrics/Sw-sqft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/p-rad_sec</property>
-                <table>
+                <table name="table/Cy_p">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .0333
@@ -1373,17 +1296,15 @@ Rename all coefficients that should be delta
             </product>
         </function>
 
-        <function name="aero/coefficient/delta-Cy_p-lef">
+        <function name="aero/coefficient/dCy_p-lef">
             <description>
                Cy due to roll rate due to leading edge flaps coefficient.
             </description>
             <product>
-                <property>aero/qbar-psf</property>
-                <property>metrics/Sw-sqft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/p-rad_sec</property>
                 <property>fcs/lef-pos-r-norm</property>
-                <table>
+                <table name="table/Cy_p-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -.141
@@ -1405,6 +1326,89 @@ Rename all coefficients that should be delta
             </product>
         </function>
 
+        <function name="aero/coefficient/dCy_lef">
+            <description>
+               Cy due to leading edge flaps coefficient.
+            </description>
+            <product>
+                <property>fcs/lef-pos-r-norm</property>
+                <difference>
+                    <p>aero/coefficient/Cy_lef</p>
+                    <p>aero/coefficient/Cy</p>
+                </difference>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/dCy_a-lef">
+            <description>
+               Cy due to aileron due to leading edge flaps coefficient
+            </description>
+            <product>
+                <p>fcs/aileron-pos-norm</p><!-- 1 = 20 degs (should it rely on absolute norm instead? [maybe]) -->
+                <sum>
+                    <difference>
+                        <p>aero/coefficient/Cy_da</p>
+                        <p>aero/coefficient/Cy</p>
+                    </difference>
+                    <product>
+                        <p>fcs/lef-pos-r-norm</p>
+                        <difference>
+                            <p>aero/coefficient/Cy_da-lef</p>
+                            <p>aero/coefficient/Cy_lef</p>                            
+                            <difference>
+                                <p>aero/coefficient/Cy_da</p>
+                                <p>aero/coefficient/Cy</p>
+                            </difference>
+                        </difference>
+                    </product>
+                </sum>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/dCy_dr">
+            <description>
+               Cy due to rudder coefficient
+            </description>
+            <product>
+                <p>fcs/rudder-pos-norm</p><!-- 1 = 30 degs (should it rely on absolute norm instead? [probably]) -->
+                <difference>
+                    <p>aero/coefficient/Cy_dr</p>
+                    <p>aero/coefficient/Cy</p>
+                </difference>
+            </product>
+        </function>        
+
+        <function name="aero/coefficient/Cy_t">
+            <description>
+               Total Side Force Coefficient
+            </description>
+            <product>
+                <sum>
+                    <p>aero/coefficient/Cy</p>
+                    <p>aero/coefficient/dCy_lef</p>
+                    <p>aero/coefficient/dCy_a-lef</p>
+                    <p>aero/coefficient/dCy_dr</p>
+                    <p>aero/coefficient/Cy_r</p>
+                    <p>aero/coefficient/dCy_r-lef</p>
+                    <p>aero/coefficient/Cy_p</p>
+                    <p>aero/coefficient/dCy_p-lef</p>
+                </sum>
+            </product>
+        </function>
+
+    <axis name="Y">
+
+        <function name="aero/coefficient/Y_t-lbf">
+            <description>
+               Side Force
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <p>aero/coefficient/Cy_t</p>
+            </product>
+        </function>
+
     </axis>
 
 
@@ -1416,7 +1420,7 @@ Rename all coefficients that should be delta
         <description>
             coefficient
         </description> 
-            <table>
+            <table name="table/Cn_dh0">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>                       
                     <tableData note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
@@ -1449,7 +1453,7 @@ Rename all coefficients that should be delta
         <description>
             coefficient
         </description>                
-                <table>
+                <table name="table/Cn_lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <tableData note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
@@ -1472,11 +1476,11 @@ Rename all coefficients that should be delta
                 </table>
     </function>
 
-    <function name="aero/coefficient/Cn_a">
+    <function name="aero/coefficient/Cn_da">
         <description>
             coefficient
         </description>                
-                <table>
+                <table name="table/Cn_da">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <tableData note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
@@ -1505,11 +1509,11 @@ Rename all coefficients that should be delta
                 </table>
     </function>
 
-    <function name="aero/coefficient/Cn_a-lef">
+    <function name="aero/coefficient/Cn_da-lef">
         <description>
             coefficient
         </description>                
-                <table>
+                <table name="table/Cn_da-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <tableData note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
@@ -1536,7 +1540,7 @@ Rename all coefficients that should be delta
         <description>
             coefficient
         </description>
-                <table>
+                <table name="table/Cn_dr">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <tableData note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
@@ -1575,7 +1579,7 @@ Rename all coefficients that should be delta
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
-                <table>
+                <table name="table/Cn">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <independentVar lookup="table">fcs/elevator-pos-deg</independentVar>
@@ -1679,16 +1683,16 @@ Rename all coefficients that should be delta
                 <p>fcs/aileron-pos-norm</p><!-- 1 = 20 degs -->
                 <sum>
                     <difference>
-                        <p>aero/coefficient/Cn_a</p>
+                        <p>aero/coefficient/Cn_da</p>
                         <p>aero/coefficient/Cn_dh0</p>
                     </difference>
                     <product>
                         <p>fcs/lef-pos-r-norm</p>
                         <difference>
-                            <p>aero/coefficient/Cn_a-lef</p>
+                            <p>aero/coefficient/Cn_da-lef</p>
                             <p>aero/coefficient/Cn_lef</p>                            
                             <difference>
-                                <p>aero/coefficient/Cn_a</p>
+                                <p>aero/coefficient/Cn_da</p>
                                 <p>aero/coefficient/Cn_dh0</p>
                             </difference>
                         </difference>
@@ -1697,7 +1701,7 @@ Rename all coefficients that should be delta
             </product>
         </function>
 
-        <!--<function name="aero/coefficient/Cn_cg">
+        <function name="aero/coefficient/Cn_cg">
             <description>
                Cn due to CoG shift
             </description>
@@ -1710,13 +1714,13 @@ Rename all coefficients that should be delta
                     <v>-193</v>
                     <p>inertia/cg-x-in</p>
                 </difference>
-                <p>aero/coefficient/Cy_t</p> need to refactor some stuff to seperate this one out
+                <p>aero/coefficient/Cy_t</p>
                 <quotient>
                     <property>metrics/cbarw-ft</property>
                     <property>metrics/bw-ft</property>
-                <quotient>
+                </quotient>
             </product>
-        </function>  -->       
+        </function>       
 
         <function name="aero/coefficient/dCn_dr">
             <description>
@@ -1744,7 +1748,7 @@ Rename all coefficients that should be delta
                 <property>metrics/bw-ft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/r-rad_sec</property>
-                <table>
+                <table name="table/Cn_r">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -.517
@@ -1781,7 +1785,7 @@ Rename all coefficients that should be delta
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
                 <property>aero/beta-rad</property>
-                <table>
+                <table name="table/Cn_b">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .0
@@ -1818,7 +1822,7 @@ Rename all coefficients that should be delta
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
                 <property>fcs/aileron-pos-rad</property>
-                <table>
+                <table name="table/dCn_da">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .0
@@ -1857,7 +1861,7 @@ Rename all coefficients that should be delta
                 <property>aero/bi2vel</property>
                 <property>velocities/r-rad_sec</property>
                 <property>fcs/lef-pos-r-norm</property>
-                <table>
+                <table name="table/Cn_r-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .137
@@ -1889,7 +1893,7 @@ Rename all coefficients that should be delta
                 <property>metrics/bw-ft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/p-rad_sec</property>
-                <table>
+                <table name="table/Cn_p">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -.0006
@@ -1928,7 +1932,7 @@ Rename all coefficients that should be delta
                 <property>aero/bi2vel</property>
                 <property>velocities/p-rad_sec</property>
                 <property>fcs/lef-pos-r-norm</property>
-                <table>
+                <table name="table/Cn_p-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .0615
@@ -1964,7 +1968,7 @@ Rename all coefficients that should be delta
         <description>
             coefficient
         </description>
-                <table>
+                <table name="table/Cl_dh0">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <tableData note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
@@ -1997,7 +2001,7 @@ Rename all coefficients that should be delta
         <description>
             coefficient
         </description>
-                <table>
+                <table name="table/Cl_lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <tableData note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
@@ -2020,11 +2024,11 @@ Rename all coefficients that should be delta
                 </table>
     </function>
 
-    <function name="aero/coefficient/Cl_a">
+    <function name="aero/coefficient/Cl_ad">
         <description>
             coefficient
         </description>
-                <table>
+                <table name="table/Cl_ad">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <tableData note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
@@ -2053,11 +2057,11 @@ Rename all coefficients that should be delta
                 </table>
     </function>
 
-    <function name="aero/coefficient/Cl_a-lef">
+    <function name="aero/coefficient/Cl_da-lef">
         <description>
             coefficient
         </description>
-                <table>
+                <table name="table/Cl_da-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <tableData note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
@@ -2080,11 +2084,11 @@ Rename all coefficients that should be delta
                 </table>
     </function>
 
-    <function name="aero/coefficient/Cl_rudder">
+    <function name="aero/coefficient/Cl_dr">
         <description>
             coefficient
         </description>
-                <table>
+                <table name="table/Cl_dr">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <tableData note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
@@ -2131,7 +2135,7 @@ Rename all coefficients that should be delta
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
-                <table>
+                <table name="table/Cl">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
                     <independentVar lookup="table">fcs/elevator-pos-deg</independentVar>
@@ -2235,16 +2239,16 @@ Rename all coefficients that should be delta
                 <p>fcs/aileron-pos-norm</p><!-- 1 = 20 degs -->
                 <sum>
                     <difference>
-                        <p>aero/coefficient/Cl_a</p>
+                        <p>aero/coefficient/Cl_da</p>
                         <p>aero/coefficient/Cl_dh0</p>
                     </difference>
                     <product>
                         <p>fcs/lef-pos-r-norm</p>
                         <difference>
-                            <p>aero/coefficient/Cl_a-lef</p>
+                            <p>aero/coefficient/Cl_da-lef</p>
                             <p>aero/coefficient/Cl_lef</p>                            
                             <difference>
-                                <p>aero/coefficient/Cl_a</p>
+                                <p>aero/coefficient/Cl_da</p>
                                 <p>aero/coefficient/Cl_dh0</p>
                             </difference>
                         </difference>
@@ -2263,7 +2267,7 @@ Rename all coefficients that should be delta
                 <property>metrics/bw-ft</property>
                 <p>fcs/rudder-pos-norm</p><!-- 1 = 30 degs -->
                 <difference>
-                    <p>aero/coefficient/Cl_rudder</p>
+                    <p>aero/coefficient/Cl_dr</p>
                     <p>aero/coefficient/Cl_dh0</p>
                 </difference>
             </product>
@@ -2279,7 +2283,7 @@ Rename all coefficients that should be delta
                 <property>metrics/bw-ft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/r-rad_sec</property>
-                <table>
+                <table name="table/Cl_r">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -.155
@@ -2316,7 +2320,7 @@ Rename all coefficients that should be delta
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
                 <property>aero/beta-rad</property>
-                <table>
+                <table name="table/Cl_b">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .0
@@ -2355,7 +2359,7 @@ Rename all coefficients that should be delta
                 <property>aero/bi2vel</property>
                 <property>velocities/r-rad_sec</property>
                 <property>fcs/lef-pos-r-norm</property>
-                <table>
+                <table name="table/Cl_r-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .029
@@ -2387,7 +2391,7 @@ Rename all coefficients that should be delta
                 <property>metrics/bw-ft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/p-rad_sec</property>
-                <table>
+                <table name="table/Cl_p">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -.366
@@ -2426,7 +2430,7 @@ Rename all coefficients that should be delta
                 <property>aero/bi2vel</property>
                 <property>velocities/p-rad_sec</property>
                 <property>fcs/lef-pos-r-norm</property>
-                <table>
+                <table name="table/Cl_p-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .006
