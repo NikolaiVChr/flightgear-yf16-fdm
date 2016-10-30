@@ -5,13 +5,26 @@
 
  Note:
 ======
-All tables that do not have author listed, the numbers was typed in by Nikolai V. Chr.
+In all tables that do not have author listed, the numbers was typed in by Nikolai V. Chr.
 
 
  Todo:
 ======
 Make all coefficients functions
 Rename all coefficients that should be delta
+Put in engine gyroscopic effect
+
+
+ Missing data:
+==============
+Gear dynamics
+Ground effect
+Wave drag
+Trailing edge flaps dynamics
+Stores dynamics
+Canopy dynamics
+Dynamics of high speed
+
 -->
 
 <aerodynamics>
@@ -20,6 +33,8 @@ Rename all coefficients that should be delta
         <function name="metrics/aero-rp-shift-mac">
             <description>
                 Mach-tuck: Transonic Shift of Aerodynamic Center
+
+                An estimate by Nikolai V. Chr.
             </description>
             <table>
                 <independentVar>velocities/mach</independentVar>
@@ -31,7 +46,73 @@ Rename all coefficients that should be delta
         </function>
     </aero_ref_pt_shift_x>
 
+    <function name="aero/coefficient/CDwave">
+        <product>
+              <table>
+                  <independentVar>velocities/mach</independentVar>
+                  <tableData>
+                      0.000  0.000
+                      0.810  0.000
+                      1.100  0.023
+                      1.800  0.015
+                  </tableData>
+              </table>
+        </product>
+    </function>
+
+    <function name="aero/coefficient/CDtef">
+        <product>
+            <property>fcs/tef-rad</property>
+            <value>0.08</value>
+        </product>
+    </function>
+
+    <function name="aero/coefficient/CDgear">
+        <product>
+            <property>gear/gear-pos-norm</property>
+            <value>0.075</value>
+        </product>
+    </function>
+
+    <function name="aero/coefficient/CLtef">
+        <product>
+            <property>fcs/tef-rad</property>
+            <value>0.35</value>
+        </product>
+    </function>    
+
     <axis name="X">
+
+        <function name="aero/coefficient/CDx">
+            <description>Drag</description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>              
+                <sum>
+                    <property>aero/coefficient/CDgear</property>
+                    <property>aero/coefficient/CDtef</property>
+                    <property>aero/coefficient/CDwave</property>
+                </sum>
+                <cos>
+                  <property>aero/alpha-rad</property>
+                </cos>
+                <v>-1</v>
+            </product>
+        </function>        
+
+        <function name="aero/coefficient/CLx">
+            <description>Lift</description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>              
+                <sum>
+                    <property>aero/coefficient/CLtef</property>
+                </sum>
+                <sin>
+                  <property>aero/alpha-rad</property>
+                </sin>
+            </product>
+        </function>
 
         <function name="aero/coefficient/Cx">
             <description>
@@ -337,6 +418,38 @@ Rename all coefficients that should be delta
 
 
     <axis name="Z">
+
+        <function name="aero/coefficient/CDz">
+            <description>Drag</description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>              
+                <sum>
+                    <property>aero/coefficient/CDgear</property>
+                    <property>aero/coefficient/CDtef</property>
+                    <property>aero/coefficient/CDwave</property>
+                </sum>
+                <sin>
+                  <property>aero/alpha-rad</property>
+                </sin>
+                <v>-1</v>
+            </product>
+        </function>  
+
+        <function name="aero/coefficient/CLz">
+            <description>Lift</description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>              
+                <sum>
+                    <property>aero/coefficient/CLtef</property>
+                </sum>
+                <cos>
+                  <property>aero/alpha-rad</property>
+                </cos>
+                <v>-1</v>
+            </product>
+        </function>           
 
         <function name="aero/coefficient/Cz">
             <description>
