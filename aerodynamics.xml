@@ -16,13 +16,13 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
 
  Missing wind-tunnel data:
 ==========================
-Gear dynamics
-Ground effect
-Wave drag
-Trailing edge flaps dynamics
-Stores dynamics
-Canopy dynamics
-Dynamics of high speed
++Gear dynamics
+ Ground effect
++Wave drag
++Trailing edge flaps dynamics
+ Stores dynamics
+ Canopy dynamics
+ Dynamics of high speed
 
 -->
 
@@ -35,7 +35,7 @@ Dynamics of high speed
 
                 An estimate by Nikolai V. Chr.
             </description>
-            <table>
+            <table name="table/ACshift">
                 <independentVar>velocities/mach</independentVar>
                 <tableData>
                   0.6 0
@@ -48,7 +48,7 @@ Dynamics of high speed
     <!-- the following 4 functions are adapted from the FGAddon F16 -->
     <function name="aero/coefficient/CDwave">
         <product>
-              <table>
+              <table name="table/CDwave">
                   <independentVar>velocities/mach</independentVar>
                   <tableData>
                       0.000  0.000
