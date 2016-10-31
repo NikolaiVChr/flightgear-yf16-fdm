@@ -1930,9 +1930,10 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
             <description>
                Cn due to aileron coefficient.
 
-               Note: This is not included in equations of motion?!?
+               Note: This is not included in equations of motion and is quite insignificant, so ignored.
             </description>
             <product>
+                <v>0</v>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
