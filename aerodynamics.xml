@@ -11,8 +11,7 @@ In all tables that do not have author listed, the numbers was typed in by Nikola
  Todo:
 ======
 Make all coefficients functions
-Rename all coefficients that should be delta
-Put in engine gyroscopic effect
+Put in engine gyroscopic effect (160 slugs-ft2/sec)
 
 
  Missing data:
@@ -46,6 +45,7 @@ Dynamics of high speed
         </function>
     </aero_ref_pt_shift_x>
 
+    <!-- the following 4 functions are adapted from the FGAddon F16 -->
     <function name="aero/coefficient/CDwave">
         <product>
               <table>
@@ -305,7 +305,7 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/Cx_sb">
+        <function name="aero/coefficient/dCx_sb">
             <description>
                Cx due speed brake coefficient.
             </description>
@@ -313,7 +313,7 @@ Dynamics of high speed
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>fcs/speedbrake-pos-norm</property>
-                <table name="table/Cx_sb">
+                <table name="table/dCx_sb">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -.0101
@@ -378,7 +378,7 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/Cx_q-lef">
+        <function name="aero/coefficient/dCx_q-lef">
             <description>
                Cx due to pitch rate due to leading edge flaps coefficient.
             </description>
@@ -388,7 +388,7 @@ Dynamics of high speed
                 <property>aero/ci2vel</property>
                 <property>velocities/q-rad_sec</property>
                 <property>fcs/lef-pos-r-norm</property>
-                <table name="table/Cx_q-lef">
+                <table name="table/dCx_q-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -1.22
@@ -642,7 +642,7 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/Cz_sb">
+        <function name="aero/coefficient/dCz_sb">
             <description>
                Cz due speed brake coefficient.
             </description>
@@ -650,7 +650,7 @@ Dynamics of high speed
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>fcs/speedbrake-pos-norm</property>
-                <table name="table/Cz_sb">
+                <table name="table/dCz_sb">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -.3858
@@ -715,7 +715,7 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/Cz_q-lef">
+        <function name="aero/coefficient/dCz_q-lef">
             <description>
                Cz due to pitch rate due to leading edge flaps coefficient.
             </description>
@@ -725,7 +725,7 @@ Dynamics of high speed
                 <property>aero/ci2vel</property>
                 <property>velocities/q-rad_sec</property>
                 <property>fcs/lef-pos-r-norm</property>
-                <table name="table/Cz_q-lef">
+                <table name="table/dCz_q-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 15.1
@@ -911,7 +911,7 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/delta-Cm_lef">
+        <function name="aero/coefficient/dCm_lef">
             <description>
                Cm due to leading edge flaps coefficient.
             </description>
@@ -921,7 +921,7 @@ Dynamics of high speed
                 <property>metrics/cbarw-ft</property>
                 <property>fcs/lef-pos-r-norm</property>
                 <difference>
-                    <table name="table/Cm_lef">
+                    <table name="table/dCm_lef">
                         <independentVar lookup="row">aero/alpha-deg</independentVar>
                         <independentVar lookup="column">aero/beta-deg</independentVar>
                         <tableData>
@@ -973,7 +973,7 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/Cm_sb">
+        <function name="aero/coefficient/dCm_sb">
             <description>
                Cm due speed brake coefficient.
             </description>
@@ -982,7 +982,7 @@ Dynamics of high speed
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/cbarw-ft</property>
                 <property>fcs/speedbrake-pos-norm</property>
-                <table name="table/Cm_sb">
+                <table name="table/dCm_sb">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -.0034
@@ -1010,7 +1010,7 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/Cm_alpha">
+        <function name="aero/coefficient/dCm_alpha">
             <description>
                Cm due to alpha coefficient.
             </description>
@@ -1018,7 +1018,7 @@ Dynamics of high speed
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/cbarw-ft</property>
-                <table name="table/Cm_alpha">
+                <table name="table/dCm_alpha">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .019
@@ -1084,7 +1084,7 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/Cm_q-lef">
+        <function name="aero/coefficient/dCm_q-lef">
             <description>
                Cm due to pitch rate due to leading edge flaps coefficient.
             </description>
@@ -1095,7 +1095,7 @@ Dynamics of high speed
                 <property>aero/ci2vel</property>
                 <property>velocities/q-rad_sec</property>
                 <property>fcs/lef-pos-r-norm</property>
-                <table name="table/Cm_q-lef">
+                <table name="table/dCm_q-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 -.367
@@ -1117,7 +1117,7 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/Cm_ds">
+        <function name="aero/coefficient/dCm_ds">
             <description>
                Cm due to deep stall coefficient
             </description>
@@ -1125,7 +1125,7 @@ Dynamics of high speed
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/cbarw-ft</property>
-                <table name="table/Cm_ds">
+                <table name="table/dCm_ds">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">fcs/elevator-pos-deg</independentVar>
                     <tableData>
@@ -1889,7 +1889,7 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/Cn_b">
+        <function name="aero/coefficient/dCn_b">
             <description>
                Cn due to beta coefficient.
             </description>
@@ -1898,7 +1898,7 @@ Dynamics of high speed
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
                 <property>aero/beta-rad</property>
-                <table name="table/Cn_b">
+                <table name="table/dCn_b">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .0
@@ -1928,7 +1928,7 @@ Dynamics of high speed
 
         <function name="aero/coefficient/dCn_a">
             <description>
-               Cn due to aileron coefficient.
+               Cn due to aileron coefficient.                                              Note: This is not included in equations of motion?!?
             </description>
             <product>
                 <property>aero/qbar-psf</property>
@@ -1963,7 +1963,7 @@ Dynamics of high speed
             </product>
         </function>        
 
-        <function name="aero/coefficient/Cn_r-lef">
+        <function name="aero/coefficient/dCn_r-lef">
             <description>
                Cn due to yaw rate due to leading edge flaps coefficient.
             </description>
@@ -1974,7 +1974,7 @@ Dynamics of high speed
                 <property>aero/bi2vel</property>
                 <property>velocities/r-rad_sec</property>
                 <property>fcs/lef-pos-r-norm</property>
-                <table name="table/Cn_r-lef">
+                <table name="table/dCn_r-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .137
@@ -2034,7 +2034,7 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/Cn_p-lef">
+        <function name="aero/coefficient/dCn_p-lef">
             <description>
                Cn due to roll rate due to leading edge flaps coefficient.
             </description>
@@ -2045,7 +2045,7 @@ Dynamics of high speed
                 <property>aero/bi2vel</property>
                 <property>velocities/p-rad_sec</property>
                 <property>fcs/lef-pos-r-norm</property>
-                <table name="table/Cn_p-lef">
+                <table name="table/dCn_p-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .0615
@@ -2068,6 +2068,11 @@ Dynamics of high speed
         </function>
 
     </axis>
+
+
+
+
+
 
 
 
@@ -2229,14 +2234,6 @@ Dynamics of high speed
             </tableData>
         </table>
     </function>
-<!--
-    <function name="aero/coefficient/">
-        <description>
-            coefficient
-        </description>
-
-    </function>
-  -->
                     
     <axis name="ROLL">
 
@@ -2424,7 +2421,7 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/Cl_b">
+        <function name="aero/coefficient/dCl_b">
             <description>
                Cl due to beta coefficient.
             </description>
@@ -2433,7 +2430,7 @@ Dynamics of high speed
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
                 <property>aero/beta-rad</property>
-                <table name="table/Cl_b">
+                <table name="table/dCl_b">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .0
@@ -2461,7 +2458,7 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/Cl_r-lef">
+        <function name="aero/coefficient/dCl_r-lef">
             <description>
                Cl due to yaw rate due to leading edge flaps coefficient.
             </description>
@@ -2472,7 +2469,7 @@ Dynamics of high speed
                 <property>aero/bi2vel</property>
                 <property>velocities/r-rad_sec</property>
                 <property>fcs/lef-pos-r-norm</property>
-                <table name="table/Cl_r-lef">
+                <table name="table/dCl_r-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .029
@@ -2532,7 +2529,7 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/Cl_p-lef">
+        <function name="aero/coefficient/dCl_p-lef">
             <description>
                Cl due to roll rate due to leading edge flaps coefficient.
             </description>
@@ -2543,7 +2540,7 @@ Dynamics of high speed
                 <property>aero/bi2vel</property>
                 <property>velocities/p-rad_sec</property>
                 <property>fcs/lef-pos-r-norm</property>
-                <table name="table/Cl_p-lef">
+                <table name="table/dCl_p-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
 -20 .006
