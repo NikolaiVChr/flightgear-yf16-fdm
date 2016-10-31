@@ -444,8 +444,18 @@
             <c1> 50 </c1>
         </lag_filter>
 
+        <pure_gain name="fcs/fly-by-wire/pitch/normal-lagged-gain">
+            <input>fcs/fly-by-wire/pitch/normal-lagged</input>
+            <gain> 1.0 </gain>
+        </pure_gain>
+
+        <pure_gain name="fcs/fly-by-wire/pitch/normal-lagged-gain2">
+            <input>fcs/fly-by-wire/pitch/normal-lagged-gain</input>
+            <gain> 0.5 </gain>
+        </pure_gain>
+
         <summer name="fcs/fly-by-wire/pitch/pitch-rate-gain-2-sum">
-            <input> fcs/fly-by-wire/pitch/normal-lagged </input>
+            <input> fcs/fly-by-wire/pitch/normal-lagged-gain2 </input>
             <input> fcs/fly-by-wire/pitch/q-gain-2 </input>
         </summer>
 
