@@ -2,6 +2,25 @@
 
 <flight_control name="FC">
 
+    <channel name="Throttle">
+
+        <fcs_function name="fcs/fly-by-wire/throttle/pos-norm">
+            <description>Page 153 of secondary doc</description>
+            <function>
+                <table>
+                    <independentVar lookup="row">fcs/throttle-cmd-norm</independentVar>
+                    <tableData>
+                      0.0       0.0
+                      0.77      1.0
+                      1.0       2.0
+                    </tableData>
+                </table>
+            </function>
+            <output>fcs/throttle-pos-norm</output>
+        </fcs_function>
+
+    </channel>
+
     <channel execrate="1" name="Leading edge flaps">
 
         <fcs_function name="fcs/fly-by-wire/lef/input-factor">
