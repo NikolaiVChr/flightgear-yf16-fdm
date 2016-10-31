@@ -14,8 +14,8 @@ Make all coefficients functions
 Put in engine gyroscopic effect (160 slugs-ft2/sec)
 
 
- Missing data:
-==============
+ Missing wind-tunnel data:
+==========================
 Gear dynamics
 Ground effect
 Wave drag
@@ -1452,7 +1452,7 @@ Dynamics of high speed
         </product>
     </function>
 
-    <function name="aero/coefficient/dCy_a-lef">
+    <function name="aero/coefficient/dCy_da-lef">
         <description>
            Cy due to aileron due to leading edge flaps coefficient
         </description>
@@ -1499,7 +1499,7 @@ Dynamics of high speed
             <sum>
                 <p>aero/coefficient/Cy</p>
                 <p>aero/coefficient/dCy_lef</p>
-                <p>aero/coefficient/dCy_a-lef</p>
+                <p>aero/coefficient/dCy_da-lef</p>
                 <p>aero/coefficient/dCy_dr</p>
                 <p>aero/coefficient/Cy_r</p>
                 <p>aero/coefficient/dCy_r-lef</p>
@@ -1785,7 +1785,7 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/dCn_a-lef">
+        <function name="aero/coefficient/dCn_da-lef">
             <description>
                Cn due to aileron coefficient
             </description>
@@ -1926,9 +1926,11 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/dCn_a">
+        <function name="aero/coefficient/dCn_da">
             <description>
-               Cn due to aileron coefficient.                                              Note: This is not included in equations of motion?!?
+               Cn due to aileron coefficient.
+
+               Note: This is not included in equations of motion?!?
             </description>
             <product>
                 <property>aero/qbar-psf</property>
@@ -1961,7 +1963,7 @@ Dynamics of high speed
                      </tableData>
                 </table>
             </product>
-        </function>        
+        </function>
 
         <function name="aero/coefficient/dCn_r-lef">
             <description>
@@ -2338,7 +2340,7 @@ Dynamics of high speed
             </product>
         </function>
 
-        <function name="aero/coefficient/dCl_a-lef">
+        <function name="aero/coefficient/dCl_da-lef">
             <description>
                Cl due to aileron coefficient
             </description>
