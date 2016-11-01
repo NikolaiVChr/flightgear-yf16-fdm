@@ -113,6 +113,48 @@
 
     </channel>
 
+    <channel name="Trailing edge flaps">
+
+        <fcs_function name="fcs/tef-cmd-pos-deg">
+            <function>
+                <product>
+                    <max>
+                      <p>/controls/flight/flaps</p><!-- should really be an on/off switch -->
+                      <p>gear/gear-cmd-norm</p>
+                    </max>
+                    <table>
+                        <independentVar lookup="row">velocities/vc-kts</independentVar>
+                        <tableData>
+                            250 20
+                            370 0
+                        </tableData>
+                    </table>
+                </product>
+            </function>
+        </fcs_function>
+
+        <kinematic name="fcs/tef-pos-deg">
+            <input>fcs/tef-cmd-pos-deg</input>
+            <noscale/>
+            <traverse>
+                <setting>
+                    <position>0</position>
+                    <time>0</time>
+                </setting>
+                <setting>
+                    <position>‪80</position><!-- 80 degs/s -->
+                    <time>1</time>
+                </setting>
+            </traverse>
+        </kinematic>
+
+        <pure_gain name="fcs/tef-pos-norm">
+            <input>fcs/tef-pos-deg</input>
+            <gain>0.05</gain>
+        </pure_gain>
+
+    </channel>
+
     <channel execrate="1" name="Pitch A">
 
         <fcs_function name="fcs/fly-by-wire/pitch/stick-force-N">
@@ -600,7 +642,7 @@
             <default value="0"/>
             <test logic="OR" value="1">
                 gear/gear-cmd-norm == 1
-                fcs/tef-pos-norm   gt 0.5 <!-- should really be the flpas manual switch -->
+                fcs/tef-pos-norm   gt 0.5 <!-- should really be the flaps manual switch -->
                 <!-- todo: if refueling door open and q_c < 646 -->
             </test>
         </switch>
@@ -899,7 +941,7 @@
 
         <pure_gain name="fcs/fly-by-wire/pitch/pitch-loop-ground-product">
             <input>fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int</input>
-            <gain> 0.5 </gain>
+            <gain> -0.5 </gain><!-- diagram say 0.5, but negative makes more sense -->
         </pure_gain>
 
         <fcs_function name="fcs/fly-by-wire/pitch/amp-deadzone-neg">
