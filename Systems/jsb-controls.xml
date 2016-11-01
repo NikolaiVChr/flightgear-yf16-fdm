@@ -587,6 +587,11 @@
 
 
     <property value="1">fcs/fly-by-wire/K_A</property>
+    <property value="5">fcs/fly-by-wire/integrator</property>
+    <property value="1">fcs/fly-by-wire/enable-q</property>
+    <property value="1">fcs/fly-by-wire/enable-nz</property>
+    <property value="0">fcs/fly-by-wire/enable-int</property>
+    <property value="1">fcs/fly-by-wire/enable-alpha</property>
 
     <channel execrate="1" name="Pitch Ref">
 
@@ -693,13 +698,34 @@
             </function>
         </fcs_function>
 
-        <summer name="fcs/fly-by-wire/pitch/g-limit">
+        <!--<summer name="fcs/fly-by-wire/pitch/g-limit-pos">
             <description>This deviates slightly from the diagram, but I think this is how its intended.</description>
             <input>fcs/fly-by-wire/pitch/command-sum</input>
             <clipto>
                 <min>fcs/fly-by-wire/pitch/negative-g-limit</min>
                 <max>8.0</max>
             </clipto>
+        </summer>-->
+
+        <summer name="fcs/fly-by-wire/pitch/g-limit-pos">
+            <input>fcs/fly-by-wire/pitch/command-sum</input>
+            <clipto>
+                <min>-10000</min>
+                <max>8.0</max>
+            </clipto>
+        </summer>
+
+        <summer name="fcs/fly-by-wire/pitch/g-limit-neg">
+            <input>fcs/fly-by-wire/pitch/command-sum</input>
+            <clipto>
+                <min>fcs/fly-by-wire/pitch/negative-g-limit</min>
+                <max>80</max>
+            </clipto>
+        </summer>
+
+        <summer name="fcs/fly-by-wire/pitch/g-limit">
+            <input>fcs/fly-by-wire/pitch/g-limit-neg</input>
+            <input>fcs/fly-by-wire/pitch/g-limit-pos</input>
         </summer>
 
         <pure_gain name="fcs/fly-by-wire/pitch/g-limit-gain">
@@ -712,8 +738,13 @@
             <c1> 8.3 </c1>
         </lag_filter>
 
+        <pure_gain name="fcs/fly-by-wire/pitch/alpha">
+            <input>aero/alpha-deg</input>
+            <gain> fcs/fly-by-wire/enable-alpha </gain>
+        </pure_gain>
+
         <summer name="fcs/fly-by-wire/pitch/alpha-indicated-clamp">
-            <input>aero/alpha-deg</input><!-- should really be indicated -->
+            <input>fcs/fly-by-wire/pitch/alpha</input><!-- should really be indicated -->
             <clipto>
                 <min>-5</min>
                 <max>30</max>
@@ -729,7 +760,7 @@
             <function>
                 <sum>
                     <property> fcs/fly-by-wire/pitch/alpha-indicated-lagged </property>
-                    <value> -20.4 </value><!-- this could be positive, the minus on diagram could be a random line. -->
+                    <value> -20.4 </value>
                     <property> fcs/fly-by-wire/pitch/pitch-rate-gain </property>
                 </sum>
             </function>
@@ -778,7 +809,7 @@
         <integrator name="fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int">
             <input> fcs/fly-by-wire/pitch/pitch-loop-gain-sum-extra </input>
             <!--<trigger> gear/gear-pos-norm </trigger>-->
-            <c1> 5 </c1>
+            <c1> fcs/fly-by-wire/integrator </c1>
         </integrator>
 
         <fcs_function name="fcs/fly-by-wire/pitch/amp-deadzone-neg">
@@ -811,11 +842,16 @@
 
         <pure_gain name="fcs/fly-by-wire/pitch/amplifier">
             <input>fcs/fly-by-wire/pitch/amp-deadzone</input>
-            <gain> fcs/fly-by-wire/K_A </gain><!-- K_A -->
+            <gain> fcs/fly-by-wire/K_A </gain>
+        </pure_gain>
+
+        <pure_gain name="fcs/fly-by-wire/pitch/integrator">
+            <input>fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int</input>
+            <gain> fcs/fly-by-wire/enable-int </gain>
         </pure_gain>
 
         <summer name="fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum">
-            <input> fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int </input>
+            <input> fcs/fly-by-wire/pitch/integrator </input>
             <input> fcs/fly-by-wire/pitch/pitch-loop-gain </input>
         </summer>
 
@@ -864,12 +900,7 @@
 
         <pure_gain name="fcs/fly-by-wire/pitch/pitch-loop-gain-feedback-gain">
             <input>fcs/fly-by-wire/pitch/pitch-loop-gain-feedback-deadzone</input>
-            <gain> 5.0 </gain>
-        </pure_gain>
-
-        <pure_gain name="fcs/fly-by-wire/pitch/alpha-feedback">
-            <input>fcs/fly-by-wire/pitch/alpha-indicated-lagged</input>
-            <gain> 0.5 </gain>
+            <gain> 5 </gain>
         </pure_gain>
 
         <scheduled_gain name="fcs/fly-by-wire/pitch/alpha-feedback">
@@ -889,8 +920,13 @@
             <input> fcs/fly-by-wire/pitch/alpha-feedback </input>
         </summer>
 
-        <pure_gain name="velocities/q-aero-deg_sec">
+        <pure_gain name="fcs/fly-by-wire/pitch/q">
             <input>velocities/q-aero-rad_sec</input>
+            <gain> fcs/fly-by-wire/enable-q </gain>
+        </pure_gain>
+
+        <pure_gain name="velocities/q-aero-deg_sec">
+            <input>fcs/fly-by-wire/pitch/q</input>
             <gain> 57.29577951308233 </gain>
         </pure_gain>
 
@@ -1008,21 +1044,24 @@
 
         <fcs_function name="fcs/fly-by-wire/pitch/normal-1">
             <function>
-                <difference>
-                    <property> accelerations/a_n </property>
-                    <value> 1 </value>
-                </difference>
+                <product>
+                    <p>fcs/fly-by-wire/enable-nz</p>
+                    <difference>
+                        <property> accelerations/a_n </property>
+                        <value> 1 </value>
+                    </difference>
+                </product>
             </function>
         </fcs_function>
 
-        <!--<lag_filter name="fcs/fly-by-wire/pitch/normal-lagged">
+        <lag_filter name="fcs/fly-by-wire/pitch/normal-lagged">
             <input> fcs/fly-by-wire/pitch/normal-1 </input>
             <c1> 50 </c1>
-        </lag_filter>-->
+        </lag_filter>
 
         <pure_gain name="fcs/fly-by-wire/pitch/normal-lagged-gain">
-            <input>fcs/fly-by-wire/pitch/normal-1</input>
-            <gain> 10 </gain>
+            <input>fcs/fly-by-wire/pitch/normal-lagged</input>
+            <gain> 1.0 </gain>
         </pure_gain>
 
         <pure_gain name="fcs/fly-by-wire/pitch/normal-lagged-gain2">
@@ -1102,6 +1141,7 @@
 
         <kinematic name="fcs/fly-by-wire/pitch/horz-tail-deflection-deg">
             <input>fcs/fly-by-wire/pitch/horz-tail-deflection</input>
+            <noscale/>
             <traverse>
                 <setting>
                     <position> -25.0 </position>
@@ -1132,6 +1172,7 @@
 
         <kinematic name="fcs/fly-by-wire/pitch/horz-tail-diff-deflection-deg">
             <input>fcs/fly-by-wire/pitch/horz-tail-diff-deflection</input>
+            <noscale/>
             <traverse>
                 <setting>
                     <position> -25.0 </position>
