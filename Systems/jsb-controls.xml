@@ -590,7 +590,7 @@
     <property value="5">fcs/fly-by-wire/integrator</property>
     <property value="1">fcs/fly-by-wire/enable-q</property>
     <property value="1">fcs/fly-by-wire/enable-nz</property>
-    <property value="0">fcs/fly-by-wire/enable-int</property>
+    <property value="1">fcs/fly-by-wire/enable-int</property>
     <property value="1">fcs/fly-by-wire/enable-fake</property>
     <property value="1">fcs/fly-by-wire/enable-alpha</property>
 
@@ -877,8 +877,16 @@
             <input> -fcs/fly-by-wire/pitch/pitch-loop-gain-feedback-gain </input>
         </summer>
 
+        <switch name="fcs/fly-by-wire/pitch/pitch-loop-gain-switch">
+            <default value="fcs/fly-by-wire/pitch/pitch-loop-gain-sum"/>
+            <test logic="AND" value="fcs/fly-by-wire/pitch/pitch-loop-ground-product">
+                gear/unit[1]/WOW eq 1
+                gear/unit[2]/WOW eq 1
+            </test>
+        </switch>
+
         <summer name="fcs/fly-by-wire/pitch/pitch-loop-gain-sum-extra">
-            <input> fcs/fly-by-wire/pitch/pitch-loop-gain-sum </input>
+            <input> fcs/fly-by-wire/pitch/pitch-loop-gain-switch </input>
             <input> -fcs/fly-by-wire/pitch/amplifier </input>
             <input> -fcs/fly-by-wire/pitch/int-balance </input>
         </summer>
@@ -888,6 +896,11 @@
             <!--<trigger> gear/gear-pos-norm </trigger>-->
             <c1> fcs/fly-by-wire/integrator </c1>
         </integrator>
+
+        <pure_gain name="fcs/fly-by-wire/pitch/pitch-loop-ground-product">
+            <input>fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int</input>
+            <gain> 0.5 </gain>
+        </pure_gain>
 
         <fcs_function name="fcs/fly-by-wire/pitch/amp-deadzone-neg">
             <function>
