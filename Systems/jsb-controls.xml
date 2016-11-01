@@ -591,9 +591,19 @@
     <property value="1">fcs/fly-by-wire/enable-q</property>
     <property value="1">fcs/fly-by-wire/enable-nz</property>
     <property value="0">fcs/fly-by-wire/enable-int</property>
+    <property value="1">fcs/fly-by-wire/enable-fake</property>
     <property value="1">fcs/fly-by-wire/enable-alpha</property>
 
     <channel execrate="1" name="Pitch Ref">
+
+        <switch name="fcs/fly-by-wire/condition-a">
+            <default value="0"/>
+            <test logic="OR" value="1">
+                gear/gear-cmd-norm == 1
+                fcs/tef-pos-norm   gt 0.5 <!-- should really be the flpas manual switch -->
+                <!-- todo: if refueling door open and q_c < 646 -->
+            </test>
+        </switch>
 
         <fcs_function name="fcs/fly-by-wire/pitch/q_c">
             <function>
@@ -698,6 +708,14 @@
             </function>
         </fcs_function>
 
+        <switch name="fcs/fly-by-wire/pitch/negative-g-limit-final">
+            <default value="fcs/fly-by-wire/pitch/negative-g-limit"/>
+            <test logic="OR" value="-4">
+                fcs/fly-by-wire/condition-a == 1
+            </test>
+        </switch>
+
+
         <!--<summer name="fcs/fly-by-wire/pitch/g-limit-pos">
             <description>This deviates slightly from the diagram, but I think this is how its intended.</description>
             <input>fcs/fly-by-wire/pitch/command-sum</input>
@@ -718,7 +736,7 @@
         <summer name="fcs/fly-by-wire/pitch/g-limit-neg">
             <input>fcs/fly-by-wire/pitch/command-sum</input>
             <clipto>
-                <min>fcs/fly-by-wire/pitch/negative-g-limit</min>
+                <min>fcs/fly-by-wire/pitch/negative-g-limit-final</min>
                 <max>80</max>
             </clipto>
         </summer>
@@ -728,9 +746,17 @@
             <input>fcs/fly-by-wire/pitch/g-limit-pos</input>
         </summer>
 
+        <switch name="fcs/fly-by-wire/pitch/g-limit-product">
+            <default value="0.5"/>
+            <test logic="AND" value="1">
+                gear/unit[1]/WOW eq 1
+                gear/unit[2]/WOW eq 1
+            </test>
+        </switch>
+
         <pure_gain name="fcs/fly-by-wire/pitch/g-limit-gain">
             <input>fcs/fly-by-wire/pitch/g-limit</input>
-            <gain> 0.5 </gain>
+            <gain> fcs/fly-by-wire/pitch/g-limit-product </gain>
         </pure_gain>
 
         <lag_filter name="fcs/fly-by-wire/pitch/command-sum-limit-lagged">
@@ -751,8 +777,59 @@
             </clipto>
         </summer>
 
+        <switch name="fcs/fly-by-wire/pitch/alpha-indicated-switch">
+            <default value="fcs/fly-by-wire/pitch/alpha-indicated-clamp"/>
+            <test logic="AND" value="0">
+                gear/unit[1]/WOW eq 1
+                gear/unit[2]/WOW eq 1
+            </test>
+        </switch>
+
+        <fcs_function name="fcs/fly-by-wire/pitch/roll-rate-abs">
+            <function>
+                <abs>
+                    <product>
+                        <property> velocities/p-aero-rad_sec </property>
+                        <v> 57.29577951308233 </v>
+                    </product>
+                </abs>
+            </function>
+        </fcs_function>
+
+        <pure_gain name="fcs/fly-by-wire/pitch/roll-rate-gain">
+            <input>fcs/fly-by-wire/pitch/roll-rate-abs</input>
+            <gain> 0.15 </gain>
+        </pure_gain>
+
+        <lag_filter name="fcs/fly-by-wire/pitch/roll-rate-lagged">
+            <input> fcs/fly-by-wire/pitch/roll-rate-gain </input>
+            <c1> 0.67 </c1>
+        </lag_filter>
+
+        <fcs_function name="fcs/fly-by-wire/pitch/roll-rate-schedule">
+            <function>
+                <table>
+                    <independentVar lookup="row">fcs/fly-by-wire/pitch/roll-rate-lagged</independentVar>
+                    <tableData>
+                        20      0
+                        54    5.4
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
+        <pure_gain name="fcs/fly-by-wire/pitch/fake-alpha">
+            <input> fcs/fly-by-wire/pitch/roll-rate-schedule </input>
+            <gain> fcs/fly-by-wire/enable-fake </gain>
+        </pure_gain>
+
+        <summer name="fcs/fly-by-wire/pitch/alpha-sum">
+            <input> fcs/fly-by-wire/pitch/alpha-indicated-switch </input>
+            <input> fcs/fly-by-wire/pitch/fake-alpha </input>
+        </summer>
+
         <lag_filter name="fcs/fly-by-wire/pitch/alpha-indicated-lagged">
-            <input> fcs/fly-by-wire/pitch/alpha-indicated-clamp </input>
+            <input> fcs/fly-by-wire/pitch/alpha-sum </input>
             <c1> 10 </c1>
         </lag_filter>
 
@@ -945,27 +1022,60 @@
             <gain> fcs/fly-by-wire/pitch/F3 </gain>
         </pure_gain>
 
-        <fcs_function name="fcs/fly-by-wire/pitch/pitch-rate-gain-sum">
+        <switch name="fcs/fly-by-wire/pitch/bias-top">
+            <default value="6"/>
+            <test logic="AND" value="0">
+                gear/unit[1]/WOW eq 1
+                gear/unit[2]/WOW eq 1
+            </test>
+        </switch>
+
+        <fcs_function name="fcs/fly-by-wire/pitch/bias-middle">
             <function>
-                <sum>
-                    <property> fcs/fly-by-wire/pitch/pitch-rate-gain </property>
-                    <value> -15 </value>
-                    <property> fcs/fly-by-wire/pitch/alpha-indicated-lagged </property>
-                </sum>
+                <v> 9 </v>
             </function>
         </fcs_function>
+
+        <switch name="fcs/fly-by-wire/pitch/bias-bottom">
+            <default value="0"/>
+            <test logic="AND" value="9">
+                fcs/fly-by-wire/condition-a == 1
+            </test>
+        </switch>
+
+        <lag_filter name="fcs/fly-by-wire/pitch/bias-top-lag">
+            <input> fcs/fly-by-wire/pitch/bias-top </input>
+            <c1> 10 </c1>
+        </lag_filter>
+
+        <lag_filter name="fcs/fly-by-wire/pitch/bias-bottom-lag">
+            <input> fcs/fly-by-wire/pitch/bias-bottom </input>
+            <c1> 0.125 </c1>
+        </lag_filter>
+
+        <summer name="fcs/fly-by-wire/pitch/bias1">
+            <input> -fcs/fly-by-wire/pitch/bias-bottom-lag </input>
+            <input> fcs/fly-by-wire/pitch/bias-middle </input>
+        </summer>
+
+        <summer name="fcs/fly-by-wire/pitch/bias2">
+            <input> fcs/fly-by-wire/pitch/bias-top-lag </input>
+            <input> fcs/fly-by-wire/pitch/bias1 </input>
+        </summer>
+
+        <summer name="fcs/fly-by-wire/pitch/pitch-rate-gain-sum">
+            <input> fcs/fly-by-wire/pitch/pitch-rate-gain </input>
+            <input> -fcs/fly-by-wire/pitch/bias2 </input>
+            <input> fcs/fly-by-wire/pitch/alpha-indicated-lagged </input>
+        </summer>
 
         <pure_gain name="fcs/fly-by-wire/pitch/pitch-rate-gain-sum-gain">
             <input>fcs/fly-by-wire/pitch/pitch-rate-gain-sum</input>
             <gain> 0.161 </gain>
-            <clipto>
-                <min> 0 </min>
-                <max>10000</max>
-            </clipto>
         </pure_gain>
 
-        <pure_gain name="fcs/fly-by-wire/pitch/pitch-rate-gain-sum-gain-pos">
-            <input>fcs/fly-by-wire/pitch/pitch-rate-gain-sum</input>
+        <pure_gain name="fcs/fly-by-wire/pitch/pitch-rate-upper">
+            <input>fcs/fly-by-wire/pitch/pitch-rate-gain-sum-gain</input>
             <gain> 1 </gain>
             <clipto>
                 <min> 0 </min>
@@ -973,8 +1083,8 @@
             </clipto>
         </pure_gain>
 
-        <pure_gain name="fcs/fly-by-wire/pitch/pitch-rate-gain-sum-gain-neg">
-            <input>fcs/fly-by-wire/pitch/pitch-rate-gain-sum</input>
+        <pure_gain name="fcs/fly-by-wire/pitch/pitch-rate-lower">
+            <input>fcs/fly-by-wire/pitch/pitch-rate-gain-sum-gain</input>
             <gain> 1 </gain>
             <clipto>
                 <min> -10000 </min>
@@ -982,8 +1092,26 @@
             </clipto>
         </pure_gain>
 
+        <switch name="fcs/fly-by-wire/pitch/pitch-rate-lower-switch">
+            <default value="0"/>
+            <test logic="AND" value="1">
+                fcs/fly-by-wire/condition-a == 1
+            </test>
+        </switch>
+
+        <lag_filter name="fcs/fly-by-wire/pitch/pitch-rate-lower-lag">
+            <input> fcs/fly-by-wire/pitch/pitch-rate-lower-switch </input>
+            <c1> 0.125 </c1>
+        </lag_filter>
+
+        <pure_gain name="fcs/fly-by-wire/pitch/pitch-rate-lower-gain">
+            <input>fcs/fly-by-wire/pitch/pitch-rate-lower</input>
+            <gain> fcs/fly-by-wire/pitch/pitch-rate-lower-lag </gain>
+        </pure_gain>
+
         <summer name="fcs/fly-by-wire/pitch/pitch-rate-gain-sum-gain-sum">
-            <input> fcs/fly-by-wire/pitch/pitch-rate-gain-sum-gain </input>
+            <input> fcs/fly-by-wire/pitch/pitch-rate-upper </input>
+            <input> fcs/fly-by-wire/pitch/pitch-rate-lower-gain </input>
             <input> fcs/fly-by-wire/pitch/pitch-rate-gain-2-sum </input>
         </summer>
 
@@ -1074,9 +1202,17 @@
             <input> fcs/fly-by-wire/pitch/q-gain-2 </input>
         </summer>
 
+        <switch name="fcs/fly-by-wire/pitch/q-product">
+            <default value="0.167"/>
+            <test logic="AND" value="0.231">
+                gear/unit[1]/WOW eq 1
+                gear/unit[2]/WOW eq 1
+            </test>
+        </switch>
+
         <pure_gain name="fcs/fly-by-wire/pitch/q-gain-2">
             <input>fcs/fly-by-wire/pitch/q-washout</input>
-            <gain> 0.167 </gain>
+            <gain> fcs/fly-by-wire/pitch/q-product </gain>
         </pure_gain>
 
         <lead_lag_filter name="fcs/fly-by-wire/pitch/pitch-rate-lead">
