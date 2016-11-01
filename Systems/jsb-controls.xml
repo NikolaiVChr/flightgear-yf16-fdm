@@ -663,7 +663,7 @@
         <fcs_function name="fcs/fly-by-wire/pitch/command-g">
             <function>
                 <table>
-                    <independentVar lookup="row">fcs/fly-by-wire/pitch/stick-force-N-lagged</independentVar>
+                    <independentVar lookup="row">fcs/fly-by-wire/pitch/stick-force-N</independentVar>
                     <tableData>
                         -80  -4.0
                         -35  -0.5
@@ -1225,7 +1225,7 @@
 
         <second_order_filter name="fcs/fly-by-wire/pitch/pitch-rate-lead-2nd">
           <input> fcs/fly-by-wire/pitch/pitch-rate-lead </input>
-          <c1> 2 </c1>
+          <c1> 2.5 </c1><!-- on old diagram looks to be 2.5, not 25 -->
           <c2> 20 </c2>
           <c3> 3500 </c3>
           <c4> 1 </c4>
