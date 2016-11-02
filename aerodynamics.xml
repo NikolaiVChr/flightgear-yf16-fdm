@@ -80,7 +80,59 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
             <property>fcs/fly-by-wire/tef/tef-pos-norm</property>
             <value>0.1221731</value>
         </product>
-    </function>    
+    </function>
+
+      <function name="aero/coefficient/CL_g">
+       <description>Change in lift due to ground effect</description>
+       <product>
+          <table>
+           <independentVar>aero/h_b-mac-ft</independentVar>
+           <tableData>
+             0.0000  0.2290
+             0.1000  0.1240
+             0.1500  0.1160
+             0.2000  0.1240
+             0.3000  0.1050
+             0.4000  0.0410
+             0.5000  0.0340
+             0.6000  0.0190
+             0.7000  0.0080
+             0.8000  0.0030
+             0.9000  0.0010
+             1.0000  0.0000
+             1.1000  0.0000
+           </tableData>
+          </table>
+       </product>
+      </function>
+
+    <function name="aero/coefficient/Cx_g">
+        <sum>
+            <v>1</v>
+            <product>
+                <property>aero/coefficient/CL_g</property>
+                <abs>
+                    <sin>
+                        <property>aero/alpha-rad</property>
+                    </sin>
+                </abs>
+            </product>
+        </sum>
+    </function>
+
+    <function name="aero/coefficient/Cz_g">
+        <sum>
+            <v>1</v>
+            <product>
+                <property>aero/coefficient/CL_g</property>
+                <abs>
+                    <cos>
+                        <property>aero/alpha-rad</property>
+                    </cos>
+                </abs>
+            </product>
+        </sum>
+    </function>
 
     <axis name="X">
 
@@ -122,6 +174,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
+                <!--<p>aero/coefficient/Cx_g</p>-->
                 <table name="table/Cx">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
@@ -459,6 +512,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
+                <!--<p>aero/coefficient/Cz_g</p>-->
                 <table name="table/Cz">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
