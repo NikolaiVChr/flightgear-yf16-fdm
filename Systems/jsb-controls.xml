@@ -638,6 +638,8 @@
     <property value="1">fcs/fly-by-wire/enable-alpha</property>
     <property value="1">fcs/fly-by-wire/enable-q-washout</property>
 
+    <property value="0">fcs/fly-by-wire/pitch/alpha-indicated-lagged</property>
+
     <channel execrate="1" name="FCS Lookup Ref">
 
         <switch name="fcs/fly-by-wire/condition-a">
@@ -1121,10 +1123,14 @@
             <!-- defl. limit = 20, rate limit = 80 deg/s -->
         </lag_filter>
 
-        <summer name="fcs/fly-by-wire/roll/mech-bias-right">
-            <input>fcs/fly-by-wire/roll/flaperon-right-lag</input>
-            <input>-1.5</input>
-        </summer>
+        <fcs_function name="fcs/fly-by-wire/roll/mech-bias-right">
+            <function>
+                <sum>
+                    <property> fcs/fly-by-wire/roll/flaperon-right-lag </property>
+                    <value> -1.5 </value>
+                </sum>
+            </function>
+        </fcs_function>
 
         <kinematic name="fcs/fly-by-wire/roll/flaperon-right-deflection-deg">
             <input>fcs/fly-by-wire/roll/mech-bias-right</input>
@@ -1164,10 +1170,14 @@
             <!-- defl. limit = 20, rate limit = 80 deg/s -->
         </lag_filter>
 
-        <summer name="fcs/fly-by-wire/roll/mech-bias-left">
-            <input>fcs/fly-by-wire/roll/flaperon-left-lag</input>
-            <input>-1.5</input>
-        </summer>
+        <fcs_function name="fcs/fly-by-wire/roll/mech-bias-left">
+            <function>
+                <sum>
+                    <property> fcs/fly-by-wire/roll/flaperon-left-lag </property>
+                    <value> -1.5 </value>
+                </sum>
+            </function>
+        </fcs_function>
 
         <kinematic name="fcs/fly-by-wire/roll/flaperon-left-deflection-deg">
             <input>fcs/fly-by-wire/roll/mech-bias-left</input>
@@ -1954,6 +1964,16 @@
                 <max>  25 </max>
             </clipto>
         </kinematic>
+
+        <summer name="fcs/fly-by-wire/pitch/horz-tail-left-deflection-deg">
+            <input> fcs/fly-by-wire/pitch/horz-tail-deflection-deg </input>
+            <input> -fcs/fly-by-wire/pitch/horz-tail-diff-deflection-deg </input>
+        </summer>
+
+        <summer name="fcs/fly-by-wire/pitch/horz-tail-right-deflection-deg">
+            <input> fcs/fly-by-wire/pitch/horz-tail-deflection-deg </input>
+            <input> fcs/fly-by-wire/pitch/horz-tail-diff-deflection-deg </input>
+        </summer>
 
     </channel>
 
