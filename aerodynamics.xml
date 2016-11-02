@@ -1952,7 +1952,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
-                <property>aero/beta-rad</property>
+                <property>aero/beta-deg</property>
                 <table name="table/dCn_b">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -2487,7 +2487,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
-                <property>aero/beta-rad</property>
+                <property>aero/beta-deg</property>
                 <table name="table/dCl_b">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
