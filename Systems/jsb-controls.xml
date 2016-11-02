@@ -475,7 +475,7 @@
 
 
 
-    <property value="1">fcs/fly-by-wire/K_A</property>
+    <property value="1.5">fcs/fly-by-wire/K_A</property>
     <property value="1">fcs/fly-by-wire/washout</property>
     <property value="5">fcs/fly-by-wire/integrator</property>
     <property value="1">fcs/fly-by-wire/enable-q</property>
@@ -483,7 +483,7 @@
     <property value="1">fcs/fly-by-wire/enable-int</property>
     <property value="1">fcs/fly-by-wire/enable-fake</property>
     <property value="1">fcs/fly-by-wire/enable-alpha</property>
-    <property value="0">fcs/fly-by-wire/enable-q-washout</property>
+    <property value="1">fcs/fly-by-wire/enable-q-washout</property>
 
     <property value="0">fcs/fly-by-wire/pitch/alpha-indicated-lagged</property>
 
