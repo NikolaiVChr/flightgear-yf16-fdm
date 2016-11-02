@@ -483,7 +483,7 @@
     <property value="1">fcs/fly-by-wire/enable-int</property>
     <property value="1">fcs/fly-by-wire/enable-fake</property>
     <property value="1">fcs/fly-by-wire/enable-alpha</property>
-    <property value="1">fcs/fly-by-wire/enable-q-washout</property>
+    <property value="0">fcs/fly-by-wire/enable-q-washout</property>
 
     <property value="0">fcs/fly-by-wire/pitch/alpha-indicated-lagged</property>
 
@@ -493,7 +493,7 @@
             <default value="0"/>
             <test logic="OR" value="1">
                 gear/gear-cmd-norm == 1
-                fcs/fly-by-wire/lef/tef-pos-norm   gt 0.5 <!-- should really be the flaps manual switch -->
+                fcs/fly-by-wire/tef/tef-pos-norm   gt 0.5 <!-- should really be the flaps manual switch -->
                 <!-- todo: if refueling door open and q_c < 646 -->
             </test>
         </switch>
@@ -588,6 +588,24 @@
         </fcs_function>
 
     </channel>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <channel execrate="1" name="Yaw Ref">
 
@@ -746,6 +764,16 @@
         </aerosurface_scale>
 
     </channel>
+
+
+
+
+
+
+
+
+
+
 
     <channel execrate="1" name="Roll Ref">
 
@@ -907,13 +935,13 @@
         <summer name="fcs/fly-by-wire/roll/top-sum">
             <input>fcs/fly-by-wire/roll/final</input>
             <input>-fcs/fly-by-wire/roll/bottom-deadzone</input>
-            <input>fcs/fly-by-wire/lef/tef-pos-deg</input>
+            <input>fcs/fly-by-wire/tef/tef-pos-deg</input>
         </summer>
 
         <summer name="fcs/fly-by-wire/roll/bottom-sum">
             <input>-fcs/fly-by-wire/roll/final</input>
             <input>-fcs/fly-by-wire/roll/top-deadzone</input>
-            <input>fcs/fly-by-wire/lef/tef-pos-deg</input>
+            <input>fcs/fly-by-wire/tef/tef-pos-deg</input>
         </summer>
 
         <fcs_function name="fcs/fly-by-wire/roll/top-deadzone-pos">
@@ -1073,7 +1101,35 @@
             <gain> fcs/fly-by-wire/roll/F10 </gain>
         </pure_gain>
 
+        <summer name="fcs/fly-by-wire/roll/aileron-pos-deg">
+            <input>-fcs/fly-by-wire/roll/flaperon-left-deflection-deg</input>
+            <input>fcs/fly-by-wire/roll/flaperon-right-deflection-deg</input>
+        </summer>
+
+        <aerosurface_scale name="fcs/fly-by-wire/roll/aileron-pos-norm">
+            <input>fcs/fly-by-wire/roll/aileron-pos-deg</input>
+            <zero_centered> true </zero_centered>
+            <domain>
+                <min> -40.0 </min>
+                <max>  40.0 </max>
+            </domain>
+            <range>
+                <min> -1.0 </min>
+                <max>  1.0 </max>
+            </range>
+        </aerosurface_scale>
+
     </channel>
+
+
+
+
+
+
+
+
+
+
 
     <channel execrate="1" name="ARI Ref">
 
@@ -1111,6 +1167,19 @@
         </pure_gain>
 
     </channel>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <channel execrate="1" name="Pitch Ref">
 
@@ -1814,17 +1883,30 @@
 
         <summer name="fcs/fly-by-wire/pitch/horz-tail-left-deflection-deg">
             <input> fcs/fly-by-wire/pitch/horz-tail-deflection-deg </input>
-            <input> -fcs/fly-by-wire/pitch/horz-tail-diff-deflection-deg </input>
+            <input> fcs/fly-by-wire/pitch/horz-tail-diff-deflection-deg </input>
         </summer>
 
         <summer name="fcs/fly-by-wire/pitch/horz-tail-right-deflection-deg">
             <input> fcs/fly-by-wire/pitch/horz-tail-deflection-deg </input>
-            <input> fcs/fly-by-wire/pitch/horz-tail-diff-deflection-deg </input>
+            <input> -fcs/fly-by-wire/pitch/horz-tail-diff-deflection-deg </input>
         </summer>
 
     </channel>
 
-        <channel name="Throttle">
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <channel name="Throttle">
 
         <fcs_function name="fcs/fly-by-wire/throttle/pos-norm">
             <description>Page 153 of secondary doc</description>
@@ -1907,12 +1989,12 @@
         </kinematic>
 
         <pure_gain name="fcs/fly-by-wire/lef/lef-pos-rad">
-            <input>fcs/lef-pos-deg</input>
+            <input>fcs/fly-by-wire/lef/lef-pos-deg</input>
             <gain>0.017453</gain>
         </pure_gain>
 
         <aerosurface_scale name="fcs/fly-by-wire/lef/lef-pos-norm">
-            <input>fcs/lef-pos-deg</input>
+            <input>fcs/fly-by-wire/lef/lef-pos-deg</input>
             <zero_centered> true </zero_centered>
             <domain>
                 <min> 0 </min>
@@ -1928,16 +2010,28 @@
             <function>
                 <difference>
                     <v>1</v>
-                    <p>fcs/lef-pos-norm</p>
+                    <p>fcs/fly-by-wire/lef/lef-pos-norm</p>
                 </difference>
             </function>
         </fcs_function>
 
     </channel>
 
+
+
+
+
+
+
+
+
+
+
+
+
     <channel name="Trailing edge flaps">
 
-        <fcs_function name="fcs/fly-by-wire/lef/tef-cmd-pos-deg">
+        <fcs_function name="fcs/fly-by-wire/tef/tef-cmd-pos-deg">
             <function>
                 <product>
                     <max>
@@ -1955,8 +2049,8 @@
             </function>
         </fcs_function>
 
-        <kinematic name="fcs/fly-by-wire/lef/tef-pos-deg">
-            <input>fcs/tef-cmd-pos-deg</input>
+        <kinematic name="fcs/fly-by-wire/tef/tef-pos-deg">
+            <input>fcs/fly-by-wire/tef/tef-cmd-pos-deg</input>
             <noscale/>
             <traverse>
                 <setting>
@@ -1970,8 +2064,8 @@
             </traverse>
         </kinematic>
 
-        <pure_gain name="fcs/fly-by-wire/lef/tef-pos-norm">
-            <input>fcs/tef-pos-deg</input>
+        <pure_gain name="fcs/fly-by-wire/tef/tef-pos-norm">
+            <input>fcs/fly-by-wire/tef/tef-pos-deg</input>
             <gain>0.05</gain>
         </pure_gain>
 

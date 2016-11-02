@@ -63,8 +63,8 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
 
     <function name="aero/coefficient/CDtef">
         <product>
-            <property>fcs/tef-rad</property>
-            <value>0.08</value>
+            <property>fcs/fly-by-wire/tef/tef-pos-norm</property>
+            <value>0.02792528</value>
         </product>
     </function>
 
@@ -77,8 +77,8 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
 
     <function name="aero/coefficient/CLtef">
         <product>
-            <property>fcs/tef-rad</property>
-            <value>0.35</value>
+            <property>fcs/fly-by-wire/tef/tef-pos-norm</property>
+            <value>0.1221731</value>
         </product>
     </function>    
 
@@ -1927,7 +1927,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
             </product>
         </function>
 
-        <function name="aero/coefficient/dCn_da">
+        <!--<function name="aero/coefficient/dCn_da">
             <description>
                Cn due to aileron coefficient.
 
@@ -1965,7 +1965,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                      </tableData>
                 </table>
             </product>
-        </function>
+        </function>-->
 
         <function name="aero/coefficient/dCn_r-lef">
             <description>
