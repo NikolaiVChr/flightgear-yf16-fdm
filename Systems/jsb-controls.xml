@@ -629,6 +629,7 @@
 
 
     <property value="1">fcs/fly-by-wire/K_A</property>
+    <property value="1">fcs/fly-by-wire/washout</property>
     <property value="5">fcs/fly-by-wire/integrator</property>
     <property value="1">fcs/fly-by-wire/enable-q</property>
     <property value="1">fcs/fly-by-wire/enable-nz</property>
@@ -642,7 +643,7 @@
             <default value="0"/>
             <test logic="OR" value="1">
                 gear/gear-cmd-norm == 1
-                fcs/tef-pos-norm   gt 0.5 <!-- should really be the flaps manual switch -->
+                fcs/tef-pos-norm   gt 0.5 <!-- should really be the flpas manual switch -->
                 <!-- todo: if refueling door open and q_c < 646 -->
             </test>
         </switch>
@@ -660,6 +661,17 @@
                 <!--<v>2116</v>-->
             </function>
         </fcs_function>
+
+        <switch name="fcs/fly-by-wire/pitch/MLG-GND">
+            <default value="0"/>
+            <!--<test logic="AND" value="1">
+                gear/gear-pos-norm == 1
+            </test>-->
+            <test logic="AND" value="1">
+                gear/unit[1]/WOW eq 1
+                gear/unit[2]/WOW eq 1
+            </test>
+        </switch>
 
         <fcs_function name="fcs/fly-by-wire/pitch/qcps-ratio">
             <function>
@@ -791,8 +803,7 @@
         <switch name="fcs/fly-by-wire/pitch/g-limit-product">
             <default value="0.5"/>
             <test logic="AND" value="1">
-                gear/unit[1]/WOW eq 1
-                gear/unit[2]/WOW eq 1
+                fcs/fly-by-wire/pitch/MLG-GND == 1
             </test>
         </switch>
 
@@ -822,8 +833,7 @@
         <switch name="fcs/fly-by-wire/pitch/alpha-indicated-switch">
             <default value="fcs/fly-by-wire/pitch/alpha-indicated-clamp"/>
             <test logic="AND" value="0">
-                gear/unit[1]/WOW eq 1
-                gear/unit[2]/WOW eq 1
+                fcs/fly-by-wire/pitch/MLG-GND == 1
             </test>
         </switch>
 
@@ -922,8 +932,7 @@
         <switch name="fcs/fly-by-wire/pitch/pitch-loop-gain-switch">
             <default value="fcs/fly-by-wire/pitch/pitch-loop-gain-sum"/>
             <test logic="AND" value="fcs/fly-by-wire/pitch/pitch-loop-ground-product">
-                gear/unit[1]/WOW eq 1
-                gear/unit[2]/WOW eq 1
+                fcs/fly-by-wire/pitch/MLG-GND == 1
             </test>
         </switch>
 
@@ -1059,16 +1068,16 @@
 
         <pure_gain name="velocities/q-aero-deg_sec">
             <input>fcs/fly-by-wire/pitch/q</input>
-            <gain> 57.29577951308233 </gain>
+            <gain> 57.2957795 </gain>
         </pure_gain>
 
         <washout_filter name="fcs/fly-by-wire/pitch/q-washout">
-          <input> velocities/q-aero-deg_sec </input><!-- radians or degrees? -->
-          <c1> 1 </c1>
+          <input> velocities/q-aero-deg_sec </input>
+          <c1> fcs/fly-by-wire/washout </c1>
         </washout_filter>
 
         <pure_gain name="fcs/fly-by-wire/pitch/q-gain-1">
-            <input>fcs/fly-by-wire/pitch/q-washout</input>
+            <input>velocities/q-aero-deg_sec</input><!-- diagram: fcs/fly-by-wire/pitch/q-washout -->
             <gain> 0.7 </gain>
         </pure_gain>
 
@@ -1080,8 +1089,7 @@
         <switch name="fcs/fly-by-wire/pitch/bias-top">
             <default value="6"/>
             <test logic="AND" value="0">
-                gear/unit[1]/WOW eq 1
-                gear/unit[2]/WOW eq 1
+                fcs/fly-by-wire/pitch/MLG-GND == 1
             </test>
         </switch>
 
@@ -1260,13 +1268,12 @@
         <switch name="fcs/fly-by-wire/pitch/q-product">
             <default value="0.167"/>
             <test logic="AND" value="0.231">
-                gear/unit[1]/WOW eq 1
-                gear/unit[2]/WOW eq 1
+                fcs/fly-by-wire/pitch/MLG-GND == 1
             </test>
         </switch>
 
         <pure_gain name="fcs/fly-by-wire/pitch/q-gain-2">
-            <input>fcs/fly-by-wire/pitch/q-washout</input>
+            <input>velocities/q-aero-deg_sec</input><!-- diagram: fcs/fly-by-wire/pitch/q-washout -->
             <gain> fcs/fly-by-wire/pitch/q-product </gain>
         </pure_gain>
 
