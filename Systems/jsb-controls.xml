@@ -574,6 +574,19 @@
             </function>
         </fcs_function>
 
+        <fcs_function name="fcs/fly-by-wire/tef/F9">
+            <function>
+                <table>
+                    <independentVar lookup="row">fcs/fly-by-wire/qcps-ratio</independentVar>
+                    <tableData>
+                        0.0  0
+                        0.787 0
+                        1.008 -2.0
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
         <fcs_function name="fcs/fly-by-wire/roll/F10">
             <function>
                 <table>
@@ -2031,18 +2044,66 @@
 
     <channel name="Trailing edge flaps">
 
+        <!--<switch name="fcs/fly-by-wire/tef/cmd-gear">
+            <default value="0"/>
+            <test logic="AND" value="20">
+                gear/gear-cmd-norm == 1
+            </test>
+        </switch>
+
+        <switch name="fcs/fly-by-wire/tef/cmd-switch">
+            <default value="fcs/fly-by-wire/tef/cmd-gear"/>
+            <test logic="AND" value="20">
+                /controls/flight/flaps gt 0
+            </test>
+        </switch>
+
+        <summer name="fcs/fly-by-wire/tef/F9-limit">
+            <input> fcs/fly-by-wire/tef/F9 </input>
+            <clipto>
+                <min> -2 </min>
+                <max>  2 </max>
+            </clipto>
+        </summer>
+
+        <summer name="fcs/fly-by-wire/tef/sum">
+            <input> fcs/fly-by-wire/tef/cmd-switch </input>
+            <input> -fcs/fly-by-wire/tef/int </input>
+            <input> fcs/fly-by-wire/tef/F9-limit </input>
+            <clipto>
+                <min> -0.625 </min>
+                <max>  0.625 </max>
+            </clipto>
+        </summer>
+
+        <integrator name="fcs/fly-by-wire/tef/int">
+            <input> fcs/fly-by-wire/tef/sum </input>
+            <c1> 8 </c1>
+        </integrator>
+
+        <fcs_function name="fcs/fly-by-wire/tef/tef-pos-deg">
+            <function>
+                <sum>
+                    <property> fcs/fly-by-wire/tef/int </property>
+                    <value> 1.5 </value>
+                </sum>
+            </function>
+        </fcs_function>-->
+
         <fcs_function name="fcs/fly-by-wire/tef/tef-cmd-pos-deg">
             <function>
                 <product>
                     <max>
-                      <p>/controls/flight/flaps</p><!-- should really be an on/off switch -->
+                      <p>/controls/flight/flaps</p>
                       <p>gear/gear-cmd-norm</p>
                     </max>
                     <table>
                         <independentVar lookup="row">velocities/vc-kts</independentVar>
+                        <independentVar lookup="row">velocities/mach</independentVar>
                         <tableData>
-                            250 20
-                            370 0
+                                 0  0.95  1
+                            250 20  20   -2
+                            370  0   0   -2
                         </tableData>
                     </table>
                 </product>
