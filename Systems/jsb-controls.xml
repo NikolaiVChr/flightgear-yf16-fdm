@@ -636,33 +636,34 @@
     <property value="1">fcs/fly-by-wire/enable-int</property>
     <property value="1">fcs/fly-by-wire/enable-fake</property>
     <property value="1">fcs/fly-by-wire/enable-alpha</property>
+    <property value="1">fcs/fly-by-wire/enable-q-washout</property>
 
-    <channel execrate="1" name="Pitch Ref">
+    <channel execrate="1" name="FCS Lookup Ref">
 
         <switch name="fcs/fly-by-wire/condition-a">
             <default value="0"/>
             <test logic="OR" value="1">
                 gear/gear-cmd-norm == 1
-                fcs/tef-pos-norm   gt 0.5 <!-- should really be the flpas manual switch -->
+                fcs/tef-pos-norm   gt 0.5 <!-- should really be the flaps manual switch -->
                 <!-- todo: if refueling door open and q_c < 646 -->
             </test>
         </switch>
 
-        <fcs_function name="fcs/fly-by-wire/pitch/q_c">
+        <fcs_function name="fcs/fly-by-wire/q_c">
             <function>
-                <!--<v>1400</v>-->
+                <!--<v>1400</v> standby gain-->
                 <p>aero/qbar-psf</p>
             </function>
         </fcs_function>
 
-        <fcs_function name="fcs/fly-by-wire/pitch/P_s">
+        <fcs_function name="fcs/fly-by-wire/P_s">
             <function>
                 <p>atmosphere/P-psf</p>
-                <!--<v>2116</v>-->
+                <!--<v>2116</v> standby gain-->
             </function>
         </fcs_function>
 
-        <switch name="fcs/fly-by-wire/pitch/MLG-GND">
+        <switch name="fcs/fly-by-wire/MLG-GND">
             <default value="0"/>
             <!--<test logic="AND" value="1">
                 gear/gear-pos-norm == 1
@@ -673,11 +674,11 @@
             </test>
         </switch>
 
-        <fcs_function name="fcs/fly-by-wire/pitch/qcps-ratio">
+        <fcs_function name="fcs/fly-by-wire/qcps-ratio">
             <function>
                 <quotient>
-                    <p>fcs/fly-by-wire/pitch/q_c</p>
-                    <p>fcs/fly-by-wire/pitch/P_s</p>
+                    <p>fcs/fly-by-wire/q_c</p>
+                    <p>fcs/fly-by-wire/P_s</p>
                 </quotient>
             </function>
         </fcs_function>
@@ -685,7 +686,7 @@
         <fcs_function name="fcs/fly-by-wire/pitch/F3">
             <function>
                 <table>
-                    <independentVar lookup="row">fcs/fly-by-wire/pitch/q_c</independentVar>
+                    <independentVar lookup="row">fcs/fly-by-wire/q_c</independentVar>
                     <tableData>
                         0.0 1
                         300 1
@@ -695,6 +696,10 @@
                 </table>
             </function>
         </fcs_function>
+
+    </channel>
+
+    <channel execrate="1" name="Pitch Ref">
 
         <fcs_function name="fcs/fly-by-wire/pitch/stick-force-N">
             <function>
@@ -803,7 +808,7 @@
         <switch name="fcs/fly-by-wire/pitch/g-limit-product">
             <default value="0.5"/>
             <test logic="AND" value="1">
-                fcs/fly-by-wire/pitch/MLG-GND == 1
+                fcs/fly-by-wire/MLG-GND == 1
             </test>
         </switch>
 
@@ -833,7 +838,7 @@
         <switch name="fcs/fly-by-wire/pitch/alpha-indicated-switch">
             <default value="fcs/fly-by-wire/pitch/alpha-indicated-clamp"/>
             <test logic="AND" value="0">
-                fcs/fly-by-wire/pitch/MLG-GND == 1
+                fcs/fly-by-wire/MLG-GND == 1
             </test>
         </switch>
 
@@ -932,7 +937,7 @@
         <switch name="fcs/fly-by-wire/pitch/pitch-loop-gain-switch">
             <default value="fcs/fly-by-wire/pitch/pitch-loop-gain-sum"/>
             <test logic="AND" value="fcs/fly-by-wire/pitch/pitch-loop-ground-product">
-                fcs/fly-by-wire/pitch/MLG-GND == 1
+                fcs/fly-by-wire/MLG-GND == 1
             </test>
         </switch>
 
@@ -1047,7 +1052,7 @@
         <scheduled_gain name="fcs/fly-by-wire/pitch/alpha-feedback">
             <input>fcs/fly-by-wire/pitch/alpha-indicated-lagged</input>
             <table>
-                <independentVar lookup="row">fcs/fly-by-wire/pitch/qcps-ratio</independentVar>
+                <independentVar lookup="row">fcs/fly-by-wire/qcps-ratio</independentVar>
                 <tableData>
                     0     0.50
                     0.53  0.50
@@ -1076,8 +1081,15 @@
           <c1> fcs/fly-by-wire/washout </c1>
         </washout_filter>
 
+        <switch name="fcs/fly-by-wire/pitch/q-switch">
+            <default value="fcs/fly-by-wire/pitch/q-washout"/>
+            <test logic="AND" value="velocities/q-aero-deg_sec">
+                fcs/fly-by-wire/enable-q-washout == 0
+            </test>
+        </switch>
+
         <pure_gain name="fcs/fly-by-wire/pitch/q-gain-1">
-            <input>velocities/q-aero-deg_sec</input><!-- diagram: fcs/fly-by-wire/pitch/q-washout -->
+            <input>fcs/fly-by-wire/pitch/q-switch</input>
             <gain> 0.7 </gain>
         </pure_gain>
 
@@ -1089,7 +1101,7 @@
         <switch name="fcs/fly-by-wire/pitch/bias-top">
             <default value="6"/>
             <test logic="AND" value="0">
-                fcs/fly-by-wire/pitch/MLG-GND == 1
+                fcs/fly-by-wire/MLG-GND == 1
             </test>
         </switch>
 
@@ -1268,12 +1280,12 @@
         <switch name="fcs/fly-by-wire/pitch/q-product">
             <default value="0.167"/>
             <test logic="AND" value="0.231">
-                fcs/fly-by-wire/pitch/MLG-GND == 1
+                fcs/fly-by-wire/MLG-GND == 1
             </test>
         </switch>
 
         <pure_gain name="fcs/fly-by-wire/pitch/q-gain-2">
-            <input>velocities/q-aero-deg_sec</input><!-- diagram: fcs/fly-by-wire/pitch/q-washout -->
+            <input>fcs/fly-by-wire/pitch/q-switch</input>
             <gain> fcs/fly-by-wire/pitch/q-product </gain>
         </pure_gain>
 
