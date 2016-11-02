@@ -34,13 +34,23 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 Mach-tuck: Transonic Shift of Aerodynamic Center
 
                 An estimate by Nikolai V. Chr.
+
+                Default static margin = 0.04c (5.4336 inch)
+                Default CoG           = 0.35c
+                Chord                 = 11.32 ft
+
+                0.19 makes the AeroRP move to 0.5c at 1.1 mach.
+
+                But 
+
             </description>
             <table name="table/ACshift">
                 <independentVar>velocities/mach</independentVar>
                 <tableData>
                   0.6 0
-                  0.9 .1
-                  1.1 0.5
+                  0.8 0.2
+                  0.9 0.4
+                  1.1 0.4
                 </tableData>
             </table>
         </function>

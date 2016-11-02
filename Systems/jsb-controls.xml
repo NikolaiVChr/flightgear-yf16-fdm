@@ -1745,7 +1745,7 @@
                 <product>
                     <p>fcs/fly-by-wire/enable-nz</p>
                     <difference>
-                        <property> accelerations/a_n </property>
+                        <property> accelerations/Nz </property>
                         <value> 1 </value>
                     </difference>
                 </product>
@@ -1758,7 +1758,7 @@
         </lag_filter>
 
         <pure_gain name="fcs/fly-by-wire/pitch/normal-lagged-gain">
-            <input>fcs/fly-by-wire/pitch/normal-lagged</input>
+            <input>fcs/fly-by-wire/pitch/normal-1</input>
             <gain> 1.0 </gain>
         </pure_gain>
 
