@@ -125,7 +125,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <table name="table/Cx">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
-                    <independentVar lookup="table">fcs/elevator-pos-deg</independentVar>
+                    <independentVar lookup="table">fcs/fly-by-wire/pitch/horz-tail-deflection-deg</independentVar>
                     <tableData breakPoint="-25.0">
        -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
 -20 -.1837 -.1953 -.1904 -.1899 -.1949 -.1914 -.1872 -.1860 -.1860 -.1868 -.1899 -.1902 -.1900 -.1896 -.1883 -.1833 -.1838 -.1787 -.1771
@@ -252,7 +252,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <property>fcs/lef-pos-r-norm</property>
+                <property>fcs/fly-by-wire/lef/lef-pos-r-norm</property>
                 <difference>
                     <table name="table/Cx_lef">
                         <independentVar lookup="row">aero/alpha-deg</independentVar>
@@ -388,7 +388,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>metrics/Sw-sqft</property>
                 <property>aero/ci2vel</property>
                 <property>velocities/q-rad_sec</property>
-                <property>fcs/lef-pos-r-norm</property>
+                <property>fcs/fly-by-wire/lef/lef-pos-r-norm</property>
                 <table name="table/dCx_q-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -462,7 +462,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <table name="table/Cz">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
-                    <independentVar lookup="table">fcs/elevator-pos-deg</independentVar>
+                    <independentVar lookup="table">fcs/fly-by-wire/pitch/horz-tail-deflection-deg</independentVar>
                     <tableData breakPoint="-25.0">
        -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
 -20 1.1940 1.2720 1.3110 1.3560 1.3960 1.3470 1.3390 1.3140 1.3210 1.3150 1.3370 1.3320 1.3400 1.3380 1.2940 1.2350 1.1850 1.1400 1.1000
@@ -589,7 +589,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
             <product>
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
-                <property>fcs/lef-pos-r-norm</property>
+                <property>fcs/fly-by-wire/lef/lef-pos-r-norm</property>
                 <difference>
                 <table name="table/Cz_lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
@@ -725,7 +725,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>metrics/Sw-sqft</property>
                 <property>aero/ci2vel</property>
                 <property>velocities/q-rad_sec</property>
-                <property>fcs/lef-pos-r-norm</property>
+                <property>fcs/fly-by-wire/lef/lef-pos-r-norm</property>
                 <table name="table/dCz_q-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -766,7 +766,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
         </description>
         <product>
             <table name="table/n_dh">
-                <independentVar lookup="row">fcs/elevator-pos-deg</independentVar>
+                <independentVar lookup="row">fcs/fly-by-wire/pitch/horz-tail-deflection-deg</independentVar>
                 <tableData>
 -25 1.0
 -10 1.0
@@ -792,7 +792,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <table name="table/Cm">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
-                    <independentVar lookup="table">fcs/elevator-pos-deg</independentVar>
+                    <independentVar lookup="table">fcs/fly-by-wire/pitch/horz-tail-deflection-deg</independentVar>
                     <tableData breakPoint="-25.0" note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
        -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
 -20 0.2059 0.1937 0.1918 0.1850 0.1692 0.1693 0.1770 0.1746 0.1742 0.1750 0.1721 0.1758 0.1801 0.1826 0.1912 0.2070 0.2140 0.2160 0.2270 
@@ -920,7 +920,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/cbarw-ft</property>
-                <property>fcs/lef-pos-r-norm</property>
+                <property>fcs/fly-by-wire/lef/lef-pos-r-norm</property>
                 <difference>
                     <table name="table/dCm_lef">
                         <independentVar lookup="row">aero/alpha-deg</independentVar>
@@ -1095,7 +1095,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>metrics/cbarw-ft</property>
                 <property>aero/ci2vel</property>
                 <property>velocities/q-rad_sec</property>
-                <property>fcs/lef-pos-r-norm</property>
+                <property>fcs/fly-by-wire/lef/lef-pos-r-norm</property>
                 <table name="table/dCm_q-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -1128,7 +1128,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>metrics/cbarw-ft</property>
                 <table name="table/dCm_ds">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
-                    <independentVar lookup="column">fcs/elevator-pos-deg</independentVar>
+                    <independentVar lookup="column">fcs/fly-by-wire/pitch/horz-tail-deflection-deg</independentVar>
                     <tableData>
         -25     -10       0      10      15      20      25
  30 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000
@@ -1352,7 +1352,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
         <product>
             <property>aero/bi2vel</property>
             <property>velocities/r-rad_sec</property>
-            <property>fcs/lef-pos-r-norm</property>
+            <property>fcs/fly-by-wire/lef/lef-pos-r-norm</property>
             <table name="table/Cy_r-lef">
                 <independentVar lookup="row">aero/alpha-deg</independentVar>
                 <tableData>
@@ -1417,7 +1417,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
         <product>
             <property>aero/bi2vel</property>
             <property>velocities/p-rad_sec</property>
-            <property>fcs/lef-pos-r-norm</property>
+            <property>fcs/fly-by-wire/lef/lef-pos-r-norm</property>
             <table name="table/Cy_p-lef">
                 <independentVar lookup="row">aero/alpha-deg</independentVar>
                 <tableData>
@@ -1445,7 +1445,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
            Cy due to leading edge flaps coefficient.
         </description>
         <product>
-            <property>fcs/lef-pos-r-norm</property>
+            <property>fcs/fly-by-wire/lef/lef-pos-r-norm</property>
             <difference>
                 <p>aero/coefficient/Cy_lef</p>
                 <p>aero/coefficient/Cy</p>
@@ -1458,14 +1458,14 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
            Cy due to aileron due to leading edge flaps coefficient
         </description>
         <product>
-            <p>fcs/aileron-pos-norm</p><!-- 1 = 20 degs (should it rely on absolute norm instead? [maybe]) -->
+            <p>fcs/fly-by-wire/roll/aileron-pos-norm</p><!-- 1 = 20 degs (should it rely on absolute norm instead? [maybe]) -->
             <sum>
                 <difference>
                     <p>aero/coefficient/Cy_da</p>
                     <p>aero/coefficient/Cy</p>
                 </difference>
                 <product>
-                    <p>fcs/lef-pos-r-norm</p>
+                    <p>fcs/fly-by-wire/lef/lef-pos-r-norm</p>
                     <difference>
                         <p>aero/coefficient/Cy_da-lef</p>
                         <p>aero/coefficient/Cy_lef</p>                            
@@ -1484,7 +1484,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
            Cy due to rudder coefficient
         </description>
         <product>
-            <p>fcs/rudder-pos-norm</p><!-- 1 = 30 degs (should it rely on absolute norm instead? [probably]) -->
+            <p>fcs/fly-by-wire/yaw/rudder-pos-norm</p><!-- 1 = 30 degs (should it rely on absolute norm instead? [probably]) -->
             <difference>
                 <p>aero/coefficient/Cy_dr</p>
                 <p>aero/coefficient/Cy</p>
@@ -1696,7 +1696,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <table name="table/Cn">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
-                    <independentVar lookup="table">fcs/elevator-pos-deg</independentVar>
+                    <independentVar lookup="table">fcs/fly-by-wire/pitch/horz-tail-deflection-deg</independentVar>
                     <tableData breakPoint="-25.0" note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
        -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
 -20 -.0633 -.0667 -.0565 -.0418 -.0175 -.0093 -.0060 0.0047 0.0034 0.0000 -.0048 -.0106 -.0074 -.0015 0.0052 0.0297 0.0443 0.0545 0.0510
@@ -1778,7 +1778,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
-                <property>fcs/lef-pos-r-norm</property>
+                <property>fcs/fly-by-wire/lef/lef-pos-r-norm</property>
                 <difference>
                     <p>aero/coefficient/Cn_lef</p>
                     <p>aero/coefficient/Cn_dh0</p>
@@ -1794,14 +1794,14 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
-                <p>fcs/aileron-pos-norm</p><!-- 1 = 20 degs -->
+                <p>fcs/fly-by-wire/roll/aileron-pos-norm</p><!-- 1 = 20 degs -->
                 <sum>
                     <difference>
                         <p>aero/coefficient/Cn_da</p>
                         <p>aero/coefficient/Cn_dh0</p>
                     </difference>
                     <product>
-                        <p>fcs/lef-pos-r-norm</p>
+                        <p>fcs/fly-by-wire/lef/lef-pos-r-norm</p>
                         <difference>
                             <p>aero/coefficient/Cn_da-lef</p>
                             <p>aero/coefficient/Cn_lef</p>                            
@@ -1844,7 +1844,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
-                <p>fcs/rudder-pos-norm</p><!-- 1 = 30 degs -->
+                <p>fcs/fly-by-wire/yaw/rudder-pos-norm</p><!-- 1 = 30 degs -->
                 <difference>
                     <p>aero/coefficient/Cn_dr</p>
                     <p>aero/coefficient/Cn_dh0</p>
@@ -1977,7 +1977,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>metrics/bw-ft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/r-rad_sec</property>
-                <property>fcs/lef-pos-r-norm</property>
+                <property>fcs/fly-by-wire/lef/lef-pos-r-norm</property>
                 <table name="table/dCn_r-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -2048,7 +2048,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>metrics/bw-ft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/p-rad_sec</property>
-                <property>fcs/lef-pos-r-norm</property>
+                <property>fcs/fly-by-wire/lef/lef-pos-r-norm</property>
                 <table name="table/dCn_p-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -2252,7 +2252,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <table name="table/Cl">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <independentVar lookup="column">aero/beta-deg</independentVar>
-                    <independentVar lookup="table">fcs/elevator-pos-deg</independentVar>
+                    <independentVar lookup="table">fcs/fly-by-wire/pitch/horz-tail-deflection-deg</independentVar>
                     <tableData breakPoint="-25.0" note="Numbers in this table typed in by E.V.Oort and L.Sonneveldt">
        -30    -25    -20    -15    -10     -8     -6     -4     -2      0      2      4      6      8     10     15     20     25     30
 -20 -.0060 0.0065 0.0133 0.0217 0.0268 0.0238 0.0219 0.0179 0.0121 0.0000 -.0096 -.0167 -.0210 -.0239 -.0245 -.0196 -.0107 -.0039 -.0118
@@ -2334,7 +2334,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
-                <property>fcs/lef-pos-r-norm</property>
+                <property>fcs/fly-by-wire/lef/lef-pos-r-norm</property>
                 <difference>
                     <p>aero/coefficient/Cl_lef</p>
                     <p>aero/coefficient/Cl_dh0</p>
@@ -2350,14 +2350,14 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
-                <p>fcs/aileron-pos-norm</p><!-- 1 = 20 degs -->
+                <p>fcs/fly-by-wire/roll/aileron-pos-norm</p><!-- 1 = 20 degs -->
                 <sum>
                     <difference>
                         <p>aero/coefficient/Cl_da</p>
                         <p>aero/coefficient/Cl_dh0</p>
                     </difference>
                     <product>
-                        <p>fcs/lef-pos-r-norm</p>
+                        <p>fcs/fly-by-wire/lef/lef-pos-r-norm</p>
                         <difference>
                             <p>aero/coefficient/Cl_da-lef</p>
                             <p>aero/coefficient/Cl_lef</p>                            
@@ -2379,7 +2379,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>aero/qbar-psf</property>
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
-                <p>fcs/rudder-pos-norm</p><!-- 1 = 30 degs -->
+                <p>fcs/fly-by-wire/yaw/rudder-pos-norm</p><!-- 1 = 30 degs -->
                 <difference>
                     <p>aero/coefficient/Cl_dr</p>
                     <p>aero/coefficient/Cl_dh0</p>
@@ -2472,7 +2472,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>metrics/bw-ft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/r-rad_sec</property>
-                <property>fcs/lef-pos-r-norm</property>
+                <property>fcs/fly-by-wire/lef/lef-pos-r-norm</property>
                 <table name="table/dCl_r-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
@@ -2543,7 +2543,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>metrics/bw-ft</property>
                 <property>aero/bi2vel</property>
                 <property>velocities/p-rad_sec</property>
-                <property>fcs/lef-pos-r-norm</property>
+                <property>fcs/fly-by-wire/lef/lef-pos-r-norm</property>
                 <table name="table/dCl_p-lef">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
