@@ -533,6 +533,19 @@
             </function>
         </fcs_function>
 
+        <fcs_function name="fcs/fly-by-wire/pitch/F2">
+            <function>
+                <table>
+                <independentVar lookup="row">fcs/fly-by-wire/qcps-ratio</independentVar>
+                <tableData>
+                    0     0.50
+                    0.53  0.50
+                    1.79 -1.00
+                </tableData>
+            </table>
+            </function>
+        </fcs_function>
+
         <fcs_function name="fcs/fly-by-wire/pitch/F3">
             <function>
                 <table>
@@ -1397,8 +1410,13 @@
         </fcs_function>
 
         <pure_gain name="fcs/fly-by-wire/pitch/alpha-indicated-gain">
+            <description>
+                This is 0.5 on diagram, but needs to be higher
+                to be able to recover from sustained turn at low speeds.
+                At 1.0 it will limit alpha to 25-30 degs and prevent a deep stall.
+            </description>
             <input>fcs/fly-by-wire/pitch/alpha-indicated-sum</input>
-            <gain> 0.5 </gain>
+            <gain> 1.0 </gain>
             <clipto>
                 <min> 0 </min>
                 <max>10000</max>
@@ -1545,17 +1563,10 @@
             <gain> 5 </gain>
         </pure_gain>
 
-        <scheduled_gain name="fcs/fly-by-wire/pitch/alpha-feedback">
+        <pure_gain name="fcs/fly-by-wire/pitch/alpha-feedback">
             <input>fcs/fly-by-wire/pitch/alpha-indicated-lagged</input>
-            <table>
-                <independentVar lookup="row">fcs/fly-by-wire/qcps-ratio</independentVar>
-                <tableData>
-                    0     0.50
-                    0.53  0.50
-                    1.79 -1.00
-                </tableData>
-            </table>
-        </scheduled_gain>
+            <gain> fcs/fly-by-wire/pitch/F2 </gain>
+        </pure_gain>
 
         <summer name="fcs/fly-by-wire/pitch/pitch-loop-gain-final">
             <input> fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum </input>
