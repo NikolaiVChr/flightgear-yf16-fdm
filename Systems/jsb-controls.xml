@@ -962,13 +962,13 @@
         <summer name="fcs/fly-by-wire/roll/top-sum">
             <input>fcs/fly-by-wire/roll/final</input>
             <input>-fcs/fly-by-wire/roll/bottom-deadzone</input>
-            <input>fcs/fly-by-wire/tef/tef-pos-deg</input>
+            <input>fcs/fly-by-wire/tef/tef-cmd-pos-deg</input>
         </summer>
 
         <summer name="fcs/fly-by-wire/roll/bottom-sum">
             <input>-fcs/fly-by-wire/roll/final</input>
             <input>-fcs/fly-by-wire/roll/top-deadzone</input>
-            <input>fcs/fly-by-wire/tef/tef-pos-deg</input>
+            <input>fcs/fly-by-wire/tef/tef-cmd-pos-deg</input>
         </summer>
 
         <fcs_function name="fcs/fly-by-wire/roll/top-deadzone-pos">
