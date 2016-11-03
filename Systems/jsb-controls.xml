@@ -494,7 +494,7 @@
             <default value="0"/>
             <test logic="OR" value="1">
                 gear/gear-cmd-norm == 1
-                fcs/fly-by-wire/tef/tef-pos-norm   gt 0.5 <!-- should really be the flaps manual switch -->
+                /controls/flight/flaps gt 0
                 <!-- todo: if refueling door open and q_c < 646 -->
             </test>
         </switch>
@@ -530,6 +530,19 @@
                     <p>fcs/fly-by-wire/q_c</p>
                     <p>fcs/fly-by-wire/P_s</p>
                 </quotient>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="fcs/fly-by-wire/integrator">
+            <function>
+                <table>
+                    <independentVar lookup="row">inertia/weight-lbs</independentVar>
+                    <tableData>
+                        17400 2
+                        20000 2.5
+                        23000 5
+                    </tableData>
+                </table>
             </function>
         </fcs_function>
 
