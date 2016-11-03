@@ -1664,8 +1664,11 @@
         </pure_gain>
 
         <switch name="fcs/fly-by-wire/pitch/pitch-rate-lower-switch">
+            <description>
+                Is 1.0 or 10 in diagram, but does not make sense to me.
+            </description>
             <default value="0"/>
-            <test logic="AND" value="1">
+            <test logic="AND" value="0.1">
                 fcs/fly-by-wire/condition-a == 1
             </test>
         </switch>
