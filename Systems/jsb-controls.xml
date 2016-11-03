@@ -476,6 +476,7 @@
 
 
     <property value="1.5">fcs/fly-by-wire/K_A</property>
+    <property value="2">fcs/fly-by-wire/normal-gain</property>
     <property value="1">fcs/fly-by-wire/washout</property>
     <property value="5">fcs/fly-by-wire/integrator</property>
     <property value="1">fcs/fly-by-wire/enable-q</property>
@@ -1671,7 +1672,7 @@
 
         <lag_filter name="fcs/fly-by-wire/pitch/pitch-rate-lower-lag">
             <input> fcs/fly-by-wire/pitch/pitch-rate-lower-switch </input>
-            <c1> 0.125 </c1>
+            <c1> 12.5 </c1><!-- diagram say 0.125, but that does a pitch up for too long after takeoff -->
         </lag_filter>
 
         <pure_gain name="fcs/fly-by-wire/pitch/pitch-rate-lower-gain">
@@ -1745,21 +1746,31 @@
                 <product>
                     <p>fcs/fly-by-wire/enable-nz</p>
                     <difference>
-                        <property> accelerations/Nz </property>
+                        <property> accelerations/a_n </property>
                         <value> 1 </value>
                     </difference>
                 </product>
             </function>
         </fcs_function>
 
+        <switch name="fcs/fly-by-wire/pitch/normal-1-special">
+            <description>This prevents NaN to propagate through the system</description>
+            <default value="0"/>
+            <test logic="AND" value="fcs/fly-by-wire/pitch/normal-1">
+                accelerations/a_n lt  30
+                accelerations/a_n gt -30
+            </test>
+        </switch>
+
         <lag_filter name="fcs/fly-by-wire/pitch/normal-lagged">
-            <input> fcs/fly-by-wire/pitch/normal-1 </input>
+            <description>Bypassing this sim lag as its close to 120 Hz timestep.</description>
+            <input> fcs/fly-by-wire/pitch/normal-1-special </input>
             <c1> 50 </c1>
         </lag_filter>
 
         <pure_gain name="fcs/fly-by-wire/pitch/normal-lagged-gain">
-            <input>fcs/fly-by-wire/pitch/normal-1</input>
-            <gain> 1.0 </gain>
+            <input>fcs/fly-by-wire/pitch/normal-1-special</input>
+            <gain> fcs/fly-by-wire/normal-gain </gain>
         </pure_gain>
 
         <pure_gain name="fcs/fly-by-wire/pitch/normal-lagged-gain2">
