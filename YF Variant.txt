@@ -22,14 +22,14 @@ Line 43: frameNotification.Nz = -getprop("accelerations/pilot/z-accel-fps_sec")/
 
 Properties that my fly-by-wire system has to map into to animate f16 model:
 
-surface-positions/rudder-pos-norm
-fdm/jsbsim/fcs/dht-right-pos-rad
-fdm/jsbsim/fcs/dht-left-pos-rad
-surface-positions/left-aileron-pos-norm
-surface-positions/right-aileron-pos-norm
-fdm/jsbsim/fcs/left-flaperon-norm
-fdm/jsbsim/fcs/right-flaperon-norm
-fdm/jsbsim/fcs/lef-pos-deg
+surface-positions/rudder-pos-norm        -> fcs/fly-by-wire/yaw/rudder-pos-norm
+fdm/jsbsim/fcs/dht-right-pos-rad         -> fcs/fly-by-wire/pitch/horz-tail-right-deflection-deg
+fdm/jsbsim/fcs/dht-left-pos-rad          -> fcs/fly-by-wire/pitch/horz-tail-left-deflection-deg
+surface-positions/left-aileron-pos-norm  -> fcs/fly-by-wire/roll/flaperon-left-deflection-deg
+surface-positions/right-aileron-pos-norm -> fcs/fly-by-wire/roll/flaperon-right-deflection-deg
+fdm/jsbsim/fcs/left-flaperon-norm        -> fcs/fly-by-wire/roll/flaperon-left-deflection-deg
+fdm/jsbsim/fcs/right-flaperon-norm       -> fcs/fly-by-wire/roll/flaperon-right-deflection-deg
+fdm/jsbsim/fcs/lef-pos-deg               -> fcs/fly-by-wire/lef/lef-pos-deg
 
 
 
