@@ -1194,7 +1194,7 @@
 
         <pure_gain name="fcs/fly-by-wire/ari/gain">
             <input>fcs/fly-by-wire/pitch/alpha-indicated-lagged</input>
-            <gain> 0.0375 </gain>
+            <gain> 0.075 </gain>
         </pure_gain>
 
         <summer name="fcs/fly-by-wire/ari/sum">
