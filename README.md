@@ -1,2 +1,2 @@
 # generic-aircraft
-For now I wont reveal what plane this is
+Coming soon_tm
