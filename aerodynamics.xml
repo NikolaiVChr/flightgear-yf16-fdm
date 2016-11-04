@@ -87,9 +87,9 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
             <property>fcs/fly-by-wire/tef/tef-pos-norm</property>
             <value>0.1221731</value>
         </product>
-    </function>
+    </function>    
 
-      <function name="aero/coefficient/CL_g">
+    <function name="aero/coefficient/CL_g">
        <description>Change in lift due to ground effect</description>
        <product>
           <table>
@@ -2625,8 +2625,8 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                     </tableData>
                 </table>
             </product>
-        </function>                        
+        </function>
 
-    </axis>
+    </axis>    
 
 </aerodynamics>
