@@ -771,7 +771,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
  60 -25.2
  70 -27.3
  80 -9.35
- 90 -2.14
+ 90 -2.16
                     </tableData>
                 </table>
             </product>
@@ -1393,7 +1393,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
  25 .483
  30 .590
  35 1.12
- 40 -.49
+ 40 -.493
  45 -1.04
  50 -1.21
  55 -1.58
@@ -1451,7 +1451,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
 -10 .0333
 -05 -.177
  00 .0055
- 05 .067
+ 05 .0679
  10 .310
  15 .234
  20 .344
@@ -1972,7 +1972,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
  10 .0
  15 .0
  20 .0
- 25 -.008
+ 25 -.0008
  30 .001
  35 .0
  40 .0
@@ -2052,7 +2052,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
  15 .014
  20 -.103
  25 -.098
- 30 -.210
+ 30 -.310
  35 -.437
  40 .167
  45 .084
@@ -2465,7 +2465,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
 -15 -.155
 -10 -.155
 -05 -.201
- 00 -.002
+ 00 -.0024
  05 .088
  10 .205
  15 .22
@@ -2542,7 +2542,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
 -10 .029
 -05 .175
  00 .665
- 05 .36
+ 05 .036
  10 .007
  15 .066
  20 .201
@@ -2625,8 +2625,8 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                     </tableData>
                 </table>
             </product>
-        </function>
+        </function>                        
 
-    </axis>    
+    </axis>
 
 </aerodynamics>
