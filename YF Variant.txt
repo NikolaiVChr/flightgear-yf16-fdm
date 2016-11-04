@@ -35,7 +35,7 @@ fdm/jsbsim/fcs/lef-pos-deg
 
 Add to authors:
 
-<author>Erik Hofman, Pensacola (skin textures), Martin "Pegasus" Schmitt (panel textures), Richard Harrison (MFD, HUD), Nikolai V. Chr. (Aero & FCS for YF-16)</author>
+<author>Erik Hofman, Pensacola (skin textures), Martin "Pegasus" Schmitt (panel textures), Richard Harrison (MFD, HUD), Nikolai V. Chr. (Aero, FCS for YF-16)</author>
 
 
 Todo for YF-16
