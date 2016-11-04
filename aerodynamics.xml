@@ -65,6 +65,13 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                       1.800  0.020
                   </tableData>
               </table>
+              <table name="table/CDwave_sb">
+                  <independentVar>fcs/speedbrake-pos-norm</independentVar>
+                  <tableData>
+                      0  1.0
+                      1  1.5
+                  </tableData>
+              </table>
         </product>
     </function>
 
