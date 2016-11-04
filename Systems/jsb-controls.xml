@@ -1,8 +1,11 @@
 <?xml version="1.0"?>
 
+<!-- Fly by wire control system for YF-16. Author: Nikolai V. Chr. -->
+
 <flight_control name="FC">
 
     <channel execrate="1" name="Pitch A">
+        <!-- Pitch control system A from TP-1538 -->
 
         <fcs_function name="fcs/fly-by-wire/pitch/stick-force-N">
             <function>
