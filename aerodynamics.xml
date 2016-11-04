@@ -5,12 +5,12 @@
 
  Note:
 ======
-In all tables that do not have author listed, the numbers was typed in by Nikolai V. Chr.
+In all aero tables that do not have author listed, the numbers was typed in by Nikolai V. Chr.
 
 
  Todo:
 ======
-Make all coefficients functions
+Make all coefficients functions (like Cy is)
 Put in engine gyroscopic effect (160 slugs-ft2/sec)
 
 
@@ -28,33 +28,30 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
 
 <aerodynamics>
 
-    <aero_ref_pt_shift_x>
+    <!--<aero_ref_pt_shift_x>
         <function name="metrics/aero-rp-shift-mac">
             <description>
                 Mach-tuck: Transonic Shift of Aerodynamic Center
 
                 An estimate by Nikolai V. Chr.
 
-                Default static margin = 0.04c (5.4336 inch)
+                Default static margin =-0.04c (5.4336 inch)
                 Default CoG           = 0.35c
                 Chord                 = 11.32 ft
 
                 0.19 makes the AeroRP move to 0.5c at 1.1 mach.
-
-                But 
 
             </description>
             <table name="table/ACshift">
                 <independentVar>velocities/mach</independentVar>
                 <tableData>
                   0.6 0
-                  0.8 0.2
-                  0.9 0.4
-                  1.1 0.4
+                  0.8 0.05
+                  1.1 0.19
                 </tableData>
             </table>
         </function>
-    </aero_ref_pt_shift_x>
+    </aero_ref_pt_shift_x>-->
 
     <!-- the following 4 functions are adapted from the FGAddon F16 -->
     <function name="aero/coefficient/CDwave">
@@ -74,14 +71,14 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
     <function name="aero/coefficient/CDtef">
         <product>
             <property>fcs/fly-by-wire/tef/tef-pos-norm</property>
-            <value>0.02792528</value>
+            <value>0.020</value>
         </product>
     </function>
 
     <function name="aero/coefficient/CDgear">
         <product>
             <property>gear/gear-pos-norm</property>
-            <value>0.075</value>
+            <value>0.025</value>
         </product>
     </function>
 
