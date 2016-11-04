@@ -2174,4 +2174,60 @@
 
     </channel>
 
+<!--                                                                             disabled since Erik made some mappings for it
+    <channel name="YF-16 Fly-by-wire mappings to model">
+
+        <pure_gain name="fcs/fly-by-wire/model/rudder-pos-norm">
+            <description>One to one</description>
+            <input>fcs/fly-by-wire/yaw/rudder-pos-norm</input>
+            <gain>1</gain>
+            <output>fcs/rudder-pos-norm</output>
+        </pure_gain>
+
+        <pure_gain name="fcs/dht-right-pos-rad">
+            <description>Degrees to radians</description>
+            <input>fcs/fly-by-wire/pitch/horz-tail-right-deflection-deg</input>
+            <gain>0.017453</gain>
+        </pure_gain>
+
+        <pure_gain name="fcs/dht-left-pos-rad">
+            <description>Degrees to -radians</description>
+            <input>fcs/fly-by-wire/pitch/horz-tail-left-deflection-deg</input>
+            <gain>-0.017453</gain>
+        </pure_gain>
+
+        <pure_gain name="fcs/fly-by-wire/model/left-aileron-pos-norm">
+            <description>Degrees to 21.5 degrees</description>
+            <input>fcs/fly-by-wire/roll/flaperon-left-deflection-deg</input>
+            <gain>0.0465</gain>
+            <output>fcs/left-aileron-pos-norm</output>
+        </pure_gain>
+
+        <pure_gain name="fcs/fly-by-wire/model/right-aileron-pos-norm">
+            <description>Degrees to -21.5 degrees. Model uses left instad of this..</description>
+            <input>fcs/fly-by-wire/roll/flaperon-right-deflection-deg</input>
+            <gain>-0.0465</gain>
+            <output>fcs/right-aileron-pos-norm</output>
+        </pure_gain>
+
+        <pure_gain name="fcs/left-flaperon-norm">
+            <description>Degrees to -20 degrees</description>
+            <input>fcs/fly-by-wire/roll/flaperon-left-deflection-deg</input>
+            <gain>-0.05</gain>
+        </pure_gain>
+
+        <pure_gain name="fcs/right-flaperon-norm">
+            <description>Degrees to 20 degrees</description>
+            <input>fcs/fly-by-wire/roll/flaperon-right-deflection-deg</input>
+            <gain>0.05</gain>
+        </pure_gain>
+
+        <pure_gain name="fcs/lef-pos-deg">
+            <description>One to one</description>
+            <input>fcs/fly-by-wire/lef/lef-pos-deg</input>
+            <gain>1</gain>
+        </pure_gain>
+
+    </channel>-->    
+
 <flight_control>
