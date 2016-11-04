@@ -15,7 +15,7 @@ Add these JSBSim main file refs:
 
 
 
-Change in exec.nas:
+Suggest change in exec.nas:
 
 Line 43: frameNotification.Nz = -getprop("accelerations/pilot/z-accel-fps_sec")/getprop("fdm/jsbsim/accelerations/gravity-ft_sec2");
 
