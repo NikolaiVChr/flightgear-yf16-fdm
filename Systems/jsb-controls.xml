@@ -979,13 +979,13 @@
         <summer name="fcs/fly-by-wire/roll/top-sum">
             <input>fcs/fly-by-wire/roll/final</input>
             <input>-fcs/fly-by-wire/roll/bottom-deadzone</input>
-            <input>fcs/fly-by-wire/tef/tef-cmd-pos-deg</input>
+            <input>fcs/fly-by-wire/tef/tef-pos-deg</input>
         </summer>
 
         <summer name="fcs/fly-by-wire/roll/bottom-sum">
             <input>-fcs/fly-by-wire/roll/final</input>
             <input>-fcs/fly-by-wire/roll/top-deadzone</input>
-            <input>fcs/fly-by-wire/tef/tef-cmd-pos-deg</input>
+            <input>fcs/fly-by-wire/tef/tef-pos-deg</input>
         </summer>
 
         <fcs_function name="fcs/fly-by-wire/roll/top-deadzone-pos">
@@ -2095,19 +2095,34 @@
 
     <channel name="Trailing edge flaps">
 
-        <!--<switch name="fcs/fly-by-wire/tef/cmd-gear">
+        <switch name="fcs/fly-by-wire/tef/cmd-gear">
             <default value="0"/>
-            <test logic="AND" value="20">
+            <test logic="AND" value="1">
                 gear/gear-cmd-norm == 1
             </test>
         </switch>
 
         <switch name="fcs/fly-by-wire/tef/cmd-switch">
             <default value="fcs/fly-by-wire/tef/cmd-gear"/>
-            <test logic="AND" value="20">
+            <test logic="AND" value="1">
                 /controls/flight/flaps gt 0
             </test>
         </switch>
+
+        <fcs_function name="fcs/fly-by-wire/tef/cmd">
+            <function>
+                <product>
+                    <p>fcs/fly-by-wire/tef/cmd-switch</p>
+                    <table>
+                        <independentVar lookup="row">velocities/vc-kts</independentVar>
+                        <tableData>
+                            250 20
+                            370  0
+                        </tableData>
+                    </table>
+                </product>
+            </function>
+        </fcs_function>
 
         <summer name="fcs/fly-by-wire/tef/F9-limit">
             <input> fcs/fly-by-wire/tef/F9 </input>
@@ -2118,7 +2133,7 @@
         </summer>
 
         <summer name="fcs/fly-by-wire/tef/sum">
-            <input> fcs/fly-by-wire/tef/cmd-switch </input>
+            <input> fcs/fly-by-wire/tef/cmd </input>
             <input> -fcs/fly-by-wire/tef/int </input>
             <input> fcs/fly-by-wire/tef/F9-limit </input>
             <clipto>
@@ -2139,46 +2154,18 @@
                     <value> 1.5 </value>
                 </sum>
             </function>
-        </fcs_function>-->
-
-        <fcs_function name="fcs/fly-by-wire/tef/tef-cmd-pos-deg">
-            <function>
-                <product>
-                    <max>
-                      <p>/controls/flight/flaps</p>
-                      <p>gear/gear-cmd-norm</p>
-                    </max>
-                    <table>
-                        <independentVar lookup="row">velocities/vc-kts</independentVar>
-                        <independentVar lookup="column">velocities/mach</independentVar>
-                        <tableData>
-                                 0  0.95  1
-                            250 20  20   -2
-                            370  0   0   -2
-                        </tableData>
-                    </table>
-                </product>
-            </function>
         </fcs_function>
 
-        <kinematic name="fcs/fly-by-wire/tef/tef-pos-deg">
-            <input>fcs/fly-by-wire/tef/tef-cmd-pos-deg</input>
-            <noscale/>
-            <traverse>
-                <setting>
-                    <position>0</position>
-                    <time>0</time>
-                </setting>
-                <setting>
-                    <position>80</position>
-                    <time>1</time>
-                </setting>
-            </traverse>
-        </kinematic>
-
         <pure_gain name="fcs/fly-by-wire/tef/tef-pos-norm">
-            <input>fcs/fly-by-wire/tef/tef-pos-deg</input>
+            <description>Using integrator output as mechanical bias should not be feed into aerodynamics</description>
+            <input>fcs/fly-by-wire/tef/int</input>
             <gain>0.05</gain>
+        </pure_gain>
+
+        <pure_gain name="fcs/fly-by-wire/tef/tef-pos-deg-hud">
+            <description>This value should be displayed in HUD.</description>
+            <input>fcs/fly-by-wire/tef/tef-pos-norm</input>
+            <gain>20</gain>
         </pure_gain>
 
     </channel>
@@ -2234,6 +2221,12 @@
         <pure_gain name="fcs/lef-pos-deg">
             <description>One to one</description>
             <input>fcs/fly-by-wire/lef/lef-pos-deg</input>
+            <gain>1</gain>
+        </pure_gain>
+
+        <pure_gain name="fcs/flap-pos-deg">
+            <description>One to one</description>
+            <input>fcs/fly-by-wire/tef/tef-pos-deg-hud</input>
             <gain>1</gain>
         </pure_gain>
 
