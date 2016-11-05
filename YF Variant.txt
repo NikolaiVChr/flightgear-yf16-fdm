@@ -1,25 +1,6 @@
 Todo for FGAddon f16 YF variant.
 ================================
 
-Add these JSBSim main file refs:
-
-  <reference refID="NASA TP-1538" author="Nguyen, L. T.; Ogburn, M. E.; Gilbert, W. P.; Kibler, K. S.; Brown, P. W.; Deal, P. L."
-    title="Simulator study of stall/post-stall characteristics of a fighter airplane with relaxed longitudinal static stability." date="12/1979"/>
-  <reference refID="YF-16 FCS Diagram" author="General Dynamics" title="F-16 Flight Control System Functional Block Diagram" date="1975"/>
-  <reference refID="NASA TN-D-8176" author="Gilbert, W. P.; Nguyen, L. T.; Vangunst, R. W."
-    title="Simulator study of the effectiveness of an automatic control system designed to improve the high-angle-of-attack characteristics of a fighter airplane" date="1976"/>
-  <reference refID="PW-100 Engine" author="Elodie Roux" title="Turbofan and Turbojet Engines: Database Handbook" date="2007"/>
-  <reference refID="Manual" author="Lockheed Martin" title="F-16C/D Block 50 Flight Manual" date="2 December 1996"/>
-  <reference refID="Youtube video showing speed brake actuation time (2 secs)" author="MultiplyLeadership's channel"
-    title="Air-to-air chase video of F-16 AB light off FTT" date="Oct 20, 2010"/>
-
-
-
-Suggest change in exec.nas:
-
-Line 43: frameNotification.Nz = -getprop("accelerations/pilot/z-accel-fps_sec")/getprop("fdm/jsbsim/accelerations/gravity-ft_sec2");
-
-
 Properties that my fly-by-wire system has to map into to animate f16 model:
 
 /surface-positions/rudder-pos-norm       -> fcs/fly-by-wire/yaw/rudder-pos-norm
@@ -38,6 +19,5 @@ Todo for YF-16
 Place fuel tanks and pilot and make it so they don't disrupt CG too much.
 Make all coefficients functions (like Cy is)
 Put in engine gyroscopic effect (160 slugs-ft2/sec)
-Fix heavy pitch up at takeoff.
 
 

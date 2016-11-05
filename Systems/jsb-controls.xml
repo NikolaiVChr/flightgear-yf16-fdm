@@ -479,7 +479,7 @@
 
 
     <property value="0.25">fcs/fly-by-wire/K_A</property>
-    <property value="2">fcs/fly-by-wire/normal-gain</property>
+    <property value="2">fcs/fly-by-wire/normal-gain</property><!-- Very important that this is changed to 2, as the normal feedback will then allow up to 9.5G instead of 19 -->
     <property value="1">fcs/fly-by-wire/washout</property>
     <property value="5">fcs/fly-by-wire/integrator</property>
     <property value="1">fcs/fly-by-wire/enable-q</property>
@@ -1332,8 +1332,13 @@
         </summer>
 
         <switch name="fcs/fly-by-wire/pitch/g-limit-product">
+            <description>
+                The test value is 1.0 on diagram,
+                but anything but 0.5 will give trouble on takeoff
+                as the commanded G rapidly switch for example to double value.
+            </description>
             <default value="0.5"/>
-            <test logic="AND" value="1">
+            <test logic="AND" value="0.5">
                 fcs/fly-by-wire/MLG-GND == 1
             </test>
         </switch>
@@ -1485,8 +1490,9 @@
         </integrator>
 
         <pure_gain name="fcs/fly-by-wire/pitch/pitch-loop-ground-product">
+            <description>diagram say 0.5, but negative makes more sense</description>
             <input>fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int</input>
-            <gain> -0.5 </gain><!-- diagram say 0.5, but negative makes more sense -->
+            <gain> -0.5 </gain>
         </pure_gain>
 
         <fcs_function name="fcs/fly-by-wire/pitch/amp-deadzone-neg">
@@ -1532,7 +1538,8 @@
             <input> fcs/fly-by-wire/pitch/pitch-loop-gain </input>
         </summer>
 
-        <summer name="fcs/fly-by-wire/pitch/int-balance-summer"><!-- test system not made, so is 0 -->
+        <summer name="fcs/fly-by-wire/pitch/int-balance-summer">
+            <description>test system not made, so is 0</description>
             <input> fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum </input>
             <input> -fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum </input>
         </summer>
@@ -1702,8 +1709,9 @@
         </switch>
 
         <lag_filter name="fcs/fly-by-wire/pitch/pitch-rate-lower-lag">
+            <description>diagram say 0.125, but that does a pitch up for too long after takeoff</description>
             <input> fcs/fly-by-wire/pitch/pitch-rate-lower-switch </input>
-            <c1> 12.5 </c1><!-- diagram say 0.125, but that does a pitch up for too long after takeoff -->
+            <c1> 12.5 </c1>
         </lag_filter>
 
         <pure_gain name="fcs/fly-by-wire/pitch/pitch-rate-lower-gain">
@@ -1835,8 +1843,9 @@
         </lead_lag_filter>
 
         <second_order_filter name="fcs/fly-by-wire/pitch/pitch-rate-lead-2nd">
+          <description>on old diagram looks to be 2.5, not 25</description>
           <input> fcs/fly-by-wire/pitch/pitch-rate-lead </input>
-          <c1> 2.5 </c1><!-- on old diagram looks to be 2.5, not 25 -->
+          <c1> 2.5 </c1>
           <c2> 20 </c2>
           <c3> 3500 </c3>
           <c4> 1 </c4>
