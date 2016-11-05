@@ -77,7 +77,10 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
 
     <function name="aero/coefficient/CDtef">
         <product>
-            <property>fcs/fly-by-wire/tef/tef-pos-norm</property>
+            <abs>
+                <!-- is absolute so -2 degs up don't give negative drag -->
+                <property>fcs/fly-by-wire/tef/tef-pos-norm</property>
+            </abs>
             <value>0.020</value>
         </product>
     </function>
