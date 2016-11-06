@@ -3,6 +3,41 @@ Todo for FGAddon f16 YF variant.
 
 Fix 3 liveries and get them included.
 
+Include in -set file:
+
+ <consumables>
+  <fuel>
+    <tank n="0">
+        <name>Fuselage FWD Tank</name>
+    </tank>
+    <tank n="1">
+        <name>Fuselage AFT Tank</name>
+    </tank>
+    <tank n="2">
+        <name>Right Drop Tank</name>
+    </tank>
+    <tank n="3">
+        <name>Left Drop Tank</name>
+    </tank>
+    <tank n="4">
+        <name>Center Drop Tank</name>
+    </tank>
+    <tank n="5">
+        <name>Right Wing Tank</name>
+    </tank>
+    <tank n="6">
+        <name>Left Wing Tank</name>
+    </tank>
+  </fuel>
+ </consumables>
+
+
+
+ remove: 
+
+
+ <file>Nasal/MFD/MFD_main.nas</file>
+
 
 Todo for YF-16
 ==============
