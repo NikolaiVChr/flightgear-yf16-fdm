@@ -1,17 +1,7 @@
 Todo for FGAddon f16 YF variant.
 ================================
 
-Properties that my fly-by-wire system has to map into to animate f16 model:
-
-/surface-positions/rudder-pos-norm       -> fcs/fly-by-wire/yaw/rudder-pos-norm
-fdm/jsbsim/fcs/dht-right-pos-rad         -> fcs/fly-by-wire/pitch/horz-tail-right-deflection-deg
-fdm/jsbsim/fcs/dht-left-pos-rad          -> fcs/fly-by-wire/pitch/horz-tail-left-deflection-deg
-/surface-positions/left-aileron-pos-norm -> fcs/fly-by-wire/roll/flaperon-left-deflection-deg
-/surface-positions/right-aileron-pos-norm-> fcs/fly-by-wire/roll/flaperon-right-deflection-deg
-fdm/jsbsim/fcs/left-flaperon-norm        -> fcs/fly-by-wire/roll/flaperon-left-deflection-deg
-fdm/jsbsim/fcs/right-flaperon-norm       -> fcs/fly-by-wire/roll/flaperon-right-deflection-deg
-fdm/jsbsim/fcs/lef-pos-deg               -> fcs/fly-by-wire/lef/lef-pos-deg
-
+Fix 3 liveries and get them included.
 
 
 Todo for YF-16
@@ -19,5 +9,5 @@ Todo for YF-16
 Place fuel tanks and pilot and make it so they don't disrupt CG too much.
 Make all coefficients functions (like Cy is)
 Put in engine gyroscopic effect (160 slugs-ft2/sec)
-
+Address minor pitch oscillations at empty fuel.
 
