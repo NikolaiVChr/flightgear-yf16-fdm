@@ -478,8 +478,8 @@
 
 
 
-    <property value="0.25">fcs/fly-by-wire/K_A</property>
-    <property value="2.15">fcs/fly-by-wire/normal-gain</property><!-- Very important that this is changed to 2, as the normal feedback will then allow up to 9.5G instead of 19 -->
+    <property value="-0.25">fcs/fly-by-wire/K_A</property>
+    <property value="2.0">fcs/fly-by-wire/normal-gain</property><!-- Very important that this is changed to 2, as the normal feedback will then allow up to 9.5G instead of 19 -->
     <property value="1">fcs/fly-by-wire/washout</property>
     <property value="5">fcs/fly-by-wire/integrator</property>
     <property value="1">fcs/fly-by-wire/enable-q</property>
@@ -1197,7 +1197,7 @@
 
         <pure_gain name="fcs/fly-by-wire/ari/gain">
             <input>fcs/fly-by-wire/pitch/alpha-indicated-lagged</input>
-            <gain> 0.075 </gain>
+            <gain> 0.0375 </gain>
         </pure_gain>
 
         <summer name="fcs/fly-by-wire/ari/sum">
@@ -1227,6 +1227,25 @@
 
     <channel execrate="1" name="Pitch Ref">
 
+        <fcs_function name="fcs/fly-by-wire/pitch/stick-force-lbf">
+            <function>
+                <table>
+                    <independentVar lookup="row">fcs/elevator-cmd-norm</independentVar>
+                    <tableData>
+                       -1   40
+                        0    0
+                        1  -17.65
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
+        <!--<lag_filter name="fcs/fly-by-wire/pitch/stick-force-N-lagged">
+            <input> fcs/fly-by-wire/pitch/stick-force-N </input>
+            <c1> 60 </c1>
+        </lag_filter>-->
+
+        <!--
         <fcs_function name="fcs/fly-by-wire/pitch/stick-force-N">
             <function>
                 <table>
@@ -1240,11 +1259,6 @@
             </function>
         </fcs_function>
 
-        <!--<lag_filter name="fcs/fly-by-wire/pitch/stick-force-N-lagged">
-            <input> fcs/fly-by-wire/pitch/stick-force-N </input>
-            <c1> 60 </c1>
-        </lag_filter>-->
-
         <fcs_function name="fcs/fly-by-wire/pitch/command-g">
             <function>
                 <table>
@@ -1256,6 +1270,22 @@
                           8   0.0
                          35   0.5 
                         180  11.0
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>-->
+
+        <fcs_function name="fcs/fly-by-wire/pitch/command-g">
+            <function>
+                <table>
+                    <independentVar lookup="row">fcs/fly-by-wire/pitch/stick-force-lbf</independentVar>
+                    <tableData>
+                       -17.65  -4.0
+                        -7.25  -0.44
+                        -1.75   0.0
+                         1.75   0.0
+                         7.25   0.44 
+                        40.00  10.86
                     </tableData>
                 </table>
             </function>
@@ -1801,24 +1831,47 @@
             </test>
         </switch>
 
-        <lag_filter name="fcs/fly-by-wire/pitch/normal-lagged">
+        <!--<lag_filter name="fcs/fly-by-wire/pitch/normal-lagged">
             <description>Bypassing this sim lag as its close to 120 Hz timestep.</description>
             <input> fcs/fly-by-wire/pitch/normal-1-special </input>
             <c1> 50 </c1>
-        </lag_filter>
+        </lag_filter>-->
 
-        <pure_gain name="fcs/fly-by-wire/pitch/normal-lagged-gain">
+        <!--<pure_gain name="fcs/fly-by-wire/pitch/normal-gain1">
             <input>fcs/fly-by-wire/pitch/normal-1-special</input>
             <gain> fcs/fly-by-wire/normal-gain </gain>
-        </pure_gain>
+        </pure_gain>-->
 
-        <pure_gain name="fcs/fly-by-wire/pitch/normal-lagged-gain2">
-            <input>fcs/fly-by-wire/pitch/normal-lagged-gain</input>
+        <fcs_function name="fcs/fly-by-wire/pitch/normal-gain">
+            <description>
+                9.43G is maximum commanded G.
+                To make sure the feedback at 1G is 0, it has to return 0 at 1G.
+                To not be able to pull 10.43G it has to return 9.43 when its
+                8.43 since 1 has already been subtracted from a_n.
+                Due to trim the gradient is not lineary rising,
+                but has a break at |2.4G|.
+            </description>
+            <function>
+                <table>
+                    <independentVar lookup="row">fcs/fly-by-wire/pitch/normal-1-special</independentVar>
+                    <tableData>
+                      -50.00 -49.00
+                       -5.00  -4.00
+                        0.00   0.00
+                        8.43   9.43
+                       50.00  51.00
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
+        <!--<pure_gain name="fcs/fly-by-wire/pitch/normal-gain2">
+            <input>fcs/fly-by-wire/pitch/normal-gain1</input>
             <gain> 0.5 </gain>
-        </pure_gain>
+        </pure_gain>-->
 
         <summer name="fcs/fly-by-wire/pitch/pitch-rate-gain-2-sum">
-            <input> fcs/fly-by-wire/pitch/normal-lagged-gain2 </input>
+            <input> fcs/fly-by-wire/pitch/normal-gain </input>
             <input> fcs/fly-by-wire/pitch/q-gain-2 </input>
         </summer>
 
@@ -1843,7 +1896,7 @@
         </lead_lag_filter>
 
         <second_order_filter name="fcs/fly-by-wire/pitch/pitch-rate-lead-2nd">
-          <description>on old diagram looks to be 2.5, not 25</description>
+          <description>on old diagram looks to be 2.5, not 2 or 25</description>
           <input> fcs/fly-by-wire/pitch/pitch-rate-lead </input>
           <c1> 2.5 </c1>
           <c2> 20 </c2>
@@ -2169,8 +2222,7 @@
         </pure_gain>
 
     </channel>
-
-<!--                                                                             disabled since Erik made some mappings for it
+<!--                                                                             disabled since Erik made some mappings for it-->
     <channel name="YF-16 Fly-by-wire mappings to model">
 
         <pure_gain name="fcs/fly-by-wire/model/rudder-pos-norm">
@@ -2224,12 +2276,50 @@
             <gain>1</gain>
         </pure_gain>
 
-        <pure_gain name="fcs/flap-pos-deg">
-            <description>One to one</description>
-            <input>fcs/fly-by-wire/tef/tef-pos-deg-hud</input>
-            <gain>1</gain>
-        </pure_gain>
+        <fcs_function name="fcs/fly-by-wire/model/flap-pos-deg-with-frac">
+            <function>
+                <product>
+                    <v>0.1</v>
+                    <integer>
+                        <product>
+                            <v>10</v>
+                            <p>fcs/fly-by-wire/tef/tef-pos-deg-hud</p>
+                        </product>
+                    </integer>
+                </product>
+            </function>
+        </fcs_function>
 
-    </channel>-->    
+        <fcs_function name="fcs/fly-by-wire/model/flap-pos-deg-frac">
+            <function>
+                <fraction>
+                      <p>fcs/fly-by-wire/model/flap-pos-deg-with-frac</p>
+                </fraction>
+            </function>
+        </fcs_function>
+
+        <switch name="fcs/fly-by-wire/model/flap-pos-deg-frac-add">
+            <default value="0"/>
+            <test logic="AND" value="1">
+                fcs/fly-by-wire/model/flap-pos-deg-frac ge 0.5
+            </test>
+            <test logic="AND" value="-1">
+                fcs/fly-by-wire/model/flap-pos-deg-frac le -0.5
+            </test>
+        </switch>
+
+        <fcs_function name="fcs/fly-by-wire/model/flap-pos-deg-final">
+            <function>
+                <sum>
+                    <integer>
+                        <p>fcs/fly-by-wire/tef/tef-pos-deg-hud</p>
+                    </integer>
+                    <p>fcs/fly-by-wire/model/flap-pos-deg-frac-add</p>
+                </sum>
+            </function>
+            <output>fcs/flap-pos-deg</output>
+        </fcs_function>
+
+    </channel>
 
 <flight_control>
