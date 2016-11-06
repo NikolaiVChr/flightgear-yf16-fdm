@@ -53,7 +53,6 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
         </function>
     </aero_ref_pt_shift_x>-->
 
-    <!-- the following 4 functions are adapted from the FGAddon F16 -->
     <function name="aero/coefficient/CDwave">
         <product>
               <table name="table/CDwave">
@@ -71,7 +70,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                       0  1.0
                       1  1.5
                   </tableData>
-              </table>
+              </table>              
         </product>
     </function>
 
@@ -1895,10 +1894,13 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
                 <v>-1</v>
-                <difference>
-                    <v>-193</v>
-                    <p>inertia/cg-x-in</p>
-                </difference>
+                <product>
+                    <difference>
+                        <v>-193</v>
+                        <p>inertia/cg-x-in</p>
+                    </difference>
+                    <v>0.083333</v><!-- in to ft -->
+                </product>
                 <p>aero/coefficient/Cy_t</p>
                 <quotient>
                     <property>metrics/cbarw-ft</property>
