@@ -41,8 +41,6 @@ Include in -set file:
 
 Todo for YF-16
 ==============
-Place fuel tanks and pilot and make it so they don't disrupt CG too much.
 Make all coefficients functions (like Cy is)
 Put in engine gyroscopic effect (160 slugs-ft2/sec)
 Address minor pitch oscillations at empty fuel.
-
