@@ -1753,6 +1753,41 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
         </table>
     </function>         
 
+        <function name="aero/CG-pos-c">
+        <description>
+            CG position
+        </description>
+        <sum>
+            <v>0.35</v><!-- X_CG-ref -->
+            <quotient>
+                <product>
+                    <difference>
+                        <p>inertia/cg-x-in</p>
+                        <v>-193</v><!-- X_CG-ref (inches) -->
+                    </difference>
+                    <v>0.083333</v><!-- in to ft -->
+                </product>
+                <property>metrics/cbarw-ft</property>
+            </quotient>
+        </sum>
+    </function>
+
+    <function name="aero/static-margin-c">
+        <description>
+            Static margin in fraction of chord
+        </description>
+        <quotient>
+            <product>
+                <difference>
+                    <p>metrics/aero-rp-x-in</p>
+                    <p>inertia/cg-x-in</p>
+                </difference>
+                <v>0.083333</v><!-- in to ft -->
+            </product>
+            <property>metrics/cbarw-ft</property>
+        </quotient>
+    </function>
+
     <axis name="YAW">
 
         <function name="aero/coefficient/Cn">
@@ -1894,20 +1929,17 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <property>metrics/Sw-sqft</property>
                 <property>metrics/bw-ft</property>
                 <v>-1</v>
-                <product>
-                    <difference>
-                        <v>-193</v>
-                        <p>inertia/cg-x-in</p>
-                    </difference>
-                    <v>0.083333</v><!-- in to ft -->
-                </product>
-                <p>aero/coefficient/Cy_t</p>
+                <difference>
+                    <v>0.35</v><!-- X_CG-ref -->
+                    <p>aero/CG-pos-c</p>
+                </difference>                    
                 <quotient>
                     <property>metrics/cbarw-ft</property>
                     <property>metrics/bw-ft</property>
                 </quotient>
+                <p>aero/coefficient/Cy_t</p>
             </product>
-        </function>       
+        </function>
 
         <function name="aero/coefficient/dCn_dr">
             <description>
