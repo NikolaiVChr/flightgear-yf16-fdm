@@ -53,6 +53,12 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
         </function>
     </aero_ref_pt_shift_x>-->
 
+    <hysteresis_limits unit="DEG">
+        <description>Stall regime</description>
+        <min> 31 </min>
+        <max> 36 </max>
+    </hysteresis_limits>
+
     <function name="aero/coefficient/CDwave">
         <product>
               <table name="table/CDwave">
