@@ -478,7 +478,7 @@
 
 
 
-    <property value="1">fcs/fly-by-wire/K_A</property>
+    <property value="2">fcs/fly-by-wire/K_A</property><!-- should be 2000, but JSB cannot handle that -->
     <property value="1">fcs/fly-by-wire/washout</property>
     <property value="1">fcs/fly-by-wire/enable-q</property>
     <property value="1">fcs/fly-by-wire/enable-nz</property>
@@ -486,6 +486,10 @@
     <property value="1">fcs/fly-by-wire/enable-fake</property>
     <property value="1">fcs/fly-by-wire/enable-alpha</property>
     <property value="1">fcs/fly-by-wire/enable-q-washout</property>
+    <property value="-25">fcs/fly-by-wire/deadzone-amp-neg</property>
+    <property value="25">fcs/fly-by-wire/deadzone-amp-pos</property>
+    <property value="-25">fcs/fly-by-wire/deadzone-feedback-neg</property>
+    <property value="25">fcs/fly-by-wire/deadzone-feedback-pos</property>
 
     <property value="0">fcs/fly-by-wire/pitch/alpha-indicated-lagged</property>
     <property value="0">fcs/fly-by-wire/pitch/pitch-loop-ground-product</property>
@@ -531,7 +535,7 @@
                 The 0.75 value will limit AoA to around 28 in normal flight.
                 The 0.5 value will give pilot more elevator control in deep stall.
             </description>
-            <default value="0.75"/>
+            <default value="0.5"/>
             <test logic="AND" value="0.5">
                 aero/alpha-deg ge 50 
                 velocities/v-fps le 25
@@ -557,9 +561,12 @@
                 <table>
                     <independentVar lookup="row">inertia/weight-lbs</independentVar>
                     <tableData>
-                        17400 1.8
-                        20000 2.25
-                        23000 5
+                        <!--17400 1.75
+                        20000 1.90
+                        23000 3.00-->
+                        17400 5.00
+                        20000 5.00
+                        23000 5.00
                     </tableData>
                 </table>
             </function>
@@ -1367,13 +1374,13 @@
             <input>fcs/fly-by-wire/pitch/command-sum</input>
             <clipto>
                 <min>fcs/fly-by-wire/pitch/negative-g-limit-final</min>
-                <max>80</max>
+                <max>8.0</max>
             </clipto>
         </summer>
 
         <summer name="fcs/fly-by-wire/pitch/g-limit">
             <input>fcs/fly-by-wire/pitch/g-limit-neg</input>
-            <input>fcs/fly-by-wire/pitch/g-limit-pos</input>
+            <!--<input>fcs/fly-by-wire/pitch/g-limit-pos</input>-->
         </summer>
 
         <switch name="fcs/fly-by-wire/pitch/g-limit-product">
@@ -1383,7 +1390,7 @@
                 as the commanded G rapidly switch for example to double value.
             </description>
             <default value="0.5"/>
-            <test logic="AND" value="0.5">
+            <test logic="AND" value="1.0">
                 fcs/fly-by-wire/MLG-GND == 1
             </test>
         </switch>
@@ -1544,7 +1551,7 @@
             <function>
                 <difference>
                     <property> fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int </property>
-                    <value> -29 </value>
+                    <p> fcs/fly-by-wire/deadzone-amp-neg </p>
                 </difference>
             </function>
         </fcs_function>
@@ -1553,7 +1560,7 @@
             <function>
                 <difference>
                     <property> fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int </property>
-                    <value> 29 </value>
+                    <p> fcs/fly-by-wire/deadzone-amp-pos </p>
                 </difference>
             </function>
         </fcs_function>
@@ -1561,10 +1568,10 @@
         <switch name="fcs/fly-by-wire/pitch/amp-deadzone">
             <default value="0"/>
             <test logic="AND" value="fcs/fly-by-wire/pitch/amp-deadzone-pos">
-                fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int gt  29
+                fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int gt  fcs/fly-by-wire/deadzone-amp-pos
             </test>
             <test logic="AND" value="fcs/fly-by-wire/pitch/amp-deadzone-neg">
-                fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int lt  -29
+                fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int lt  fcs/fly-by-wire/deadzone-amp-neg
             </test>
         </switch>
 
@@ -1603,7 +1610,7 @@
             <function>
                 <difference>
                     <property> fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum-sum </property>
-                    <value> -29 </value>
+                    <p> fcs/fly-by-wire/deadzone-feedback-neg </p>
                 </difference>
             </function>
         </fcs_function>
@@ -1612,7 +1619,7 @@
             <function>
                 <difference>
                     <property> fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum-sum </property>
-                    <value> 29 </value>
+                    <p> fcs/fly-by-wire/deadzone-feedback-pos </p>
                 </difference>
             </function>
         </fcs_function>
@@ -1620,10 +1627,10 @@
         <switch name="fcs/fly-by-wire/pitch/pitch-loop-gain-feedback-deadzone">
             <default value="0"/>
             <test logic="AND" value="fcs/fly-by-wire/pitch/pitch-loop-gain-feedback-deadzone-pos">
-                fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum-sum gt  29
+                fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum-sum gt  fcs/fly-by-wire/deadzone-feedback-pos
             </test>
             <test logic="AND" value="fcs/fly-by-wire/pitch/pitch-loop-gain-feedback-deadzone-neg">
-                fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum-sum lt  -29
+                fcs/fly-by-wire/pitch/pitch-loop-gain-sum-int-sum-sum lt  fcs/fly-by-wire/deadzone-feedback-neg
             </test>
         </switch>
 
@@ -1857,7 +1864,7 @@
             <gain> fcs/fly-by-wire/normal-gain </gain>
         </pure_gain>-->
 
-        <fcs_function name="fcs/fly-by-wire/pitch/normal-gain">
+        <!--<fcs_function name="fcs/fly-by-wire/pitch/normal-gain">
             <description>
                 9.43G is maximum commanded G.
                 To make sure the feedback at 1G is 0, it has to return 0 at 1G.
@@ -1878,12 +1885,12 @@
                     </tableData>
                 </table>
             </function>
-        </fcs_function>
+        </fcs_function>-->
 
-        <!--<pure_gain name="fcs/fly-by-wire/pitch/normal-gain2">
-            <input>fcs/fly-by-wire/pitch/normal-gain1</input>
+        <pure_gain name="fcs/fly-by-wire/pitch/normal-gain">
+            <input>fcs/fly-by-wire/pitch/normal-1-special</input>
             <gain> 0.5 </gain>
-        </pure_gain>-->
+        </pure_gain>
 
         <summer name="fcs/fly-by-wire/pitch/pitch-rate-gain-2-sum">
             <input> fcs/fly-by-wire/pitch/normal-gain </input>
@@ -2015,12 +2022,12 @@
 
         <summer name="fcs/fly-by-wire/pitch/horz-tail-left-deflection-deg">
             <input> fcs/fly-by-wire/pitch/horz-tail-deflection-deg </input>
-            <input> fcs/fly-by-wire/pitch/horz-tail-diff-deflection-deg </input>
+            <input> -fcs/fly-by-wire/pitch/horz-tail-diff-deflection-deg </input>
         </summer>
 
         <summer name="fcs/fly-by-wire/pitch/horz-tail-right-deflection-deg">
             <input> fcs/fly-by-wire/pitch/horz-tail-deflection-deg </input>
-            <input> -fcs/fly-by-wire/pitch/horz-tail-diff-deflection-deg </input>
+            <input> fcs/fly-by-wire/pitch/horz-tail-diff-deflection-deg </input>
         </summer>
 
     </channel>
@@ -2267,9 +2274,9 @@
         </pure_gain>
 
         <pure_gain name="fcs/fly-by-wire/model/right-aileron-pos-norm">
-            <description>Degrees to -21.5 degrees. Model uses left instad of this..</description>
+            <description>Degrees to 21.5 degrees.</description>
             <input>fcs/fly-by-wire/roll/flaperon-right-deflection-deg</input>
-            <gain>-0.0465</gain>
+            <gain>0.0465</gain>
             <output>fcs/right-aileron-pos-norm</output>
         </pure_gain>
 
