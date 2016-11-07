@@ -479,9 +479,10 @@
 
 
     <property value="1">fcs/fly-by-wire/K_A</property>
-    <property value="2.0">fcs/fly-by-wire/normal-gain</property><!-- Very important that this is changed to 2, as the normal feedback will then allow up to 9.5G instead of 19 -->
+    <!--<property value="2.0">fcs/fly-by-wire/normal-gain</property>--><!-- Very important that this is changed to 2, as the normal feedback will then allow up to 9.5G instead of 19 -->
     <property value="1">fcs/fly-by-wire/washout</property>
     <property value="5">fcs/fly-by-wire/integrator</property>
+    <!--<property value="0.5">fcs/fly-by-wire/alpha-limit</property>-->
     <property value="1">fcs/fly-by-wire/enable-q</property>
     <property value="1">fcs/fly-by-wire/enable-nz</property>
     <property value="1">fcs/fly-by-wire/enable-int</property>
@@ -528,6 +529,19 @@
             </test>
         </switch>
 
+        <switch name="fcs/fly-by-wire/alpha-limit">
+            <description>
+                The 0.75 value will limit AoA to around 28 in normal flight.
+                The 0.5 value will give pilot more elevator control in deep stall.
+            </description>
+            <default value="0.75"/>
+            <test logic="AND" value="0.5">
+                aero/alpha-deg ge 50 
+                velocities/v-fps le 25
+                fcs/fly-by-wire/MLG-GND == 0
+            </test>
+        </switch>
+
         <fcs_function name="fcs/fly-by-wire/qcps-ratio">
             <function>
                 <quotient>
@@ -542,8 +556,8 @@
                 <table>
                     <independentVar lookup="row">inertia/weight-lbs</independentVar>
                     <tableData>
-                        17400 2
-                        20000 2.5
+                        17400 1.8
+                        20000 2.25
                         23000 5
                     </tableData>
                 </table>
@@ -1468,7 +1482,7 @@
                 At 1.0 it will limit alpha to 25-30 degs and prevent a deep stall.
             </description>
             <input>fcs/fly-by-wire/pitch/alpha-indicated-sum</input>
-            <gain> 0.75 </gain>
+            <gain> fcs/fly-by-wire/alpha-limit </gain>
             <clipto>
                 <min> 0 </min>
                 <max>10000</max>
