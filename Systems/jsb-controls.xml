@@ -479,10 +479,7 @@
 
 
     <property value="1">fcs/fly-by-wire/K_A</property>
-    <!--<property value="2.0">fcs/fly-by-wire/normal-gain</property>--><!-- Very important that this is changed to 2, as the normal feedback will then allow up to 9.5G instead of 19 -->
     <property value="1">fcs/fly-by-wire/washout</property>
-    <property value="5">fcs/fly-by-wire/integrator</property>
-    <!--<property value="0.5">fcs/fly-by-wire/alpha-limit</property>-->
     <property value="1">fcs/fly-by-wire/enable-q</property>
     <property value="1">fcs/fly-by-wire/enable-nz</property>
     <property value="1">fcs/fly-by-wire/enable-int</property>
@@ -552,6 +549,10 @@
         </fcs_function>
 
         <fcs_function name="fcs/fly-by-wire/integrator">
+            <description>
+                This is to prevent the integrator from oscillation due to plane reacting very fast to its value at low mass.
+                Can probably be bypassed by running at 240 Hz.
+            </description>
             <function>
                 <table>
                     <independentVar lookup="row">inertia/weight-lbs</independentVar>
