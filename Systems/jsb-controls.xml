@@ -496,15 +496,6 @@
 
     <channel execrate="1" name="FCS Lookup Ref">
 
-        <switch name="fcs/fly-by-wire/condition-a">
-            <default value="0"/>
-            <test logic="OR" value="1">
-                gear/gear-cmd-norm == 1
-                /controls/flight/flaps gt 0
-                <!-- todo: if refueling door open and q_c < 646 -->
-            </test>
-        </switch>
-
         <fcs_function name="fcs/fly-by-wire/q_c">
             <function>
                 <!--<v>1400</v> standby gain-->
@@ -527,6 +518,18 @@
             <test logic="AND" value="1">
                 gear/unit[1]/WOW eq 1
                 gear/unit[2]/WOW eq 1
+            </test>
+        </switch>
+
+        <switch name="fcs/fly-by-wire/condition-a">
+            <default value="0"/>
+            <test logic="OR" value="1">
+                gear/gear-cmd-norm == 1
+                /controls/flight/flaps gt 0
+            </test>
+            <test logic="AND" value="1">
+                /systems/refuel/serviceable == 1
+                fcs/fly-by-wire/q_c lt 646
             </test>
         </switch>
 
