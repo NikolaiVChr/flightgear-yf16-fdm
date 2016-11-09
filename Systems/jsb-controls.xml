@@ -678,10 +678,29 @@
 
     <channel execrate="1" name="Yaw Ref">
 
+        <kinematic name="fcs/fly-by-wire/yaw/rudder-cmd-norm-kinematic">
+            <description>
+                Real pedals can not be moved as fast as a joystick.
+                This will limit the movement speed.
+            </description>
+            <input>fcs/rudder-cmd-norm</input>
+            <noscale/>
+            <traverse>
+                <setting>
+                    <position> -1.0 </position>
+                    <time>      0.0 </time>
+                </setting>
+                <setting>
+                    <position>  1.0 </position>
+                    <time>      1.25 </time>
+                </setting>
+            </traverse>
+        </kinematic>
+
         <fcs_function name="fcs/fly-by-wire/yaw/pedal-force-lbf">
             <function>
                 <table>
-                    <independentVar lookup="row">fcs/rudder-cmd-norm</independentVar>
+                    <independentVar lookup="row">fcs/fly-by-wire/yaw/rudder-cmd-norm-kinematic</independentVar>
                     <tableData>
                        -1 -120
                         0    0
