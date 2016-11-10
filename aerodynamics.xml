@@ -109,7 +109,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                   <independentVar>fcs/speedbrake-pos-norm</independentVar>
                   <tableData>
                       0  1.0
-                      1  1.5
+                      1  1.25
                   </tableData>
               </table>              
         </product>
@@ -423,6 +423,8 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
         <function name="aero/coefficient/dCx_sb">
             <description>
                Cx due speed brake coefficient.
+
+               This table is for Cz in TP 1538, but seems to have been switched with Cx.
             </description>
             <product>
                 <property>aero/qbar-psf</property>
@@ -431,26 +433,26 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <table name="table/dCx_sb">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
--20 -.0101
--15 -.0101
--10 -.0101
--05 -.0101
- 00 -.0101
- 05 -.0358
- 10 -.0790
- 15 -.1227
- 20 -.1827
- 25 -.1892
- 30 -.1988
- 35 -.2000
- 40 -.1874
- 45 -.1673
- 50 -.1476
- 55 -.1310
- 60 -.1279
- 70 -.1325
- 80 -.1250
- 90 -.1250
+-20 -.3858
+-15 -.3858
+-10 -.3858
+-05 -.3858
+ 00 -.3858
+ 05 -.2685
+ 10 -.3021
+ 15 -.4248
+ 20 -.2094
+ 25 -.0969
+ 30 0.0438
+ 35 0.0947
+ 40 0.0014
+ 45 -.0097
+ 50 -.0153
+ 55 -.0520
+ 60 -.0010
+ 70 -.0202
+ 80 -.0369
+ 90 -.0369
                      </tableData>
                 </table>
             </product>
@@ -761,32 +763,34 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
     <function name="aero/coefficient/dCz_sb">
         <description>
            Cz due speed brake coefficient.
+
+           This table is for Cx in TP 1538, but seems to have been switched with Cz.
         </description>
         <product>
             <property>fcs/speedbrake-pos-norm</property>
             <table name="table/dCz_sb">
                 <independentVar lookup="row">aero/alpha-deg</independentVar>
                 <tableData>
--20 -.3858
--15 -.3858
--10 -.3858
--05 -.3858
- 00 -.3858
- 05 -.2685
- 10 -.3021
- 15 -.4248
- 20 -.2094
- 25 -.0969
- 30 0.0438
- 35 0.0947
- 40 0.0014
- 45 -.0097
- 50 -.0153
- 55 -.0520
- 60 -.0010
- 70 -.0202
- 80 -.0369
- 90 -.0369
+-20 -.0101
+-15 -.0101
+-10 -.0101
+-05 -.0101
+ 00 -.0101
+ 05 -.0358
+ 10 -.0790
+ 15 -.1227
+ 20 -.1827
+ 25 -.1892
+ 30 -.1988
+ 35 -.2000
+ 40 -.1874
+ 45 -.1673
+ 50 -.1476
+ 55 -.1310
+ 60 -.1279
+ 70 -.1325
+ 80 -.1250
+ 90 -.1250
                  </tableData>
             </table>
         </product>
