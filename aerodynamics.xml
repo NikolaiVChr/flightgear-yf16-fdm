@@ -109,7 +109,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                   <independentVar>fcs/speedbrake-pos-norm</independentVar>
                   <tableData>
                       0  1.0
-                      1  1.25
+                      1  1.5
                   </tableData>
               </table>              
         </product>
@@ -420,11 +420,11 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
             </product>
         </function>
 
-        <function name="aero/coefficient/dCx_sb">
+        <!--<function name="aero/coefficient/dCx_sb">
             <description>
                Cx due speed brake coefficient.
 
-               This table is for Cz in TP 1538, but seems to have been switched with Cx.
+               These values are wrong. Mistake in TP 1538.
             </description>
             <product>
                 <property>aero/qbar-psf</property>
@@ -433,26 +433,62 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
                 <table name="table/dCx_sb">
                     <independentVar lookup="row">aero/alpha-deg</independentVar>
                     <tableData>
--20 -.3858
--15 -.3858
--10 -.3858
--05 -.3858
- 00 -.3858
- 05 -.2685
- 10 -.3021
- 15 -.4248
- 20 -.2094
- 25 -.0969
- 30 0.0438
- 35 0.0947
- 40 0.0014
- 45 -.0097
- 50 -.0153
- 55 -.0520
- 60 -.0010
- 70 -.0202
- 80 -.0369
- 90 -.0369
+-20 -.0101
+-15 -.0101
+-10 -.0101
+-05 -.0101
+ 00 -.0101
+ 05 -.0358
+ 10 -.0790
+ 15 -.1227
+ 20 -.1827
+ 25 -.1892
+ 30 -.1988
+ 35 -.2000
+ 40 -.1874
+ 45 -.1673
+ 50 -.1476
+ 55 -.1310
+ 60 -.1279
+ 70 -.1325
+ 80 -.1250
+ 90 -.1250
+                     </tableData>
+                </table>
+            </product>
+        </function>-->
+
+        <function name="aero/coefficient/dCx_sb">
+            <description>
+               Cx due speed brake coefficient.
+
+               Source: TN-D-8176
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <!--<property>metrics/Sw-sqft</property>--><v>280</v>
+                <property>fcs/speedbrake-pos-norm</property>
+                <table name="table/dCx_sb">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+-10 -.0790
+-05 -.0498
+ 00 -.0500
+ 05 -.0498
+ 10 -.0493
+ 15 -.0483
+ 20 -.0470
+ 25 -.0453
+ 30 -.0433
+ 35 -.0410
+ 40 -.0383
+ 45 -.0354
+ 50 -.0322
+ 55 -.0287
+ 60 -.0250
+ 70 -.0171
+ 80 -.0087
+ 90 0.0000
                      </tableData>
                 </table>
             </product>
@@ -498,6 +534,8 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
         <function name="aero/coefficient/dCx_q-lef">
             <description>
                Cx due to pitch rate due to leading edge flaps coefficient.
+
+               Source for alpha 50+: TN-D-8176
             </description>
             <product>
                 <property>aero/qbar-psf</property>
@@ -522,6 +560,12 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
  35 -.817
  40 -1.10
  45 -.550
+ 50 0.000
+ 55 0.000
+ 60 0.000
+ 70 0.000
+ 80 0.000
+ 90 0.000
                      </tableData>
                 </table>
             </product>
@@ -760,37 +804,72 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
         </product>
     </function>
 
-    <function name="aero/coefficient/dCz_sb">
+    <!--<function name="aero/coefficient/dCz_sb">
         <description>
            Cz due speed brake coefficient.
 
-           This table is for Cx in TP 1538, but seems to have been switched with Cz.
+           TP 1538 is unreliable in this regard, these numbers makes no sense.
         </description>
         <product>
             <property>fcs/speedbrake-pos-norm</property>
             <table name="table/dCz_sb">
                 <independentVar lookup="row">aero/alpha-deg</independentVar>
                 <tableData>
--20 -.0101
--15 -.0101
--10 -.0101
--05 -.0101
- 00 -.0101
- 05 -.0358
- 10 -.0790
- 15 -.1227
- 20 -.1827
- 25 -.1892
- 30 -.1988
- 35 -.2000
- 40 -.1874
- 45 -.1673
- 50 -.1476
- 55 -.1310
- 60 -.1279
- 70 -.1325
- 80 -.1250
- 90 -.1250
+-20 -.3858
+-15 -.3858
+-10 -.3858
+-05 -.3858
+ 00 -.3858
+ 05 -.2685
+ 10 -.3021
+ 15 -.4248
+ 20 -.2094
+ 25 -.0969
+ 30 0.0438
+ 35 0.0947
+ 40 0.0014
+ 45 -.0097
+ 50 -.0153
+ 55 -.0520
+ 60 -.0010
+ 70 -.0202
+ 80 -.0369
+ 90 -.0369
+                 </tableData>
+            </table>
+        </product>
+    </function>-->
+
+    <function name="aero/coefficient/dCz_sb">
+        <description>
+           Cz due speed brake coefficient.
+
+           Source: TN-D-8176
+        </description>
+        <product>
+            <v>0.9333</v><!-- ref area is different -->
+            <property>fcs/speedbrake-pos-norm</property>
+            <table name="table/dCz_sb">
+                <independentVar lookup="row">aero/alpha-deg</independentVar>
+                <tableData>
+-10 0.0087
+-05 0.0044
+ 00 0.0000
+ 05 -.0044
+ 10 -.0087
+ 15 -.0130
+ 20 -.0171
+ 25 -.0212
+ 30 -.0250
+ 35 -.0287
+ 40 -.0322
+ 45 -.0354
+ 50 -.0383
+ 55 -.0410
+ 60 -.0433
+ 70 -.0470
+ 80 -.0493
+ 90 -.0500
                  </tableData>
             </table>
         </product>
@@ -834,6 +913,8 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
     <function name="aero/coefficient/dCz_q-lef">
         <description>
            Cz due to pitch rate due to leading edge flaps coefficient.
+
+           Source for alpha 50+: TN-D-8176
         </description>
         <product>
             <property>aero/ci2vel</property>
@@ -856,6 +937,12 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
  35 -3.5
  40 -1.3
  45 -.65
+ 50 0.00
+ 55 0.00
+ 60 0.00
+ 70 0.00
+ 80 0.00
+ 90 0.00
                  </tableData>
             </table>
         </product>
@@ -1246,6 +1333,8 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
         <function name="aero/coefficient/dCm_q-lef">
             <description>
                Cm due to pitch rate due to leading edge flaps coefficient.
+
+               Source for alpha 50+: TN-D-8176
             </description>
             <product>
                 <property>aero/qbar-psf</property>
@@ -1271,6 +1360,12 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
  35 -1.72
  40 -1.2
  45 -.60
+ 50 0.000
+ 55 0.000
+ 60 0.000
+ 70 0.000
+ 80 0.000
+ 90 0.000
                      </tableData>
                 </table>
             </product>
@@ -1489,7 +1584,7 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
  20 .819
  25 .483
  30 .590
- 35 1.12
+ 35 1.21
  40 -.493
  45 -1.04
  50 -1.21
@@ -1506,6 +1601,8 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
     <function name="aero/coefficient/dCy_r-lef">
         <description>
            Cy due to yaw rate due to leading edge flaps coefficient.
+
+           Source for alpha 50+: TN-D-8176
         </description>
         <product>
             <property>aero/bi2vel</property>
@@ -1528,6 +1625,12 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
  35 -.060
  40 -.374
  45 -.187
+ 50 0.000
+ 55 0.000
+ 60 0.000
+ 70 0.000
+ 80 0.000
+ 90 0.000
                  </tableData>
             </table>
         </product>
@@ -1571,6 +1674,8 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
     <function name="aero/coefficient/dCy_p-lef">
         <description>
            Cy due to roll rate due to leading edge flaps coefficient.
+
+           Source for alpha 50+: TN-D-8176
         </description>
         <product>
             <property>aero/bi2vel</property>
@@ -1593,6 +1698,12 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
  35 -.642
  40 -.255
  45 -.128
+ 50 0.000
+ 55 0.000
+ 60 0.000
+ 70 0.000
+ 80 0.000
+ 90 0.000
                  </tableData>
             </table>
         </product>
@@ -2153,6 +2264,8 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
  35 -.437
  40 .167
  45 .084
+
+ 50 0.00
                      </tableData>
                 </table>
             </product>
@@ -2199,6 +2312,8 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
         <function name="aero/coefficient/dCn_p-lef">
             <description>
                Cn due to roll rate due to leading edge flaps coefficient.
+
+               Source for alpha 50+: TN-D-8176
             </description>
             <product>
                 <property>aero/qbar-psf</property>
@@ -2224,6 +2339,12 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
  35 .211
  40 .392
  45 .196
+ 50 0.000
+ 55 0.000
+ 60 0.000
+ 70 0.000
+ 80 0.000
+ 90 0.000
                      </tableData>
                 </table>
             </product>
@@ -2702,6 +2823,8 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
         <function name="aero/coefficient/dCl_p-lef">
             <description>
                Cl due to roll rate due to leading edge flaps coefficient.
+
+               Source for alpha 50+: TN-D-8176
             </description>
             <product>
                 <property>aero/qbar-psf</property>
@@ -2727,6 +2850,12 @@ Put in engine gyroscopic effect (160 slugs-ft2/sec)
  35 .362
  40 .194
  45 .097
+ 50 0.000
+ 55 0.000
+ 60 0.000
+ 70 0.000
+ 80 0.000
+ 90 0.000
                     </tableData>
                 </table>
             </product>
