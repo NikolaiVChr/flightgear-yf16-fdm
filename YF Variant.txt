@@ -1,6 +1,58 @@
 Todo for FGAddon f16 YF variant.
 ================================
 
+Consider asking Erik to include this:
+
+<effect>
+  <inherits-from>Effects/model-combined-deferred</inherits-from>
+  <object-name>LeftUpperHorizonTail</object-name>
+  <object-name>RightUpperHorizonTail</object-name>
+  <object-name>LeftLowerHorizonTail</object-name>
+  <object-name>RightLowerHorizonTail</object-name>
+  <object-name>LeftUpperAileron</object-name>
+  <object-name>RightUpperAileron</object-name>
+  <object-name>LeftLowerAileron</object-name>
+  <object-name>RightLowerAileron</object-name>
+  <object-name>LeftUpperFlap</object-name>
+  <object-name>RightUpperFlap</object-name>
+  <object-name>LeftLowerFlap</object-name>
+  <object-name>RightLowerFlap</object-name>
+  <object-name>LeftUpperSpeedbrake</object-name>
+  <object-name>RightUpperSpeedbrake</object-name>
+  <object-name>LeftLowerSpeedbrake</object-name>
+  <object-name>RightLowerSpeedbrake</object-name>
+  <object-name>LeftLowerLef</object-name>
+  <object-name>RightLowerLef</object-name>
+  <object-name>LeftUpperLef</object-name>
+  <object-name>RightUpperLef</object-name>
+  <object-name>Tail</object-name>
+  <object-name>VentralFins</object-name>
+  <object-name>ExternalFrontGearDoor</object-name>
+  <object-name>ExternalLeftMainDoor</object-name>
+  <object-name>ExternalRightMainDoor</object-name>
+  <object-name>VentralFins</object-name>
+  <object-name>LWStation1</object-name>
+  <object-name>LWStation2</object-name>
+  <object-name>RWStation1</object-name>
+  <object-name>RWStation1</object-name>
+  <object-name>WingTips</object-name>
+  <object-name>Rudder</object-name>
+  <object-name>Rudder.001</object-name>
+  <object-name>Rudder.002</object-name>
+  <object-name>Rudder.003</object-name>
+  <object-name>Rudder.004</object-name>
+  <object-name>Rudder.005</object-name>
+  <object-name>Rudder.006</object-name>
+  <!--<object-name>FuselageTop</object-name>
+  <object-name>FuselageBottom</object-name>-->
+  <object-name>CanopyFrame</object-name>
+  <object-name>RadarDomeTop</object-name>
+  <object-name>RadarDomeBottom</object-name>
+  <!--<object-name>RNLAF_Tailroot</object-name>
+  <object-name>USAF_Tailroot</object-name>-->
+  <object-name>FuelTank</object-name>
+  <object-name>ArresterHook</object-name>
+</effect>
 
 Todo for YF-16
 ==============
