@@ -512,9 +512,6 @@
 
         <switch name="fcs/fly-by-wire/MLG-GND">
             <default value="0"/>
-            <!--<test logic="AND" value="1">
-                gear/gear-pos-norm == 1
-            </test>-->
             <test logic="AND" value="1">
                 gear/unit[1]/WOW eq 1
                 gear/unit[2]/WOW eq 1
@@ -537,6 +534,8 @@
             <description>
                 The 0.75 value will limit AoA to around 28 in normal flight.
                 The 0.5 value will give pilot more elevator control in deep stall.
+
+                Todo: Make into pure gain with just 0.5, as the issue that caused this test to be needed is solved.
             </description>
             <default value="0.5"/>
             <test logic="AND" value="0.5">
@@ -559,6 +558,8 @@
             <description>
                 This is to prevent the integrator from oscillation due to plane reacting very fast to its value at low mass.
                 Can probably be bypassed by running at 240 Hz.
+
+                Todo: Make into pure gain, as it is now stable at all weights.
             </description>
             <function>
                 <table>
@@ -1384,13 +1385,13 @@
             </clipto>
         </summer>-->
 
-        <summer name="fcs/fly-by-wire/pitch/g-limit-pos">
+        <!--<summer name="fcs/fly-by-wire/pitch/g-limit-pos">
             <input>fcs/fly-by-wire/pitch/command-sum</input>
             <clipto>
                 <min>-10000</min>
                 <max>8.0</max>
             </clipto>
-        </summer>
+        </summer>-->
 
         <summer name="fcs/fly-by-wire/pitch/g-limit-neg">
             <input>fcs/fly-by-wire/pitch/command-sum</input>
@@ -1822,7 +1823,11 @@
         </fcs_function>
 
         <fcs_function name="accelerations/a_n">
-            <description>Page 43: Calc of G-force.</description>
+            <description>
+                Page 43: Calc of G-force.
+
+                I had some trouble using the Nz, but don't remember what it was.
+            </description>
             <function>
                 <quotient>
                     <sum>
@@ -2266,7 +2271,14 @@
         </pure_gain>
 
     </channel>
-<!--                                                                             disabled since Erik made some mappings for it-->
+
+
+
+
+
+
+
+
     <channel name="YF-16 Fly-by-wire mappings to model">
 
         <pure_gain name="fcs/fly-by-wire/model/rudder-pos-norm">
