@@ -4,7 +4,7 @@
 ##                                                                               ##
 ## Author: Nikolai V. Chr.                                                       ##
 ##                                                                               ##
-## Version 1.0             License: GPL 2.0                                      ##
+## Version 1.02            License: GPL 2.0                                      ##
 ##                                                                               ##
 ###################################################################################
 
@@ -12,7 +12,7 @@
 var clamp = func(v, min, max) { v < min ? min : v > max ? max : v }
 
 var invert = func (acc) {
-	var g_inv = -1 * (acc - 5);
+	var g_inv = -1 * (acc - 2);
 	return g_inv;
 }
 
@@ -33,7 +33,7 @@ var invert = func (acc) {
 
 var blackout_onset      =    5;
 var blackout_fast       =    9;
-var redout_onset        = -1.5;
+var redout_onset        =   -2;
 var redout_fast         =   -4;
 
 var blackout_onset_time =  300;
@@ -69,7 +69,7 @@ var blackout_loop = func {
 	var g = 0;
 	if (fdm == "jsb") {
 		# JSBSim
-		g = getprop("fdm/jsbsim/accelerations/Nz");
+		g = -getprop("accelerations/pilot/z-accel-fps_sec")/32.174;
 	} else {
 		# Yasim
 		g = getprop("/accelerations/pilot-g[0]");
