@@ -4,7 +4,7 @@
 ##                                                                               ##
 ## Author: Nikolai V. Chr.                                                       ##
 ##                                                                               ##
-## Version 1.02            License: GPL 2.0                                      ##
+## Version 1.03            License: GPL 2.0                                      ##
 ##                                                                               ##
 ###################################################################################
 
@@ -20,7 +20,7 @@ var invert = func (acc) {
 #
 # Customize the values according to the quality of the G-suit the pilot is wearing. The times are in seconds.
 #
-# According to NASA TP-1538 (1979), this should be the blackout values for F16:
+# According to NASA (1979), this should be the blackout values for F-16:
 #
 # blackout_onset      =   5;
 # blackout_fast       =   9;
@@ -33,7 +33,7 @@ var invert = func (acc) {
 
 var blackout_onset      =    5;
 var blackout_fast       =    9;
-var redout_onset        =   -2;
+var redout_onset        = -2.0;
 var redout_fast         =   -4;
 
 var blackout_onset_time =  300;
@@ -146,15 +146,13 @@ var blackout_loop = func {
     	setprop("/sim/rendering/redout/red", 0);
     	setprop("/sim/rendering/redout/alpha", sum);
     }
-
-    settimer(blackout_loop, 0);
 }
 
 
 var blackout_init = func {
 	fdm = getprop("/sim/flight-model");
-
-	blackout_loop();
+	var timer = maketimer(0, func blackout_loop() );
+	timer.start();
 }
 
 
