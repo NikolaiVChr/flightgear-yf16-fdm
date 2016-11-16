@@ -488,7 +488,7 @@
     <property value="0">fcs/fly-by-wire/pitch/alpha-indicated-lagged</property>
     <property value="0">fcs/fly-by-wire/pitch/pitch-loop-ground-product</property>
 
-    <channel execrate="1" name="FCS Lookup Ref">
+    <channel execrate="1" name="FCS Lookup">
 
         <fcs_function name="fcs/fly-by-wire/q_c">
             <function>
@@ -634,7 +634,7 @@
 
 
 
-    <channel execrate="1" name="Yaw Ref">
+    <channel execrate="1" name="Yaw">
 
         <kinematic name="fcs/fly-by-wire/yaw/rudder-cmd-norm-kinematic">
             <description>
@@ -821,7 +821,7 @@
 
 
 
-    <channel execrate="1" name="Roll Ref">
+    <channel execrate="1" name="Roll">
 
         <fcs_function name="fcs/fly-by-wire/roll/stick-force-lbf">
             <function>
@@ -1177,7 +1177,7 @@
 
 
 
-    <channel execrate="1" name="ARI Ref">
+    <channel execrate="1" name="Aileron-Rudder-Interconnect">
 
         <fcs_function name="fcs/fly-by-wire/ari/inverter-norm">
             <function>
@@ -1227,7 +1227,7 @@
 
 
 
-    <channel execrate="1" name="Pitch Ref">
+    <channel execrate="1" name="Pitch">
 
         <fcs_function name="fcs/fly-by-wire/pitch/stick-force-lbf">
             <function>
@@ -1954,6 +1954,14 @@
 
     </channel>
 
+
+
+
+
+
+
+
+
     <channel execrate="1" name="Leading edge flaps">
 
         <fcs_function name="fcs/fly-by-wire/lef/input-factor">
@@ -2194,6 +2202,8 @@
             <input>fcs/fly-by-wire/lef/lef-pos-deg</input>
             <gain>1</gain>
         </pure_gain>
+
+        <!-- the below components rounds flaps position in degrees to zero decimal points: -->
 
         <fcs_function name="fcs/fly-by-wire/model/flap-pos-deg-with-frac">
             <function>
