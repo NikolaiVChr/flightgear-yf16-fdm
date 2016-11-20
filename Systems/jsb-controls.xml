@@ -484,7 +484,7 @@
     <property value="1">fcs/fly-by-wire/enable-int</property>
     <property value="1">fcs/fly-by-wire/enable-fake</property>
     <property value="1">fcs/fly-by-wire/enable-alpha</property>
-
+    
     <property value="0">fcs/fly-by-wire/pitch/alpha-indicated-lagged</property>
     <property value="0">fcs/fly-by-wire/pitch/pitch-loop-ground-product</property>
 
@@ -634,182 +634,7 @@
 
 
 
-    <channel execrate="1" name="Yaw">
 
-        <kinematic name="fcs/fly-by-wire/yaw/rudder-cmd-norm-kinematic">
-            <description>
-                Real pedals can not be moved as fast as a joystick.
-                This will limit the movement speed.
-            </description>
-            <input>fcs/rudder-cmd-norm</input>
-            <noscale/>
-            <traverse>
-                <setting>
-                    <position> -1.0 </position>
-                    <time>      0.0 </time>
-                </setting>
-                <setting>
-                    <position>  1.0 </position>
-                    <time>      1.25 </time>
-                </setting>
-            </traverse>
-        </kinematic>
-
-        <fcs_function name="fcs/fly-by-wire/yaw/pedal-force-lbf">
-            <function>
-                <table>
-                    <independentVar lookup="row">fcs/fly-by-wire/yaw/rudder-cmd-norm-kinematic</independentVar>
-                    <tableData>
-                       -1 -120
-                        0    0
-                        1  120
-                    </tableData>
-                </table>
-            </function>
-        </fcs_function>
-
-        <fcs_function name="fcs/fly-by-wire/yaw/command-deg">
-            <function>
-                <table>
-                    <independentVar lookup="row">fcs/fly-by-wire/yaw/pedal-force-lbf</independentVar>
-                    <tableData>
-                        -120  30.0
-                         -15   0.0
-                          15   0.0
-                         120 -30.0
-                    </tableData>
-                </table>
-            </function>
-        </fcs_function>
-
-        <aerosurface_scale name="fcs/fly-by-wire/yaw/trim-scaled">
-            <input>fcs/yaw-trim-cmd-norm</input>
-            <zero_centered> true </zero_centered>
-            <domain>
-                <min> -1.0 </min>
-                <max>  1.0 </max>
-            </domain>
-            <range>
-                <min> -8 </min>
-                <max>  8 </max>
-            </range>
-        </aerosurface_scale>
-
-        <summer name="fcs/fly-by-wire/yaw/command-sum">
-            <input>fcs/fly-by-wire/yaw/trim-scaled</input>
-            <input>-fcs/fly-by-wire/yaw/command-deg</input>
-        </summer>
-
-        <summer name="fcs/fly-by-wire/yaw/command-sum-ari">
-            <input>fcs/fly-by-wire/ari/final</input>
-            <input>fcs/fly-by-wire/yaw/command-sum</input>
-        </summer>
-
-        <pure_gain name="fcs/fly-by-wire/yaw/g-gain">
-            <input>accelerations/Ny</input>
-            <gain> 19.32 </gain>
-        </pure_gain>
-
-        <pure_gain name="velocities/r-aero-deg_sec">
-            <input>velocities/r-aero-rad_sec</input>
-            <gain> 57.2957795 </gain>
-        </pure_gain>
-
-        <pure_gain name="fcs/fly-by-wire/yaw/cross-gain">
-            <input>fcs/fly-by-wire/roll/lead-exit</input>
-            <gain> 0.01745 </gain>
-        </pure_gain>
-
-        <pure_gain name="fcs/fly-by-wire/yaw/cross-multiplier">
-            <input>fcs/fly-by-wire/pitch/alpha-indicated-lagged</input>
-            <gain> fcs/fly-by-wire/yaw/cross-gain </gain>
-        </pure_gain>
-
-        <summer name="fcs/fly-by-wire/yaw/yaw-limits-sum-1">
-            <input>velocities/r-aero-deg_sec</input>
-            <input>-fcs/fly-by-wire/yaw/cross-multiplier</input>
-        </summer>
-
-        <lead_lag_filter name="fcs/fly-by-wire/yaw/lead">
-          <input> fcs/fly-by-wire/yaw/yaw-limits-sum-1 </input>
-          <c1> 3 </c1>
-          <c2> 15 </c2>
-          <c3> 1 </c3>
-          <c4> 15 </c4>
-        </lead_lag_filter>
-
-        <lead_lag_filter name="fcs/fly-by-wire/yaw/lead-second">
-          <input> fcs/fly-by-wire/yaw/lead </input>
-          <c1> 1.5 </c1>
-          <c2> 0 </c2>
-          <c3> 1 </c3>
-          <c4> 1 </c4>
-        </lead_lag_filter>
-
-        <summer name="fcs/fly-by-wire/yaw/yaw-limits-sum-2">
-            <input>fcs/fly-by-wire/yaw/lead-second</input>
-            <input>fcs/fly-by-wire/yaw/g-gain</input>
-        </summer>
-
-        <pure_gain name="fcs/fly-by-wire/yaw/schedule">
-            <input>fcs/fly-by-wire/yaw/yaw-limits-sum-2</input>
-            <gain> fcs/fly-by-wire/yaw/F8 </gain>
-        </pure_gain>
-
-        <summer name="fcs/fly-by-wire/yaw/rudder-sum">
-            <input>fcs/fly-by-wire/yaw/schedule</input>
-            <input>fcs/fly-by-wire/yaw/command-sum-ari</input>
-        </summer>
-
-        <second_order_filter name="fcs/fly-by-wire/yaw/final-filter">
-          <input> fcs/fly-by-wire/yaw/rudder-sum </input>
-          <c1> 1 </c1>
-          <c2> 0 </c2>
-          <c3> 1225 </c3>
-          <c4> 1 </c4>
-          <c5> 0 </c5>
-          <c6> 1225 </c6>
-        </second_order_filter>
-
-        <lag_filter name="fcs/fly-by-wire/yaw/rudder-lag">
-            <input> fcs/fly-by-wire/yaw/final-filter </input>
-            <c1> 20 </c1>
-            <!-- defl. limit = 30, rate limit = 120 deg/s -->
-        </lag_filter>
-
-        <kinematic name="fcs/fly-by-wire/yaw/rudder-deflection-deg">
-            <input>fcs/fly-by-wire/yaw/rudder-lag</input>
-            <noscale/>
-            <traverse>
-                <setting>
-                    <position> -30.0 </position>
-                    <time>      0.0 </time>
-                </setting>
-                <setting>
-                    <position>  30.0 </position>
-                    <time>      0.5 </time>
-                </setting>
-            </traverse>
-            <clipto>
-                <min> -30 </min>
-                <max>  30 </max>
-            </clipto>
-        </kinematic>
-
-        <aerosurface_scale name="fcs/fly-by-wire/yaw/rudder-pos-norm">
-            <input>fcs/fly-by-wire/yaw/rudder-deflection-deg</input>
-            <zero_centered> true </zero_centered>
-            <domain>
-                <min> -30.0 </min>
-                <max>  30.0 </max>
-            </domain>
-            <range>
-                <min> -1.0 </min>
-                <max>  1.0 </max>
-            </range>
-        </aerosurface_scale>
-
-    </channel>
 
 
 
@@ -870,7 +695,7 @@
             </range>
         </aerosurface_scale>
 
-        <switch name="fcs/fly-by-wire/roll/switch">
+        <switch name="fcs/fly-by-wire/roll/gain-switch">
             <default value="1.0"/>
             <test logic="OR" value="0.542">
                 fcs/fly-by-wire/condition-a == 1
@@ -879,7 +704,7 @@
 
         <pure_gain name="fcs/fly-by-wire/roll/ground-gain">
             <input>fcs/fly-by-wire/roll/command-deg_s</input>
-            <gain> fcs/fly-by-wire/roll/switch </gain>
+            <gain> fcs/fly-by-wire/roll/gain-switch </gain>
         </pure_gain>
 
         <summer name="fcs/fly-by-wire/roll/loop-sum">
@@ -969,8 +794,21 @@
           <c6> 6400 </c6>
         </second_order_filter>
 
+        <pure_gain name="fcs/fly-by-wire/roll/yaw-rate-input">
+            <input> velocities/r-aero-deg_sec </input>
+            <gain> 8.34 </gain>
+        </pure_gain>
+
+        <switch name="fcs/fly-by-wire/roll/switch">
+            <default value="fcs/fly-by-wire/roll/loop-sum-end"/>
+            <test logic="AND" value="fcs/fly-by-wire/roll/yaw-rate-input">
+                aero/alpha-deg ge 29
+                fcs/fly-by-wire/prototype == 0
+            </test>
+        </switch>
+
         <pure_gain name="fcs/fly-by-wire/roll/final">
-            <input>fcs/fly-by-wire/roll/loop-sum-end</input>
+            <input>fcs/fly-by-wire/roll/switch</input>
             <gain> 0.12 </gain>
             <clipto>
                 <min> -21.5 </min>
@@ -1177,7 +1015,7 @@
 
 
 
-    <channel execrate="1" name="Aileron-Rudder-Interconnect">
+    <channel execrate="1" name="Aileron Rudder Interconnect">
 
         <fcs_function name="fcs/fly-by-wire/ari/inverter-norm">
             <function>
@@ -1192,14 +1030,33 @@
             </function>
         </fcs_function>
 
-        <pure_gain name="fcs/fly-by-wire/ari/schedule">
-            <input>fcs/fly-by-wire/ari/inverter-norm</input>
-            <gain> fcs/fly-by-wire/ari/F7 </gain>
-        </pure_gain>
+        <switch name="fcs/fly-by-wire/ari/schedule-gain">
+            <default value="0.65"/>
+            <test logic="AND" value="1">
+                fcs/fly-by-wire/prototype == 0
+            </test>
+        </switch>
+
+        <fcs_function name="fcs/fly-by-wire/ari/schedule">
+            <function>
+                <product>
+                    <p> fcs/fly-by-wire/ari/inverter-norm </p>
+                    <p> fcs/fly-by-wire/ari/schedule-gain </p>
+                    <p> fcs/fly-by-wire/ari/F7 </p>
+                </product>
+            </function>
+        </fcs_function>
+
+        <switch name="fcs/fly-by-wire/ari/gain-value">
+            <default value="0.0375"/>
+            <test logic="AND" value="0.0750">
+                fcs/fly-by-wire/prototype == 0
+            </test>
+        </switch>
 
         <pure_gain name="fcs/fly-by-wire/ari/gain">
             <input>fcs/fly-by-wire/pitch/alpha-indicated-lagged</input>
-            <gain> 0.0375 </gain>
+            <gain> fcs/fly-by-wire/ari/gain-value </gain>
         </pure_gain>
 
         <summer name="fcs/fly-by-wire/ari/sum">
@@ -1213,6 +1070,240 @@
         </pure_gain>
 
     </channel>
+
+
+
+
+
+
+
+
+
+
+
+
+    <channel execrate="1" name="Yaw">
+
+        <kinematic name="fcs/fly-by-wire/yaw/rudder-cmd-norm-kinematic">
+            <description>
+                Real pedals can not be moved as fast as a joystick.
+                This will limit the movement speed.
+            </description>
+            <input>fcs/rudder-cmd-norm</input>
+            <noscale/>
+            <traverse>
+                <setting>
+                    <position> -1.0 </position>
+                    <time>      0.0 </time>
+                </setting>
+                <setting>
+                    <position>  1.0 </position>
+                    <time>      1.25 </time>
+                </setting>
+            </traverse>
+        </kinematic>
+
+        <fcs_function name="fcs/fly-by-wire/yaw/pedal-force-lbf">
+            <function>
+                <table>
+                    <independentVar lookup="row">fcs/fly-by-wire/yaw/rudder-cmd-norm-kinematic</independentVar>
+                    <tableData>
+                       -1 -120
+                        0    0
+                        1  120
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="fcs/fly-by-wire/yaw/command-deg">
+            <function>
+                <table>
+                    <independentVar lookup="row">fcs/fly-by-wire/yaw/pedal-force-lbf</independentVar>
+                    <tableData>
+                        -120  30.0
+                         -15   0.0
+                          15   0.0
+                         120 -30.0
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
+        <aerosurface_scale name="fcs/fly-by-wire/yaw/trim-scaled">
+            <input>fcs/yaw-trim-cmd-norm</input>
+            <zero_centered> true </zero_centered>
+            <domain>
+                <min> -1.0 </min>
+                <max>  1.0 </max>
+            </domain>
+            <range>
+                <min> -8 </min>
+                <max>  8 </max>
+            </range>
+        </aerosurface_scale>
+
+        <summer name="fcs/fly-by-wire/yaw/command-sum">
+            <input>fcs/fly-by-wire/yaw/trim-scaled</input>
+            <input>-fcs/fly-by-wire/yaw/command-deg</input>
+        </summer>
+
+        <fcs_function name="fcs/fly-by-wire/yaw/command-schedule">
+            <function>
+                <product>
+                    <table>
+                        <independentVar lookup="row">fcs/fly-by-wire/pitch/alpha-indicated-lagged</independentVar>
+                        <tableData>
+                            20   1.0
+                            30   0.0
+                        </tableData>
+                    </table>
+                    <p>fcs/fly-by-wire/yaw/command-sum</p>
+                </product>
+            </function>
+        </fcs_function>
+
+        <switch name="fcs/fly-by-wire/yaw/ari-input">
+            <default value="fcs/fly-by-wire/ari/final"/>
+            <test logic="AND" value="0">
+                aero/alpha-deg ge 29
+                fcs/fly-by-wire/prototype == 0
+            </test>
+        </switch>
+
+        <switch name="fcs/fly-by-wire/yaw/command-switch">
+            <default value="fcs/fly-by-wire/yaw/command-sum"/>
+            <test logic="AND" value="fcs/fly-by-wire/yaw/command-schedule">
+                fcs/fly-by-wire/prototype == 0
+            </test>
+        </switch>
+
+        <summer name="fcs/fly-by-wire/yaw/command-sum-ari">
+            <input>fcs/fly-by-wire/yaw/ari-input</input>
+            <input>fcs/fly-by-wire/yaw/command-switch</input>
+        </summer>
+
+        <pure_gain name="fcs/fly-by-wire/yaw/g-gain">
+            <input>accelerations/Ny</input>
+            <gain> 19.32 </gain>
+        </pure_gain>
+
+        <pure_gain name="velocities/r-aero-deg_sec">
+            <input>velocities/r-aero-rad_sec</input>
+            <gain> 57.2957795 </gain>
+        </pure_gain>
+
+        <pure_gain name="fcs/fly-by-wire/yaw/cross-gain">
+            <input>fcs/fly-by-wire/roll/lead-exit</input>
+            <gain> 0.01745 </gain>
+        </pure_gain>
+
+        <pure_gain name="fcs/fly-by-wire/yaw/cross-multiplier">
+            <input>fcs/fly-by-wire/pitch/alpha-indicated-lagged</input>
+            <gain> fcs/fly-by-wire/yaw/cross-gain </gain>
+        </pure_gain>
+
+        <summer name="fcs/fly-by-wire/yaw/yaw-limits-sum-1">
+            <input>velocities/r-aero-deg_sec</input>
+            <input>-fcs/fly-by-wire/yaw/cross-multiplier</input>
+        </summer>
+
+        <lead_lag_filter name="fcs/fly-by-wire/yaw/lead">
+          <input> fcs/fly-by-wire/yaw/yaw-limits-sum-1 </input>
+          <c1> 3 </c1>
+          <c2> 15 </c2>
+          <c3> 1 </c3>
+          <c4> 15 </c4>
+        </lead_lag_filter>
+
+        <lead_lag_filter name="fcs/fly-by-wire/yaw/lead-second">
+          <input> fcs/fly-by-wire/yaw/lead </input>
+          <c1> 1.5 </c1>
+          <c2> 0 </c2>
+          <c3> 1 </c3>
+          <c4> 1 </c4>
+        </lead_lag_filter>
+
+        <summer name="fcs/fly-by-wire/yaw/yaw-limits-sum-2">
+            <input>fcs/fly-by-wire/yaw/lead-second</input>
+            <input>fcs/fly-by-wire/yaw/g-gain</input>
+        </summer>
+
+        <pure_gain name="fcs/fly-by-wire/yaw/schedule">
+            <input>fcs/fly-by-wire/yaw/yaw-limits-sum-2</input>
+            <gain> fcs/fly-by-wire/yaw/F8 </gain>
+        </pure_gain>
+
+        <pure_gain name="fcs/fly-by-wire/yaw/alt-schedule">
+            <input> velocities/r-aero-deg_sec </input>
+            <gain> 0.75 </gain>
+        </pure_gain>
+
+        <switch name="fcs/fly-by-wire/yaw/schedule-final">
+            <default value="fcs/fly-by-wire/yaw/schedule"/>
+            <test logic="AND" value="fcs/fly-by-wire/yaw/alt-schedule">
+                aero/alpha-deg ge 29
+                fcs/fly-by-wire/prototype == 0
+            </test>
+        </switch>
+
+        <summer name="fcs/fly-by-wire/yaw/rudder-sum">
+            <input>fcs/fly-by-wire/yaw/schedule-final</input>
+            <input>fcs/fly-by-wire/yaw/command-sum-ari</input>
+        </summer>
+
+        <second_order_filter name="fcs/fly-by-wire/yaw/final-filter">
+          <input> fcs/fly-by-wire/yaw/rudder-sum </input>
+          <c1> 1 </c1>
+          <c2> 0 </c2>
+          <c3> 1225 </c3>
+          <c4> 1 </c4>
+          <c5> 0 </c5>
+          <c6> 1225 </c6>
+        </second_order_filter>
+
+        <lag_filter name="fcs/fly-by-wire/yaw/rudder-lag">
+            <input> fcs/fly-by-wire/yaw/final-filter </input>
+            <c1> 20 </c1>
+            <!-- defl. limit = 30, rate limit = 120 deg/s -->
+        </lag_filter>
+
+        <kinematic name="fcs/fly-by-wire/yaw/rudder-deflection-deg">
+            <input>fcs/fly-by-wire/yaw/rudder-lag</input>
+            <noscale/>
+            <traverse>
+                <setting>
+                    <position> -30.0 </position>
+                    <time>      0.0 </time>
+                </setting>
+                <setting>
+                    <position>  30.0 </position>
+                    <time>      0.5 </time>
+                </setting>
+            </traverse>
+            <clipto>
+                <min> -30 </min>
+                <max>  30 </max>
+            </clipto>
+        </kinematic>
+
+        <aerosurface_scale name="fcs/fly-by-wire/yaw/rudder-pos-norm">
+            <input>fcs/fly-by-wire/yaw/rudder-deflection-deg</input>
+            <zero_centered> true </zero_centered>
+            <domain>
+                <min> -30.0 </min>
+                <max>  30.0 </max>
+            </domain>
+            <range>
+                <min> -1.0 </min>
+                <max>  1.0 </max>
+            </range>
+        </aerosurface_scale>
+
+    </channel>
+
+
+
 
 
 
@@ -1291,9 +1382,16 @@
         </fcs_function>
 
         <switch name="fcs/fly-by-wire/pitch/negative-g-limit-final">
+            <description>
+                The second test is for MPO switch enabled.
+                Source: The Israeli document.
+            </description>
             <default value="fcs/fly-by-wire/pitch/negative-g-limit"/>
             <test logic="OR" value="-4">
                 fcs/fly-by-wire/condition-a == 1
+            </test>
+            <test logic="AND" value="-4">
+                fcs/fbw-override == 1
             </test>
         </switch>
 
@@ -1307,19 +1405,34 @@
 
         <switch name="fcs/fly-by-wire/pitch/g-limit-product">
             <description>
-                The test value is 1.0 on diagram,
-                but anything but 0.5 will give trouble on takeoff
-                as the commanded G rapidly switch for example to double value.
+                The second test is for MPO switch enabled.
+                Source: The Israeli document.
             </description>
             <default value="0.5"/>
             <test logic="AND" value="1.0">
                 fcs/fly-by-wire/MLG-GND == 1
             </test>
+            <test logic="AND" value="1.0">
+                fcs/fbw-override == 1
+                aero/alpha-deg   gt 29
+            </test>
         </switch>
+
+        <switch name="fcs/fly-by-wire/pitch/g-gain">
+            <default value="1"/>
+            <test logic="AND" value="2">
+                fcs/fly-by-wire/prototype == 0
+            </test>
+        </switch>
+
+        <pure_gain name="fcs/fly-by-wire/pitch/g-limit-product-gain">
+            <input>fcs/fly-by-wire/pitch/g-limit-product</input>
+            <gain> fcs/fly-by-wire/pitch/g-gain </gain>
+        </pure_gain>
 
         <pure_gain name="fcs/fly-by-wire/pitch/g-limit-gain">
             <input>fcs/fly-by-wire/pitch/g-limit</input>
-            <gain> fcs/fly-by-wire/pitch/g-limit-product </gain>
+            <gain> fcs/fly-by-wire/pitch/g-limit-product-gain </gain>
         </pure_gain>
 
         <lag_filter name="fcs/fly-by-wire/pitch/command-sum-limit-lagged">
@@ -1385,30 +1498,56 @@
             <gain> fcs/fly-by-wire/enable-fake </gain>
         </pure_gain>
 
-        <summer name="fcs/fly-by-wire/pitch/alpha-sum">
-            <input> fcs/fly-by-wire/pitch/alpha-indicated-switch </input>
-            <input> fcs/fly-by-wire/pitch/fake-alpha </input>
-        </summer>
-
         <lag_filter name="fcs/fly-by-wire/pitch/alpha-indicated-lagged">
-            <input> fcs/fly-by-wire/pitch/alpha-sum </input>
+            <input> fcs/fly-by-wire/pitch/alpha-indicated-switch </input>
             <c1> 10 </c1>
         </lag_filter>
+
+        <lag_filter name="fcs/fly-by-wire/pitch/fake-alpha-lagged">
+            <input> fcs/fly-by-wire/pitch/fake-alpha </input>
+            <c1> 10 </c1>
+        </lag_filter>
+
+        <summer name="fcs/fly-by-wire/pitch/alpha-sum">
+            <input> fcs/fly-by-wire/pitch/alpha-indicated-lagged </input>
+            <input> fcs/fly-by-wire/pitch/fake-alpha-lagged </input>
+        </summer>
+
+        <switch name="fcs/fly-by-wire/pitch/alpha-indicated-mpo">
+            <description>
+                The test is for MPO switch enabled.
+                Source: The Israeli document.
+
+                Should fake alpha be allowed through? (probably not, the pilot wants full control of elevator even when rolling)
+            </description>
+            <default value="fcs/fly-by-wire/pitch/alpha-sum"/>
+            <test logic="AND" value="0"><!-- consider to lag this 0 -->
+                fcs/fbw-override == 1
+                aero/alpha-deg   gt 29
+            </test>
+        </switch>
 
         <fcs_function name="fcs/fly-by-wire/pitch/alpha-indicated-sum">
             <function>
                 <sum>
-                    <property> fcs/fly-by-wire/pitch/alpha-indicated-lagged </property>
+                    <property> fcs/fly-by-wire/pitch/alpha-indicated-mpo </property>
                     <value> -20.4 </value>
                     <property> fcs/fly-by-wire/pitch/pitch-rate-gain </property>
                 </sum>
             </function>
         </fcs_function>
 
+        <switch name="fcs/fly-by-wire/pitch/alpha-gain">
+            <default value="0.5"/>
+            <test logic="AND" value="1">
+                fcs/fly-by-wire/prototype == 0
+            </test>
+        </switch>
+
         <pure_gain name="fcs/fly-by-wire/pitch/alpha-indicated-gain">
             <description></description>
             <input>fcs/fly-by-wire/pitch/alpha-indicated-sum</input>
-            <gain> 0.5 </gain>
+            <gain> fcs/fly-by-wire/pitch/alpha-gain </gain>
             <clipto>
                 <min> 0 </min>
                 <max>10000</max>
@@ -1425,9 +1564,16 @@
             <input> fcs/fly-by-wire/pitch/pitch-rate-lead-2nd </input>
         </summer>
 
+        <switch name="fcs/fly-by-wire/pitch/main-gain">
+            <default value="3"/>
+            <test logic="AND" value="1.5">
+                fcs/fly-by-wire/prototype == 0
+            </test>
+        </switch>
+
         <pure_gain name="fcs/fly-by-wire/pitch/command-sum-limit-alpha-pitch-gain">
             <input>fcs/fly-by-wire/pitch/command-sum-limit-alpha-pitch</input>
-            <gain> 3.0 </gain>
+            <gain> fcs/fly-by-wire/pitch/main-gain </gain>
         </pure_gain>
 
         <pure_gain name="fcs/fly-by-wire/pitch/pitch-loop-gain">
@@ -1637,9 +1783,16 @@
             <input> fcs/fly-by-wire/pitch/alpha-indicated-lagged </input>
         </summer>
 
+        <switch name="fcs/fly-by-wire/pitch/pitch-gain">
+            <default value="0.161"/>
+            <test logic="AND" value="0.322">
+                fcs/fly-by-wire/prototype == 0
+            </test>
+        </switch>
+
         <pure_gain name="fcs/fly-by-wire/pitch/pitch-rate-gain-sum-gain">
             <input>fcs/fly-by-wire/pitch/pitch-rate-gain-sum</input>
-            <gain> 0.161 </gain>
+            <gain> fcs/fly-by-wire/pitch/pitch-gain </gain>
         </pure_gain>
 
         <pure_gain name="fcs/fly-by-wire/pitch/pitch-rate-upper">
@@ -1745,9 +1898,16 @@
             </test>
         </switch>
 
+        <switch name="fcs/fly-by-wire/pitch/normal-gain-value">
+            <default value="0.5"/>
+            <test logic="AND" value="1">
+                fcs/fly-by-wire/prototype == 0
+            </test>
+        </switch>
+
         <pure_gain name="fcs/fly-by-wire/pitch/normal-gain">
             <input>fcs/fly-by-wire/pitch/normal-1-special</input>
-            <gain> 0.5 </gain>
+            <gain> fcs/fly-by-wire/pitch/normal-gain-value </gain>
         </pure_gain>
 
         <summer name="fcs/fly-by-wire/pitch/pitch-rate-gain-2-sum">
@@ -1762,9 +1922,21 @@
             </test>
         </switch>
 
+        <switch name="fcs/fly-by-wire/pitch/q-product-gain">
+            <default value="1"/>
+            <test logic="AND" value="2">
+                fcs/fly-by-wire/prototype == 0
+            </test>
+        </switch>
+
+        <pure_gain name="fcs/fly-by-wire/pitch/q-product-final">
+            <input>fcs/fly-by-wire/pitch/q-product</input>
+            <gain> fcs/fly-by-wire/pitch/q-product-gain </gain>
+        </pure_gain>
+
         <pure_gain name="fcs/fly-by-wire/pitch/q-gain-2">
             <input>fcs/fly-by-wire/pitch/q-washout</input>
-            <gain> fcs/fly-by-wire/pitch/q-product </gain>
+            <gain> fcs/fly-by-wire/pitch/q-product-final </gain>
         </pure_gain>
 
         <lead_lag_filter name="fcs/fly-by-wire/pitch/pitch-rate-lead">
@@ -1786,45 +1958,13 @@
           <c6> 3500 </c6>
         </second_order_filter>
 
-        <fcs_function name="fcs/elevator-cmd-deg">
-            <description>
-                Not sure if it should be full 25 deg deflection, but can be adjusted as needed.
-                The deadband represent 1.75 lbf stick force as per diagram.
-            </description>
-            <function>
-                <table>
-                    <independentVar lookup="row">fcs/elevator-cmd-norm</independentVar>
-                    <tableData>
-                     -1.0     -25.0
-                     -0.04375   0.0
-                      0.0       0.0
-                      0.04375   0.0
-                      1.0      25.0
-                    </tableData>
-                </table>
-            </function>
-        </fcs_function>
-
-        <switch name="fcs/fly-by-wire/pitch/final-cmd">
-            <description>
-                Manual Pitch Override.
-                For getting out of deep stall by pitch rocking.
-                This is for F-16, not YF-16.
-                It simulates using MPO switch.
-            </description>
-            <default value="fcs/fly-by-wire/pitch/pitch-loop-gain-final"/>
-            <test logic="AND" value="fcs/elevator-cmd-deg">
-                fcs/fbw-override == 1
-            </test>
-        </switch>
-
         <summer name="fcs/fly-by-wire/pitch/tp-left-sum">
-            <input> fcs/fly-by-wire/pitch/final-cmd </input>
+            <input> fcs/fly-by-wire/pitch/pitch-loop-gain-final </input>
             <input> fcs/fly-by-wire/roll/inter-schedule </input> 
         </summer>
 
         <summer name="fcs/fly-by-wire/pitch/bt-left-sum">
-            <input> fcs/fly-by-wire/pitch/final-cmd </input>
+            <input> fcs/fly-by-wire/pitch/pitch-loop-gain-final </input>
             <input> -fcs/fly-by-wire/roll/inter-schedule </input>
         </summer>
 
@@ -1890,6 +2030,24 @@
             <max>1</max>
           </range>
         </aerosurface_scale>
+
+        <fcs_function name="fcs/fly-by-wire/pitch/block15-horz-tail-factor">
+            <description>
+                Block-15 and above had the horizontal tail surface enlarged
+                by 25% for better control. This data does not factor that in
+                so do it ourselves.
+            </description>
+            <function>
+                <table>
+                    <independentVar lookup="row">fcs/fly-by-wire/pitch/horz-tail-deflection-deg</independentVar>
+                    <tableData>
+                     -25.0      1.25
+                      0.0       1.0
+                      25.0      1.25
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
 
         <kinematic name="fcs/fly-by-wire/pitch/horz-tail-diff-deflection-deg">
             <input>fcs/fly-by-wire/pitch/horz-tail-diff-deflection</input>
@@ -2250,5 +2408,213 @@
         </fcs_function>
 
     </channel>
+<!-- end: control system by Nikolai V. Chr. -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <channel name="Landing Gear">
+
+   <switch name="fcs/gear-wow">
+    <default value="0"/>
+    <test logic="AND" value="1">
+     gear/unit[1]/WOW eq 1
+     gear/unit[2]/WOW eq 1
+    </test>
+   </switch>
+
+   <kinematic name="fcs/gear-control">
+    <input>gear/gear-cmd-norm</input>
+    <traverse>
+     <setting>
+      <position>0</position>
+      <time>0</time>
+     </setting>
+     <setting>
+      <position>1</position>
+      <time>5</time>
+     </setting>
+    </traverse>
+    <output>gear/gear-pos-norm</output>
+   </kinematic>
+
+   <scheduled_gain name="fcs/scheduled-steer-pos-deg">
+    <input>fcs/steer-cmd-norm</input>
+    <table>
+     <independentVar>velocities/vg-fps</independentVar>
+     <tableData>
+      10.0  32.0
+      50.0   5.0
+      150.0  2.0
+      300.0  0.5
+     </tableData>
+    </table>
+    <output>fcs/steer-pos-deg</output>
+   </scheduled_gain>
+
+  </channel>
+   
+
+
+  <channel name="Speedbrake">
+   <!--
+     - To prevent deep stall the Flight Computer commands speedbrake
+     - deflection at high angle of attack (alpha) and low speeds. This
+     - will provide just enough pitch down moment to keep the aircraft
+     - under control.
+     -->
+   <switch name="fcs/speedbrake-alpha-limiter">
+    <default value="0"/>
+    <test logic="AND" value="1">
+     aero/alpha-deg ge 53 
+     velocities/v-fps le 18
+     fcs/fly-by-wire/MLG-GND == 0
+    </test>
+   </switch>
+
+   <switch name="fcs/speedbrake-initiate">
+    <default value="0"/>
+    <test logic="OR" value="1">
+     fcs/speedbrake-alpha-limiter eq 1
+     fcs/speedbrake-cmd-norm eq 1
+    </test>
+   </switch>
+
+   <!--
+     - Speedbrake deflection is limited to 43 degrees (instead of 60
+     - degrees) when the gear is extended to prevent physical
+     - speedbrake damage on touchdown.
+     -->
+   <scheduled_gain name="fcs/speedbrake-scheduler">
+    <input>fcs/speedbrake-initiate</input>
+    <table>
+     <independentVar>gear/gear-cmd-norm</independentVar>
+     <tableData>
+      0 1.0
+      1 0.71667
+     </tableData>
+    </table>
+    <!-- <output>fcs/speedbrake-pos-norm</output> -->
+   </scheduled_gain>
+
+   <kinematic name="fcs/speedbrake-control">
+    <input>fcs/speedbrake-scheduler</input>
+    <traverse>
+     <setting>
+      <position>0</position>
+      <time>0</time>
+     </setting>
+     <setting>
+      <position>60</position>
+      <time>2</time>                                      <!-- 2 seconds to deploy -->
+     </setting>
+    </traverse>
+    <output>fcs/speedbrake-pos-deg</output>
+   </kinematic>
+
+     <aerosurface_scale name="fcs/speedbrake-position-normalizer">
+     <input>fcs/speedbrake-control</input>
+     <domain>
+    <min>0</min>
+    <max>60</max>
+     </domain>
+     <range>
+    <min>0</min>
+    <max>1</max>
+     </range>
+     <output>fcs/speedbrake-pos-norm</output>
+   </aerosurface_scale>
+
+  </channel>
+
+  <channel name="Hook">
+
+   <kinematic name="fcs/hook-control">
+    <input>fcs/hook-engage</input>
+    <traverse>
+     <setting>
+      <position>0</position>
+      <time>0</time>
+     </setting>
+     <setting>
+      <position>1</position>
+      <time>2.5</time>
+     </setting>
+    </traverse>
+    <output>fcs/hook-pos-norm</output>
+   </kinematic>
+   
+  </channel>
+
+  <channel name="Canopy">
+
+   <switch name="fcs/canopy-trigger">
+    <default value="fcs/canopy-engage"/>
+    <test value="0">
+     velocities/u-fps gt 1.0
+    </test>
+   </switch>
+
+   <kinematic name="fcs/canopy-control">
+    <input>fcs/canopy-trigger</input>
+    <traverse>
+     <setting>
+      <position>0</position>
+      <time>0</time>
+     </setting>
+     <setting>
+      <position>1</position>
+      <time>10</time>
+     </setting>
+    </traverse>
+    <output>fcs/canopy-pos-norm</output>
+   </kinematic>
+
+  </channel>
 
 <flight_control>
