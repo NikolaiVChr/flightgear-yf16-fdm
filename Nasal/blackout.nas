@@ -4,7 +4,7 @@
 ##                                                                               ##
 ## Author: Nikolai V. Chr.                                                       ##
 ##                                                                               ##
-## Version 1.03            License: GPL 2.0                                      ##
+## Version 1.05            License: GPL 2.0                                      ##
 ##                                                                               ##
 ###################################################################################
 
@@ -151,8 +151,11 @@ var blackout_loop = func {
 
 var blackout_init = func {
 	fdm = getprop("/sim/flight-model");
-	var timer = maketimer(0, func blackout_loop() );
-	timer.start();
+
+	if (getprop("sim/rendering/redout/internal/log/g-force") == nil) {
+		var timer = maketimer(0, func blackout_loop() );
+		timer.start();
+	}
 }
 
 
@@ -161,27 +164,3 @@ var blackout_init_listener = setlistener("sim/signals/fdm-initialized", func {
 	blackout_init();
 	removelistener(blackout_init_listener);
 }, 0, 0);
-
-
-var test = func (blackout_onset, blackout_fast, blackout_onset_time, blackout_fast_time) {
-	var blackout_onset_log = math.log10(blackout_onset);
-	var blackout_fast_log = math.log10(blackout_fast);
-
-	var g = 5;
-	print();
-	while(g <= 20) {
-
-		var g_log = g <= 1?0:math.log10(g);
-
-		var curr_time = math.log10(blackout_onset_time) + ((g_log - blackout_onset_log) / (blackout_fast_log - blackout_onset_log)) * (math.log10(blackout_fast_time) - math.log10(blackout_onset_time));
-
-		curr_time = math.pow(10, curr_time);
-
-		curr_time = clamp(curr_time, 0, 1000);
-
-		printf("%0.1f, %0.2f", g, curr_time);
-
-		g += .5;
-	}
-	print();
-}
