@@ -8,6 +8,8 @@
 # Notice that everything below test code line, is not decoupled, nor optimized in any way.
 # Also notice that most comments are old and not updated.
 #
+# Needs rcs.nas and vector.nas. Nothing else.
+#
 # GPL 2.0
 
 
