@@ -1501,6 +1501,9 @@ ExampleRadar = {
 
 
 
+#
+# I made this fire-control shell, to get me thinking about way to design such a thing plus pylons.
+#
 
 var pylonWsets = {
 	a: {id: "2 x AIM-9", content: ["AIM-9","AIM-9"], launcherDragArea: 0.25, launcherMass: 20, launcherJettisonable: 0},
