@@ -1,3 +1,15 @@
+#
+# Prototype to test Richard and radar-mafia's radar designs.
+#
+# v1: Modular - 7 Nov. 2017
+# v2: Decoupled via emesary - 8 Nov 2017
+#
+#
+# Notice that everything below test code line, is not decoupled, nor optimized in any way.
+# Also notice that most comments are old and not updated.
+#
+# GPL 2.0
+
 
 var AIR = 0;
 var MARINE = 1;
@@ -19,6 +31,17 @@ var knownShips = {
     "USS-SanAntonio":     nil,
 };
 
+var VectorNotification = {
+    new: func(type) {
+        var new_class = emesary.Notification.new(type, rand());
+        new_class.updateV = func (vector) {
+	    	me.vector = vector;
+	    	return me;
+	    };
+        return new_class;
+    },
+};
+
 AIToNasal = {
 # convert AI property tree to Nasal vector
 # will send notification when some is updated (emesary?)
@@ -35,6 +58,8 @@ AIToNasal = {
 		me.callInProgress = 0;
 		me.updateInProgress = 0;
 		me.lookupCallsign = {};
+		me.AINotification = VectorNotification.new("AINotification");
+		me.AINotification.updateV(me.vector_aicontacts);
 
 		setlistener("/ai/models/model-added", func me.callReadTree());
 		setlistener("/ai/models/model-removed", func me.callReadTree());
@@ -185,6 +210,7 @@ AIToNasal = {
 		}
 		me.lookupCallsign = me.lookupCallsignNew;
 		#print("NR: update called "~size(me.vector_aicontacts));
+		emesary.GlobalTransmitter.NotifyAll(me.AINotification.updateV(me.vector_aicontacts));
 	},
 
 	containsVectorContact: func (vec, item) {
@@ -201,363 +227,6 @@ AIToNasal = {
 
 
 
-
-
-
-
-
-Radar = {
-# master radar class
-#
-# Attributes:
-#   on/off
-#   limitedContactVector of RadarContacts
-#   link to AIToNasal
-	enabled: TRUE,
-	masterReader: AIToNasal,
-};
-
-
-
-
-
-
-
-
-
-
-var REVERSE = 0;
-var LOOP    = 1;
-
-var NONE = 0;
-var SOFT = 1;
-var HARD = 2;
-
-var max_soft_locks = 8;
-var time_to_keep_bleps = 6;
-var time_to_fadeout_bleps = 5;
-var time_till_lose_lock = 0.5;
-var time_till_lose_lock_soft = 4.5;
-var sam_radius = 15;
-var max_tws_range = 30;# these 2 should be determined from RCS instead.
-var max_lock_range = 40;
-
-#air scan modes:
-var TRACK_WHILE_SCAN = 2;# Gives velocity, angle, azimuth and range. Multiple soft locks. Short range. Fast.
-#var SINGLE_TARGET_TRACK = 4;# focus on a contact. hard lock. Good for identification. Mid range.
-var RANGE_WHILE_SEARCH = 1;# Gives range/angle info. Long range. Narrow bars.
-#var SITUATION_AWARENESS_MODE = 3;# submode of RWS/TWS. A contact can be followed/selected while scan still being done that can show other bleps nearby.
-var VELOCITY_SEARCH = 0;# gives positive closure rate. Long range.
-
-
-
-ActiveDiscRadar = {
-# inherits from Radar
-# will check range, field of view/regard, ground occlusion and FCS.
-# will also scan a field. And move that scan field as appropiate for scan mode.
-# loop (0.05 secs)
-#
-# Attributes:
-#   contact selection(s) of type Contact
-#   soft/hard lock
-#   painted (is the hard lock) of type Contact
-	new: func () {
-		var ar = {parents: [ActiveDiscRadar, Radar]};
-		ar.masterReader   = AIToNasal;
-		ar.discSpeed_dps  = 120;
-		ar.fovRadius_deg  = 3.6;
-		ar.timer          = maketimer(1, ar, func ar.loop());
-		ar.calcLoop();
-		ar.lock           = NONE;# NONE, SOFT, HARD
-		ar.locks          = [];
-		ar.follow         = [];
-		ar.vector_aicontacts_bleps = [];
-		ar.calcBars();
-		ar.pattern        = [-58,58,[1,2,3,4,5,6]];#6/8 bars
-		ar.forDist_m      = 15000;#range setting
-		ar.forRadius_deg  = 61.5;
-		ar.scanMode       = RANGE_WHILE_SEARCH;
-		ar.scanType       = AIR;
-		ar.directionX     = 1;
-		ar.patternBar     = 0;
-		ar.barOffset      = 0;
-		ar.posE           = ar.bars[ar.pattern[2][ar.patternBar]];
-		ar.posH           = ar.pattern[0];
-		ar.lockX = 1;
-		ar.lockY = 1;
-		ar.posHLast = ar.posH;
-		ar.scanFOR();
-		ar.timer.start();
-    	return ar;
-	},
-
-	calcBars: func {
-		# must be called each time fovRadius_deg is changed.
-		me.bars           = [-me.fovRadius_deg*7,-me.fovRadius_deg*5,-me.fovRadius_deg*3,-me.fovRadius_deg,me.fovRadius_deg,me.fovRadius_deg*3,me.fovRadius_deg*5,me.fovRadius_deg*7];
-	},
-
-	calcLoop: func {
-		me.loopSpeed      = 1/(me.discSpeed_dps/(me.fovRadius_deg*2));
-		me.timer.restart(me.loopSpeed);
-		#print("loop: "~me.loopSpeed);
-	},
-
-	loop: func {
-		me.moveDisc();
-		if (me.reset) {
-			me.scanFOR();
-		}
-		me.scanFOV();
-		if (me.lock == HARD) {
-			me.purgeLock(time_till_lose_lock);
-		} else {
-			me.purgeLocks(time_till_lose_lock_soft);
-		}
-	},
-
-	purgeLocks: func (time) {
-		me.locks_tmp = [];
-		me.elapsed = getprop("sim/time/elapsed-sec");
-		foreach(contact ; me.locks) {
-			if (me.elapsed - contact.blepTime < time) {
-				append(me.locks_tmp, contact);
-			}
-		}
-		me.locks = me.locks_tmp;
-		if (size(me.locks) == 0) {
-			me.lock = NONE;
-		}
-		if (size(me.follow) > 0 and !me.containsVector(me.vector_aicontacts_bleps, me.follow[0])) {
-			me.follow = [];
-		}
-	},
-
-	purgeLock: func (time) {
-		if (size(me.locks) == 1) {
-			me.elapsed = getprop("sim/time/elapsed-sec");
-			if (me.elapsed - me.locks[0].blepTime > time) {
-				me.locks = [];
-				me.lock = NONE;
-				me.follow = [];
-			} elsif (me.locks[0].getRangeDirect()*M2NM > max_lock_range) {
-				me.locks = [];
-				me.lock = NONE;
-			}
-		} elsif (size(me.locks) == 0) {
-			me.lock = NONE;
-		}
-	},
-
-	containsVector: func (vec, item) {
-		foreach(test; vec) {
-			if (test == item) {
-				return TRUE;
-			}
-		}
-		return FALSE;
-	},
-
-	vectorIndex: func (vec, item) {
-		me.i = 0;
-		foreach(test; vec) {
-			if (test == item) {
-				return me.i;
-			}
-			me.i += 1;
-		}
-		return -1;
-	},
-
-	moveDisc: func {
-		# move the FOV inside the FOR
-		#me.acPitch = getprop("orientation/pitch-deg");
-		me.reset = 0;
-		me.step = 1;
-		me.pattern_move = [me.pattern[0],me.pattern[1],me.pattern[2]];# we move on a temp pattern, so we can revert to normal scan mode, after lock/follow.
-		if (size(me.follow) > 0 and me.lock != HARD) {
-			# scan follows selection (SAM)
-			me.pattern_move[0] = me.follow[0].getDeviationHeadingFrozen()-sam_radius;
-			me.pattern_move[1] = me.follow[0].getDeviationHeadingFrozen()+sam_radius;
-			if (me.pattern_move[0] < -me.forRadius_deg) {
-				me.pattern_move[0] = -me.forRadius_deg;
-			}
-			if (me.pattern_move[1] > me.forRadius_deg) {
-				me.pattern_move[1] = me.forRadius_deg;
-			}
-		}
-		if (me.lock != HARD) {
-			# Normal scan
-			me.reverted = 0;
-			if (getprop("sim/time/delta-sec") > me.loopSpeed) {
-				# hack for slow FPS
-				me.step = 2;
-			}		
-			me.posH_new  = me.posH+me.directionX*me.fovRadius_deg*2*me.step;
-			me.polarDist = math.sqrt(me.posH_new*me.posH_new+me.posE*me.posE);
-			if (me.polarDist > me.forRadius_deg or (me.directionX==1 and me.posH > me.pattern_move[1]) or (me.directionX==-1 and me.posH < me.pattern_move[0])) {
-				me.patternBar +=1;
-				me.directionX *= -1;
-				me.reverted = 1;
-				me.checkBarValid();
-				me.posE = me.bars[me.pattern_move[2][me.patternBar]]+me.barOffset*me.fovRadius_deg*2;
-				if (me.directionX == 1) {
-					me.posH = me.pattern_move[0]+me.fovRadius_deg;
-				} else {
-					me.posH = me.pattern_move[1]-me.fovRadius_deg;
-				}
-				me.polarDist = math.sqrt(me.posH*me.posH+me.posE*me.posE);
-				if (me.polarDist > me.forRadius_deg) {
-					me.posH = -math.cos(math.asin(clamp(me.posE/me.pattern_move[1],-1,1)))*me.pattern_move[1]*me.directionX+me.directionX*me.fovRadius_deg;# disc set at beginning of new bar.
-				}
-				#if (me.posE-getprop("orientation/pitch-deg") > me.forRadius_deg) {
-					#is this realy how it works when you pitch much down?
-				#	me.posE = me.forRadius_deg-getprop("orientation/pitch-deg");
-				#} elsif (me.posE-getprop("orientation/pitch-deg") < -me.forRadius_deg) {
-				#	me.posE = getprop("orientation/pitch-deg")+me.forRadius_deg;
-				#}
-			} else {
-				me.posH = me.posH_new;
-			}
-		} else {
-			# lock scan
-			me.posH_n = me.locks[0].getDeviationHeadingFrozen()+me.lockX*me.fovRadius_deg*0.5;
-			me.posE_n = me.locks[0].getDeviationPitchFrozen()+me.lockY*me.fovRadius_deg*0.5;
-			if (me.forRadius_deg >= math.sqrt(me.posH_n*me.posH_n+me.posE_n*me.posE_n)) {
-				me.posH = me.posH_n;
-				me.posE = me.posE_n;
-			}
-			me.lockX *= -1;
-			if (me.lockX == -1) {
-				me.lockY *= -1;
-			}
-		}
-		#printf("scanning %04.1f, %04.1f", me.posH, me.posE);
-	},
-
-	checkBarValid: func {
-		if (me.patternBar > size(me.pattern_move[2])-1) {
-			me.patternBar = 0;
-			me.reset = 1;
-		}
-	},
-
-	scanFOR: func {
-		#iterate:
-		# check direct distance
-		# check field of regard
-		# sort in bearing?
-		# check radr pitch might exclude certain bars. (TODO)
-		# called once every full scan.
-		me.vector_aicontacts_for = [];
-		foreach(contact ; me.masterReader.vector_aicontacts) {
-			if (contact.getRangeDirect() > me.forDist_m) {
-				continue;
-			} elsif (math.abs(contact.getDeviationHeading()) > me.forRadius_deg) {
-				continue;
-			} elsif (math.abs(contact.getDeviationPitch()) > me.forRadius_deg) {
-				continue;
-			}
-			append(me.vector_aicontacts_for, contact);
-		}
-		me.vector_aicontacts_bleps_tmp = [];
-		me.elapsed = getprop("sim/time/elapsed-sec");
-		foreach(contact ; me.vector_aicontacts_bleps) {
-			if (me.elapsed - contact.blepTime < time_to_keep_bleps) {
-				append(me.vector_aicontacts_bleps_tmp, contact);
-			}
-		}
-		me.vector_aicontacts_bleps = me.vector_aicontacts_bleps_tmp;
-		if (size(me.follow) > 0 and !me.containsVector(me.vector_aicontacts_bleps, me.follow[0])) {
-			me.follow = [];
-		}
-		#print("In Field of Regard: "~size(me.vector_aicontacts_for));
-	},
-
-	scanFOV: func {
-		#iterate:
-		# check sensor field of view
-		# check Terrain
-		# check Doppler
-		# due to FG Nasal update rate, we consider FOV square.
-		# only detect 1 contact, even if more are present.
-		foreach(contact ; me.vector_aicontacts_for) {
-			me.contactPosH = contact.getDeviationHeading();
-			me.contactPosE = contact.getDeviationPitch();
-			if (me.contactPosE < me.posE+me.fovRadius_deg and me.contactPosE > me.posE-me.fovRadius_deg) {
-				# in correct elevation for detection
-				me.doDouble = me.step == 2 and me.reverted == 0;
-				if (!me.doDouble and me.contactPosH < me.posH+me.fovRadius_deg and me.contactPosH > me.posH-me.fovRadius_deg) {
-					# detected
-					#todo: check RCS, Terrain, Doppler here.
-					if (me.registerBlep(contact)) {
-						#print("detect-1 "~contact.callsign);
-						break;
-					}
-				} elsif (me.doDouble and me.directionX == 1 and me.contactPosH < me.posH+me.fovRadius_deg and me.contactPosH > me.posHLast+me.fovRadius_deg) {
-					# detected
-					if (me.registerBlep(contact)) {
-						#print("detect-1 "~contact.callsign);
-						break;
-					}
-				} elsif (me.doDouble and me.directionX == -1 and me.contactPosH < me.posHLast-me.fovRadius_deg and me.contactPosH > me.posH-me.fovRadius_deg) {
-					# detected
-					if (me.registerBlep(contact)) {
-						#print("detect-1 "~contact.callsign);
-						break;
-					}
-				}
-			}
-		}
-		me.posHLast = me.posH;
-	},
-
-	registerBlep: func (contact) {
-		me.strength = targetRCSSignal(
-			contact.getCoord(),
-		 contact.model,
-		  contact.ori.getNode("true-heading-deg").getValue(),
-		   contact.ori.getNode("pitch-deg").getValue(),
-		    contact.ori.getNode("roll-deg").getValue());
-		if (me.strength > contact.getRangeDirect()) {
-			contact.blep(getprop("sim/time/elapsed-sec"), me.lock==HARD or (me.scanMode == TRACK_WHILE_SCAN and contact.getRangeDirect() < max_tws_range*NM2M), me.strength);
-			if (me.lock != HARD) {
-				if (!me.containsVector(me.vector_aicontacts_bleps, contact)) {
-					append(me.vector_aicontacts_bleps, contact);
-				}
-				if (contact.getRangeDirect() < max_tws_range*NM2M and me.scanMode == TRACK_WHILE_SCAN and size(me.locks)<max_soft_locks and !me.containsVector(me.locks, contact)) {
-					append(me.locks, contact);
-					me.lock = SOFT;
-				}
-			}
-			return 1;
-		}
-		return 0;
-	},
-};
-
-
-
-
-
-
-
-
-###LinkRadar:
-# inherits from Radar
-# Get contact name from other aircraft, and finds local RadarControl for it.
-# no loop. emesary listener on aircraft for link.
-#
-# Attributes:
-#   contact selection(s) of type LinkContact
-#   imaginary hard/soft lock
-#   link list of contacts of type LinkContact
-
-###RWR:
-# inherits from Radar
-# will check radar/transponder and ground occlusion.
-# will sort according to threat level
-# will detect launches (MLW) or (active) incoming missiles (MAW)
-# loop (0.5 sec)
 
 
 
@@ -699,6 +368,10 @@ AIContact = {
 	},
 };
 
+
+
+
+
 ###GPSContact:
 # inherits from Contact
 #
@@ -710,7 +383,6 @@ AIContact = {
 #
 # Attributes:
 #   isPainted()  [asks parent radar is it the one that is painted]
-#   link to AIToNasal
 #   isDetected() [asks parent radar if it still is in limitedContactVector]
 
 ###LinkContact:
@@ -722,14 +394,429 @@ AIContact = {
 #   isDetected() [asks parent radar if it still is in limitedContactVector]
 
 
+
+
+
+
+
+
+
+
+
+
+
+Radar = {
+# master radar class
+#
+# Attributes:
+#   on/off
+#   limitedContactVector of RadarContacts
+	enabled: TRUE,
+};
+
+NoseRadar = {
+	new: func (range_m, radius, rate) {
+		var nr = {parents: [NoseRadar, Radar]};
+
+		nr.forRadius_deg  = radius;
+		nr.forDist_m      = range_m;#range setting
+		nr.vector_aicontacts = [];
+		nr.vector_aicontacts_for = [];
+		nr.timer          = maketimer(rate, nr, func nr.scanFOR());
+
+		nr.NoseRadarRecipient = emesary.Recipient.new("NoseRadarRecipient");
+		nr.NoseRadarRecipient.radar = nr;
+		nr.NoseRadarRecipient.Receive = func(notification) {
+	        if (notification.NotificationType == "AINotification") {
+	        	printf("NoseRadar recv: %s", notification.NotificationType);
+	            if (me.radar.enabled == 1) {
+	    		    me.radar.vector_aicontacts = notification.vector;
+	    	    }
+	            return emesary.Transmitter.ReceiptStatus_OK;
+	        }
+	        return emesary.Transmitter.ReceiptStatus_NotProcessed;
+	    };
+		emesary.GlobalTransmitter.Register(nr.NoseRadarRecipient);
+		nr.FORNotification = VectorNotification.new("FORNotification");
+		nr.FORNotification.updateV(nr.vector_aicontacts_for);
+		nr.timer.start();
+		return nr;
+	},
+
+	scanFOR: func {
+		#iterate:
+		# check direct distance
+		# check field of regard
+		# sort in bearing?
+		# called every approx 5 seconds
+		me.vector_aicontacts_for = [];
+		foreach(contact ; me.vector_aicontacts) {
+			if (contact.getRangeDirect() > me.forDist_m) {
+				continue;
+			} elsif (math.abs(contact.getDeviationHeading()) > me.forRadius_deg) {
+				continue;
+			} elsif (math.abs(contact.getDeviationPitch()) > me.forRadius_deg) {
+				continue;
+			}
+			append(me.vector_aicontacts_for, contact);
+		}		
+		emesary.GlobalTransmitter.NotifyAll(me.FORNotification.updateV(me.vector_aicontacts_for));
+		#print("In Field of Regard: "~size(me.vector_aicontacts_for));
+	},
+
+	more: func {
+		#test method
+		me.forDist_m      *= 2;
+		me.scanFOR();
+	},
+
+	less: func {
+		#test method
+		me.forDist_m      *= 0.5;
+		me.scanFOR();
+	},
+};
+
+
+
+
+
+
+
+
+var REVERSE = 0;
+var LOOP    = 1;
+
+var NONE = 0;
+var SOFT = 1;
+var HARD = 2;
+
+var max_soft_locks = 8;
+var time_to_keep_bleps = 6;
+var time_to_fadeout_bleps = 5;
+var time_till_lose_lock = 0.5;
+var time_till_lose_lock_soft = 4.5;
+var sam_radius = 15;
+var max_tws_range = 30;# these 2 should be determined from RCS instead.
+var max_lock_range = 40;
+
+#air scan modes:
+var TRACK_WHILE_SCAN = 2;# Gives velocity, angle, azimuth and range. Multiple soft locks. Short range. Fast.
+#var SINGLE_TARGET_TRACK = 4;# focus on a contact. hard lock. Good for identification. Mid range.
+var RANGE_WHILE_SEARCH = 1;# Gives range/angle info. Long range. Narrow bars.
+#var SITUATION_AWARENESS_MODE = 3;# submode of RWS/TWS. A contact can be followed/selected while scan still being done that can show other bleps nearby.
+var VELOCITY_SEARCH = 0;# gives positive closure rate. Long range.
+
+
+
+ActiveDiscRadar = {
+# inherits from Radar
+# will check range, field of view/regard, ground occlusion and FCS.
+# will also scan a field. And move that scan field as appropiate for scan mode.
+# do not use directly, inherit and instance it.
+# fast loop
+#
+# Attributes:
+#   contact selection(s) of type Contact
+#   soft/hard lock
+#   painted (is the hard lock) of type Contact
+	new: func () {
+		var ar = {parents: [ActiveDiscRadar, Radar]};
+		ar.timer          = maketimer(1, ar, func ar.loop());
+		ar.lock           = NONE;# NONE, SOFT, HARD
+		ar.locks          = [];
+		ar.follow         = [];
+		ar.vector_aicontacts_for = [];
+		ar.vector_aicontacts_bleps = [];
+		ar.scanMode       = RANGE_WHILE_SEARCH;
+		ar.scanType       = AIR;
+		ar.directionX     = 1;
+		ar.patternBar     = 0;
+		ar.barOffset      = 0;
+
+		# these should be init in the actuaal radar:
+		ar.discSpeed_dps  = 1;
+		ar.fovRadius_deg  = 1;
+		ar.calcLoop();
+		ar.calcBars();
+		ar.pattern        = [-1,1,[0]];#6/8 bars
+		
+		
+		ar.posE           = ar.bars[ar.pattern[2][ar.patternBar]];
+		ar.posH           = ar.pattern[0];
+
+		ar.lockX = 1;
+		ar.lockY = 1;
+		ar.posHLast = ar.posH;
+
+		# emesary
+		ar.ActiveDiscRadarRecipient = emesary.Recipient.new("ActiveDiscRadarRecipient");
+		ar.ActiveDiscRadarRecipient.radar = ar;
+		ar.ActiveDiscRadarRecipient.Receive = func(notification) {
+	        if (notification.NotificationType == "FORNotification") {
+	        	printf("DiscRadar recv: %s", notification.NotificationType);
+	            if (me.radar.enabled == 1) {
+	    		    me.radar.vector_aicontacts_for = notification.vector;
+	    		    me.radar.forWasScanned();
+	    	    }
+	            return emesary.Transmitter.ReceiptStatus_OK;
+	        }
+	        return emesary.Transmitter.ReceiptStatus_NotProcessed;
+	    };
+		emesary.GlobalTransmitter.Register(ar.ActiveDiscRadarRecipient);
+		ar.timer.start();
+    	return ar;
+	},
+
+	calcBars: func {
+		# must be called each time fovRadius_deg is changed.
+		me.bars           = [-me.fovRadius_deg*7,-me.fovRadius_deg*5,-me.fovRadius_deg*3,-me.fovRadius_deg,me.fovRadius_deg,me.fovRadius_deg*3,me.fovRadius_deg*5,me.fovRadius_deg*7];
+	},
+
+	calcLoop: func {
+		me.loopSpeed      = 1/(me.discSpeed_dps/(me.fovRadius_deg*2));
+		me.timer.restart(me.loopSpeed);
+		#print("loop: "~me.loopSpeed);
+	},
+
+	loop: func {
+		me.moveDisc();
+		me.scanFOV();
+		if (me.lock == HARD) {
+			me.purgeLock(time_till_lose_lock);
+		} else {
+			me.purgeLocks(time_till_lose_lock_soft);
+		}
+	},
+
+	forWasScanned: func {
+		me.vector_aicontacts_bleps_tmp = [];
+		me.elapsed = getprop("sim/time/elapsed-sec");
+		foreach(contact ; me.vector_aicontacts_bleps) {
+			if (me.elapsed - contact.blepTime < time_to_keep_bleps) {
+				append(me.vector_aicontacts_bleps_tmp, contact);
+			}
+		}
+		me.vector_aicontacts_bleps = me.vector_aicontacts_bleps_tmp;
+		if (size(me.follow) > 0 and !me.containsVector(me.vector_aicontacts_bleps, me.follow[0])) {
+			me.follow = [];
+		}
+	},
+
+	purgeLocks: func (time) {
+		me.locks_tmp = [];
+		me.elapsed = getprop("sim/time/elapsed-sec");
+		foreach(contact ; me.locks) {
+			if (me.elapsed - contact.blepTime < time) {
+				append(me.locks_tmp, contact);
+			}
+		}
+		me.locks = me.locks_tmp;
+		if (size(me.locks) == 0) {
+			me.lock = NONE;
+		}
+		if (size(me.follow) > 0 and !me.containsVector(me.vector_aicontacts_bleps, me.follow[0])) {
+			me.follow = [];
+		}
+	},
+
+	purgeLock: func (time) {
+		if (size(me.locks) == 1) {
+			me.elapsed = getprop("sim/time/elapsed-sec");
+			if (me.elapsed - me.locks[0].blepTime > time) {
+				me.locks = [];
+				me.lock = NONE;
+				me.follow = [];
+			} elsif (me.locks[0].getRangeDirect()*M2NM > max_lock_range) {
+				me.locks = [];
+				me.lock = NONE;
+			}
+		} elsif (size(me.locks) == 0) {
+			me.lock = NONE;
+		}
+	},
+
+	containsVector: func (vec, item) {
+		foreach(test; vec) {
+			if (test == item) {
+				return TRUE;
+			}
+		}
+		return FALSE;
+	},
+
+	vectorIndex: func (vec, item) {
+		me.i = 0;
+		foreach(test; vec) {
+			if (test == item) {
+				return me.i;
+			}
+			me.i += 1;
+		}
+		return -1;
+	},
+
+	moveDisc: func {
+		# move the FOV inside the FOR
+		#me.acPitch = getprop("orientation/pitch-deg");
+		me.reset = 0;
+		me.step = 1;
+		me.pattern_move = [me.pattern[0],me.pattern[1],me.pattern[2]];# we move on a temp pattern, so we can revert to normal scan mode, after lock/follow.
+		if (size(me.follow) > 0 and me.lock != HARD) {
+			# scan follows selection (SAM)
+			me.pattern_move[0] = me.follow[0].getDeviationHeadingFrozen()-sam_radius;
+			me.pattern_move[1] = me.follow[0].getDeviationHeadingFrozen()+sam_radius;
+			if (me.pattern_move[0] < -me.forRadius_deg) {
+				me.pattern_move[0] = -me.forRadius_deg;
+			}
+			if (me.pattern_move[1] > me.forRadius_deg) {
+				me.pattern_move[1] = me.forRadius_deg;
+			}
+		}
+		if (me.lock != HARD) {
+			# Normal scan
+			me.reverted = 0;
+			if (getprop("sim/time/delta-sec") > me.loopSpeed) {
+				# hack for slow FPS
+				me.step = 2;
+			}		
+			me.posH_new  = me.posH+me.directionX*me.fovRadius_deg*2*me.step;
+			me.polarDist = math.sqrt(me.posH_new*me.posH_new+me.posE*me.posE);
+			if (me.polarDist > me.forRadius_deg or (me.directionX==1 and me.posH > me.pattern_move[1]) or (me.directionX==-1 and me.posH < me.pattern_move[0])) {
+				me.patternBar +=1;
+				me.directionX *= -1;
+				me.reverted = 1;
+				me.checkBarValid();
+				me.posE = me.bars[me.pattern_move[2][me.patternBar]]+me.barOffset*me.fovRadius_deg*2;
+				if (me.directionX == 1) {
+					me.posH = me.pattern_move[0]+me.fovRadius_deg;
+				} else {
+					me.posH = me.pattern_move[1]-me.fovRadius_deg;
+				}
+				me.polarDist = math.sqrt(me.posH*me.posH+me.posE*me.posE);
+				if (me.polarDist > me.forRadius_deg) {
+					me.posH = -math.cos(math.asin(clamp(me.posE/me.pattern_move[1],-1,1)))*me.pattern_move[1]*me.directionX+me.directionX*me.fovRadius_deg;# disc set at beginning of new bar.
+				}
+				#if (me.posE-getprop("orientation/pitch-deg") > me.forRadius_deg) {
+					#is this realy how it works when you pitch much down?
+				#	me.posE = me.forRadius_deg-getprop("orientation/pitch-deg");
+				#} elsif (me.posE-getprop("orientation/pitch-deg") < -me.forRadius_deg) {
+				#	me.posE = getprop("orientation/pitch-deg")+me.forRadius_deg;
+				#}
+			} else {
+				me.posH = me.posH_new;
+			}
+		} else {
+			# lock scan
+			me.posH_n = me.locks[0].getDeviationHeadingFrozen()+me.lockX*me.fovRadius_deg*0.5;
+			me.posE_n = me.locks[0].getDeviationPitchFrozen()+me.lockY*me.fovRadius_deg*0.5;
+			if (me.forRadius_deg >= math.sqrt(me.posH_n*me.posH_n+me.posE_n*me.posE_n)) {
+				me.posH = me.posH_n;
+				me.posE = me.posE_n;
+			}
+			me.lockX *= -1;
+			if (me.lockX == -1) {
+				me.lockY *= -1;
+			}
+		}
+		#printf("scanning %04.1f, %04.1f", me.posH, me.posE);
+	},
+
+	checkBarValid: func {
+		if (me.patternBar > size(me.pattern_move[2])-1) {
+			me.patternBar = 0;
+			me.reset = 1;
+		}
+	},
+
+	scanFOV: func {
+		#iterate:
+		# check sensor field of view
+		# check Terrain
+		# check Doppler
+		# due to FG Nasal update rate, we consider FOV square.
+		# only detect 1 contact, even if more are present.
+		foreach(contact ; me.vector_aicontacts_for) {
+			me.contactPosH = contact.getDeviationHeading();
+			me.contactPosE = contact.getDeviationPitch();
+			if (me.contactPosE < me.posE+me.fovRadius_deg and me.contactPosE > me.posE-me.fovRadius_deg) {
+				# in correct elevation for detection
+				me.doDouble = me.step == 2 and me.reverted == 0;
+				if (!me.doDouble and me.contactPosH < me.posH+me.fovRadius_deg and me.contactPosH > me.posH-me.fovRadius_deg) {
+					# detected
+					#todo: check RCS, Terrain, Doppler here.
+					if (me.registerBlep(contact)) {
+						#print("detect-1 "~contact.callsign);
+						break;
+					}
+				} elsif (me.doDouble and me.directionX == 1 and me.contactPosH < me.posH+me.fovRadius_deg and me.contactPosH > me.posHLast+me.fovRadius_deg) {
+					# detected
+					if (me.registerBlep(contact)) {
+						#print("detect-1 "~contact.callsign);
+						break;
+					}
+				} elsif (me.doDouble and me.directionX == -1 and me.contactPosH < me.posHLast-me.fovRadius_deg and me.contactPosH > me.posH-me.fovRadius_deg) {
+					# detected
+					if (me.registerBlep(contact)) {
+						#print("detect-1 "~contact.callsign);
+						break;
+					}
+				}
+			}
+		}
+		me.posHLast = me.posH;
+	},
+
+	registerBlep: func (contact) {
+		me.strength = targetRCSSignal(contact.getCoord(), contact.model, contact.ori.getNode("true-heading-deg").getValue(), contact.ori.getNode("pitch-deg").getValue(), contact.ori.getNode("roll-deg").getValue());
+		if (me.strength > contact.getRangeDirect()) {
+			contact.blep(getprop("sim/time/elapsed-sec"), me.lock==HARD or (me.scanMode == TRACK_WHILE_SCAN and contact.getRangeDirect() < max_tws_range*NM2M), me.strength);
+			if (me.lock != HARD) {
+				if (!me.containsVector(me.vector_aicontacts_bleps, contact)) {
+					append(me.vector_aicontacts_bleps, contact);
+				}
+				if (contact.getRangeDirect() < max_tws_range*NM2M and me.scanMode == TRACK_WHILE_SCAN and size(me.locks)<max_soft_locks and !me.containsVector(me.locks, contact)) {
+					append(me.locks, contact);
+					me.lock = SOFT;
+				}
+			}
+			return 1;
+		}
+		return 0;
+	},
+};
+
+
+
+###LinkRadar:
+# inherits from Radar
+# Get contact name from other aircraft, and finds local RadarControl for it.
+# no loop. emesary listener on aircraft for link.
+#
+# Attributes:
+#   contact selection(s) of type LinkContact
+#   imaginary hard/soft lock
+#   link list of contacts of type LinkContact
+
+###RWR:
+# inherits from Radar
+# will check radar/transponder and ground occlusion.
+# will sort according to threat level
+# will detect launches (MLW) or (active) incoming missiles (MAW)
+# loop (0.5 sec)
+
+
 var targetRCSSignal = func(targetCoord, targetModel, targetHeading, targetPitch, targetRoll, myRadarDistance_m = 74000, myRadarStrength_rcs = 3.2) {
+	#
+	# test method. Belongs in rcs.nas.
+	#
     #print(targetModel);
     var target_front_rcs = nil;
     if ( contains(rcs.rcs_database,targetModel) ) {
         target_front_rcs = rcs.rcs_database[targetModel];
     } else {
         #return 1;
-        target_front_rcs = 5;#rcs.rcs_database["default"];
+        target_front_rcs = 5;#rcs.rcs_database["default"];# hardcode defaults to 5 to test with KXTA target scenario.
     }
     var myCoord = geo.aircraft_position();
     var target_rcs = rcs.getRCS(targetCoord, targetHeading, targetPitch, targetRoll, myCoord, target_front_rcs);
@@ -754,9 +841,48 @@ var targetRCSSignal = func(targetCoord, targetModel, targetHeading, targetPitch,
 
 
 
-#
-# test code below this line
-#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#############################
+# test code below this line #
+#############################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 RadarViewPPI = {
@@ -806,7 +932,7 @@ RadarViewPPI = {
 		me.rootCenterBleps.removeAllChildren();
 		foreach(contact; exampleRadar.vector_aicontacts_bleps) {
 			if (me.elapsed - contact.blepTime < 5) {
-				me.distPixels = contact.getRangeFrozen()*(me.sweepDistance/exampleRadar.forDist_m);
+				me.distPixels = contact.getRangeFrozen()*(me.sweepDistance/nose.forDist_m);
 
 				me.rootCenterBleps.createChild("path")
 					.moveTo(0,0)
@@ -853,7 +979,7 @@ RadarViewPPI = {
 		}
 		if (exampleRadar.patternBar<size(exampleRadar.pattern[2])) {
 			# the if is due to just after changing bars and before radar loop has run, patternBar can be out of bounds of pattern.
-			me.text.setText(sprintf("Bar %+d    Range %d NM", exampleRadar.pattern[2][exampleRadar.patternBar]<4?exampleRadar.pattern[2][exampleRadar.patternBar]-4:exampleRadar.pattern[2][exampleRadar.patternBar]-3,exampleRadar.forDist_m*M2NM));
+			me.text.setText(sprintf("Bar %+d    Range %d NM", exampleRadar.pattern[2][exampleRadar.patternBar]<4?exampleRadar.pattern[2][exampleRadar.patternBar]-4:exampleRadar.pattern[2][exampleRadar.patternBar]-3,nose.forDist_m*M2NM));
 		}
 		me.md = exampleRadar.scanMode==TRACK_WHILE_SCAN?"TWS":"RWS";
 		if (size(exampleRadar.follow) > 0 and exampleRadar.lock != HARD) {
@@ -908,7 +1034,7 @@ RadarViewBScope = {
 		me.rootCenterBleps.removeAllChildren();
 		foreach(contact; exampleRadar.vector_aicontacts_bleps) {
 			if (me.elapsed - contact.blepTime < 5) {
-				me.distPixels = contact.getRangeFrozen()*(256/exampleRadar.forDist_m);
+				me.distPixels = contact.getRangeFrozen()*(256/nose.forDist_m);
 
 				me.rootCenterBleps.createChild("path")
 					.moveTo(0,0)
@@ -1129,6 +1255,15 @@ ExampleRadar = {
 	new: func () {
 		var vr = ActiveDiscRadar.new();
 		append(vr.parents, ExampleRadar);
+		vr.discSpeed_dps  = 120;
+		vr.fovRadius_deg  = 3.6;
+		vr.calcLoop();
+		vr.calcBars();
+		vr.pattern        = [-58,58,[1,2,3,4,5,6]];#6/8 bars
+		vr.forDist_m      = 15000;#range setting
+		vr.forRadius_deg  = 61.5;
+		vr.posE           = vr.bars[vr.pattern[2][vr.patternBar]];
+		vr.posH           = vr.pattern[0];
     	return vr;
 	},
 
@@ -1334,18 +1469,6 @@ ExampleRadar = {
 		me.barOffset = 0;
 	},
 
-	more: func {
-		#test method
-		me.forDist_m      *= 2;
-		me.scanFOR();
-	},
-
-	less: func {
-		#test method
-		me.forDist_m      *= 0.5;
-		me.scanFOR();
-	},
-
 	lockRandom: func {
 		#test method
 
@@ -1378,10 +1501,10 @@ ExampleRadar = {
 
 
 var pylonWsets = {
-	a: {id: "2 x AIM-9", content: ["AIM-9","AIM-9"]},
-	b: {id: "2 x AIM-120", content: ["AIM-120","AIM-120"]},
-	c: {id: "1 x AIM-7", content: ["AIM-7"]},
-	d: {id: "1 x GBU-82", content: ["GBU-82"]},
+	a: {id: "2 x AIM-9", content: ["AIM-9","AIM-9"], launcherDragArea: 0.25, launcherMass: 20, launcherJettisonable: 0},
+	b: {id: "2 x AIM-120", content: ["AIM-120","AIM-120"], launcherDragArea: 0.25, launcherMass: 20, launcherJettisonable: 0},
+	c: {id: "1 x AIM-7", content: ["AIM-7"], launcherDragArea: 0.25, launcherMass: 20, launcherJettisonable: 0},
+	d: {id: "1 x GBU-82", content: ["GBU-82"], launcherDragArea: 0.25, launcherMass: 20, launcherJettisonable: 0},
 };
 
 var loadAirSuperiority  = [500, "a","b"];# load 500 round into cannon, set 'a' onto left wing pylon, and set 'b' onto right wing pylon.
@@ -1407,7 +1530,7 @@ myFireControl = {
 		# number of total stations
 		fc.stationCount     = 3;
 		# the pylon instances
-		fc.vector_pylons  = [Cannon.new(0, 500), Pylon.new(1,"Left wing", pylonWsets), Pylon.new(2,"Right wing", pylonWsets)];
+		fc.vector_pylons  = [SubModelStation.new(0, 500), Pylon.new(1,"Left wing", pylonWsets), Pylon.new(2,"Right wing", pylonWsets)];
 		# property for trigger
 		fc.prop_trigger   = globals.getNode("controls/armament/trigger");
 		# when trigger is pulled, fire command is sent to these armaments
@@ -1423,25 +1546,59 @@ myFireControl = {
 	},
 
 	jettisonAll: func {
-		# drops everything from all pylons
+		# drops everything from all pylons.
 	},
 
 	jettison: func {
 		# drops current selected arms
 	},
 
+	addTrigger: func {
+		# the currently selected arms is added to list arms that will fire when trigger is pulled.
+	},
+
+	removeTrigger: func {
+		# the currently selected arms is removed from list arms that will fire when trigger is pulled.
+	},
+
+	autoTrigger: func (enable) {
+		# selected arms is auto set to trigger
+	},
+
 	assign: func {
 		# assign current selected radar contact to current selected arms
 	},
 
+	autoAssign: func (enable) {
+		# If ON then all contacts in Field of Regard is propegated to selected Arms. (used for heatseekers when radar is off)
+	},
+
+	clear: func {
+		# select nothing
+	},
+
+	setMasterMode: func (mode) {
+		# Set master arm OFF, ON, REDUCED, SIM.
+	},
+
 	cycleArm: func {
 		# cycle between arms of same type
-
 	},
 
 	cycleType: func {
-		# cycle between different types of arms
+		# cycle between different types of arms. Will also clear trigger list.
+	},
 
+	selectType: func {
+		# select specific type explicit. Will also clear trigger list.
+	},
+
+	selectArm: func {
+		# select specific arm explicit
+	},
+
+	getSelectedArms: func {
+		# get the missile-code instance of selected arms. Returns vector.
 	},
 
 	loadFullSets: func (loadSets) {
@@ -1452,7 +1609,7 @@ myFireControl = {
 ###Station
 #
 
-###Cannon:
+###SubModelStation:
 # inherits from station
 # Implements a fixed station.
 #  cannon/rockets and methods to give them commands.
@@ -1460,22 +1617,23 @@ myFireControl = {
 #  no loop, but lots of listeners.
 #
 # Attributes:
+#  drag, weight, submodel(s)
 
 ###Pylon:
 # inherits from station
 # Implements a pylon.
 #  missiles/bombs/rockets and methods to give them commands.
-#  sets jsbsim/yasim point mass and drag
-#  interacts with GUI payload dialog  ("2 x AIM9L", "1 x GBU-82")
+#  sets jsbsim/yasim point mass and drag. Mass is combined of all missile-code instances + launcher mass. Same with drag.
+#  interacts with GUI payload dialog  ("2 x AIM9L", "1 x GBU-82"), auto-adjusts the name when munitions is fired/jettisoned.
 #  should be able to hold missile-code arms.
 #  no loop, but lots of listeners.
 #
 # Attributes:
-#   munition instance(s) [each with a individual id number]
+#   missile-code instance(s) [each with a unique id number that corresponds to a 3D position]
 #   pylon id number
 #   jsb pointmass id number
-#   GUI payload id numbers
-#   individiual positions for 3D
+#   GUI payload id number
+#   individiual positions for 3D (from xml)
 #   possible sets that can be loaded ("2 x AIM9L", "1 x GBU-82") At loadtime, this can be many, so store in Nasal :(
 
 
@@ -1549,14 +1707,14 @@ var buttonWindow = func {
 		.setText("Range+")
 		.setFixedSize(75, 20);
 	button7.listen("clicked", func {
-		exampleRadar.more();
+		nose.more();
 	});
 	myLayout.addItem(button7);
 	var button8 = canvas.gui.widgets.Button.new(root, canvas.style, {})
 		.setText("Range-")
 		.setFixedSize(75, 20);
 	button8.listen("clicked", func {
-		exampleRadar.less();
+		nose.less();
 	});
 	myLayout.addItem(button8);
 	var button9 = canvas.gui.widgets.Button.new(root, canvas.style, {})
@@ -1659,7 +1817,9 @@ var buttonWindow = func {
 	});
 	myLayout2.addItem(button22);
 };
+
 AIToNasal.new();
+var nose = NoseRadar.new(15000,60,5);
 var exampleRadar = ExampleRadar.new();
 RadarViewPPI.new();
 RadarViewBScope.new();
