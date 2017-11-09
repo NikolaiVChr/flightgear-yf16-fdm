@@ -281,6 +281,13 @@ AIContact = {
     	me.lat = me.pos.getNode("latitude-deg");
     	me.lon = me.pos.getNode("longitude-deg");
     	me.heading = me.ori.getNode("true-heading-deg");
+    	me.pitch = me.ori.getNode("pitch-deg");
+    	me.roll = me.ori.getNode("roll-deg");
+    	me.acHeading = props.globals.getNode("orientation/heading-deg");
+    	me.acPitch = props.globals.getNode("orientation/pitch-deg");
+    	me.aalt = props.globals.getNode("position/altitude-ft");
+    	me.alat = props.globals.getNode("position/latitude-deg");
+    	me.alon = props.globals.getNode("position/longitude-deg");
 	},
 
 	update: func (newC) {
@@ -313,20 +320,35 @@ AIContact = {
 	    }	
 	},
 
+	getAcCoord: func {
+		me.accoord = geo.Coord.new().set_latlon(me.alat.getValue(), me.alon.getValue(), me.aalt.getValue()*FT2M);
+	    return me.accoord;
+	},
+
 	getDeviationPitch: func {
 		me.getCoord();
-		me.pitch = vector.Math.getPitch(geo.aircraft_position(), me.coord);
-		return me.pitch - getprop("orientation/pitch-deg");
+		me.getAcCoord();
+		me.pitched = vector.Math.getPitch(me.accoord, me.coord);
+		return me.pitched - me.acPitch.getValue();
 	},
 
 	getDeviationHeading: func {
 		me.getCoord();
-		return geo.normdeg180(geo.aircraft_position().course_to(me.coord)-getprop("orientation/heading-deg"));
+		me.getAcCoord();
+		return geo.normdeg180(me.accoord.course_to(me.coord)-me.acHeading.getValue());
+	},
+
+	getDeviation: func {
+		# optimized method that return both heading and pitch deviation, to limit property calls
+		me.getCoord();
+		me.getAcCoord();
+		return [geo.normdeg180(me.accoord.course_to(me.coord)-me.acHeading.getValue()), vector.Math.getPitch(me.accoord, me.coord) - me.acPitch.getValue()];
 	},
 
 	getRangeDirect: func {# meters
 		me.getCoord();
-		return geo.aircraft_position().direct_distance_to(me.coord);
+		me.getAcCoord();
+		return me.accoord.direct_distance_to(me.coord);
 	},
 
 	blep: func (time, azimuth, strength) {
@@ -338,20 +360,38 @@ AIContact = {
 	},
 
 	getDeviationPitchFrozen: func {
-		me.pitch = vector.Math.getPitch(geo.aircraft_position(), me.coordFrozen);
-		return me.pitch - getprop("orientation/pitch-deg");
+		me.getAcCoord();
+		me.pitched = vector.Math.getPitch(me.accoord, me.coordFrozen);
+		return me.pitched - me.acPitch.getValue();
 	},
 
 	getDeviationHeadingFrozen: func {
-		return geo.normdeg180(geo.aircraft_position().course_to(me.coordFrozen)-getprop("orientation/heading-deg"));
+		me.getAcCoord();
+		return me.accoord.course_to(me.coordFrozen)-me.acHeading.getValue();
 	},
 
 	getRangeDirectFrozen: func {# meters
-		return geo.aircraft_position().direct_distance_to(me.coordFrozen);
+		me.getAcCoord();
+		return me.accoord.direct_distance_to(me.coordFrozen);
 	},
 
 	getRangeFrozen: func {# meters
-		return geo.aircraft_position().distance_to(me.coordFrozen);
+		me.getAcCoord();
+		return me.accoord.distance_to(me.coordFrozen);
+	},
+
+	getPitch: func {
+		if (me.pitch == nil) {
+			return 0;
+		}
+		return me.pitch.getValue();
+	},
+
+	getRoll: func {
+		if (me.roll == nil) {
+			return 0;
+		}
+		return me.roll.getValue();
 	},
 
 	getHeading: func {
@@ -582,13 +622,19 @@ ActiveDiscRadar = {
 	},
 
 	loop: func {
-		me.moveDisc();
-		me.scanFOV();
-		if (me.lock == HARD) {
+		#debug.benchmark("move ",func
+		 me.moveDisc();
+		# );
+		#debug.benchmark("fov  ",func
+		 me.scanFOV();
+		# );
+		#debug.benchmark("purge",func {
+			if (me.lock == HARD) {
 			me.purgeLock(time_till_lose_lock);
 		} else {
 			me.purgeLocks(time_till_lose_lock_soft);
 		}
+		#});
 	},
 
 	forWasScanned: func {
@@ -700,7 +746,7 @@ ActiveDiscRadar = {
 					me.posH = -math.cos(math.asin(clamp(me.posE/me.pattern_move[1],-1,1)))*me.pattern_move[1]*me.directionX+me.directionX*me.fovRadius_deg;# disc set at beginning of new bar.
 				}
 				#if (me.posE-getprop("orientation/pitch-deg") > me.forRadius_deg) {
-					#is this realy how it works when you pitch much down?
+					#is this realy how it works when you pitch much down?..its not
 				#	me.posE = me.forRadius_deg-getprop("orientation/pitch-deg");
 				#} elsif (me.posE-getprop("orientation/pitch-deg") < -me.forRadius_deg) {
 				#	me.posE = getprop("orientation/pitch-deg")+me.forRadius_deg;
@@ -739,8 +785,9 @@ ActiveDiscRadar = {
 		# due to FG Nasal update rate, we consider FOV square.
 		# only detect 1 contact, even if more are present.
 		foreach(contact ; me.vector_aicontacts_for) {
-			me.contactPosH = contact.getDeviationHeading();
-			me.contactPosE = contact.getDeviationPitch();
+			me.dev = contact.getDeviation();
+			me.contactPosH = me.dev[0];
+			me.contactPosE = me.dev[1];
 			if (me.contactPosE < me.posE+me.fovRadius_deg and me.contactPosE > me.posE-me.fovRadius_deg) {
 				# in correct elevation for detection
 				me.doDouble = me.step == 2 and me.reverted == 0;
@@ -770,7 +817,7 @@ ActiveDiscRadar = {
 	},
 
 	registerBlep: func (contact) {
-		me.strength = targetRCSSignal(contact.getCoord(), contact.model, contact.ori.getNode("true-heading-deg").getValue(), contact.ori.getNode("pitch-deg").getValue(), contact.ori.getNode("roll-deg").getValue());
+		me.strength = me.targetRCSSignal(contact.getCoord(), contact.model, contact.getHeading(), contact.getPitch(), contact.getRoll());
 		if (me.strength > contact.getRangeDirect()) {
 			contact.blep(getprop("sim/time/elapsed-sec"), me.lock==HARD or (me.scanMode == TRACK_WHILE_SCAN and contact.getRangeDirect() < max_tws_range*NM2M), me.strength);
 			if (me.lock != HARD) {
@@ -785,6 +832,25 @@ ActiveDiscRadar = {
 			return 1;
 		}
 		return 0;
+	},
+
+	targetRCSSignal: func(targetCoord, targetModel, targetHeading, targetPitch, targetRoll, myRadarDistance_m = 74000, myRadarStrength_rcs = 3.2) {
+		#
+		# test method. Belongs in rcs.nas.
+		#
+	    #print(targetModel);
+	    me.target_front_rcs = nil;
+	    if ( contains(rcs.rcs_database,targetModel) ) {
+	        me.target_front_rcs = rcs.rcs_database[targetModel];
+	    } else {
+	        #return 1;
+	        me.target_front_rcs = 5;#rcs.rcs_database["default"];# hardcode defaults to 5 to test with KXTA target scenario.
+	    }
+	    me.myCoord = geo.aircraft_position();
+	    me.target_rcs = rcs.getRCS(targetCoord, targetHeading, targetPitch, targetRoll, me.myCoord, me.target_front_rcs);
+
+	    # standard formula
+	    return myRadarDistance_m/math.pow(myRadarStrength_rcs/me.target_rcs, 1/4);
 	},
 };
 
@@ -808,25 +874,7 @@ ActiveDiscRadar = {
 # loop (0.5 sec)
 
 
-var targetRCSSignal = func(targetCoord, targetModel, targetHeading, targetPitch, targetRoll, myRadarDistance_m = 74000, myRadarStrength_rcs = 3.2) {
-	#
-	# test method. Belongs in rcs.nas.
-	#
-    #print(targetModel);
-    var target_front_rcs = nil;
-    if ( contains(rcs.rcs_database,targetModel) ) {
-        target_front_rcs = rcs.rcs_database[targetModel];
-    } else {
-        #return 1;
-        target_front_rcs = 5;#rcs.rcs_database["default"];# hardcode defaults to 5 to test with KXTA target scenario.
-    }
-    var myCoord = geo.aircraft_position();
-    var target_rcs = rcs.getRCS(targetCoord, targetHeading, targetPitch, targetRoll, myCoord, target_front_rcs);
 
-    # standard formula
-    var currMaxDist = myRadarDistance_m/math.pow(myRadarStrength_rcs/target_rcs, 1/4);
-    return currMaxDist;
-}
 
 
 #troubles:
@@ -1396,6 +1444,10 @@ ExampleRadar = {
 		#me.follow = [];
 	},
 
+	b1: func {
+		me.pattern[2] = [4];
+	},
+
 	b2: func {
 		me.pattern[2] = [3,4];
 	},
@@ -1500,7 +1552,6 @@ ExampleRadar = {
 
 
 
-
 #
 # I made this fire-control shell, to get me thinking about way to design such a thing plus pylons.
 #
@@ -1537,7 +1588,7 @@ myFireControl = {
 		# the pylon instances
 		fc.vector_pylons  = [SubModelStation.new(0, 500), Pylon.new(1,"Left wing", pylonWsets), Pylon.new(2,"Right wing", pylonWsets)];
 		# property for trigger
-		fc.prop_trigger   = globals.getNode("controls/armament/trigger");
+		fc.prop_trigger   = props.globals.getNode("controls/armament/trigger");
 		# when trigger is pulled, fire command is sent to these armaments
 		fc.triggerArms    = [[1,0]];#first arm on first pylon
 		# current selected armaments. Can send radar contact info to these arms.
@@ -1765,6 +1816,13 @@ var buttonWindow = func {
 	});
 	myLayout.addItem(button14);
 
+	var button15b = canvas.gui.widgets.Button.new(root, canvas.style, {})
+		.setText("1 Bar")
+		.setFixedSize(75, 25);
+	button15b.listen("clicked", func {
+		exampleRadar.b1();
+	});
+	myLayout2.addItem(button15b);
 	var button15 = canvas.gui.widgets.Button.new(root, canvas.style, {})
 		.setText("2 Bars")
 		.setFixedSize(75, 25);
