@@ -582,6 +582,7 @@ ActiveDiscRadar = {
 		ar.calcLoop();
 		ar.calcBars();
 		ar.pattern        = [-1,1,[0]];#6/8 bars
+		ar.pattern_move   = [-1,1,[0]];#6/8 bars
 		
 		
 		ar.posE           = ar.bars[ar.pattern[2][ar.patternBar]];
@@ -724,13 +725,13 @@ ActiveDiscRadar = {
 		if (me.lock != HARD) {
 			# Normal scan
 			me.reverted = 0;
-			if (getprop("sim/time/delta-sec") > me.loopSpeed) {
+			if (getprop("sim/time/delta-sec") > me.loopSpeed*1.5) {
 				# hack for slow FPS
 				me.step = 2;
 			}		
 			me.posH_new  = me.posH+me.directionX*me.fovRadius_deg*2*me.step;
 			me.polarDist = math.sqrt(me.posH_new*me.posH_new+me.posE*me.posE);
-			if (me.polarDist > me.forRadius_deg or (me.directionX==1 and me.posH > me.pattern_move[1]) or (me.directionX==-1 and me.posH < me.pattern_move[0])) {
+			if (me.polarDist > me.forRadius_deg or (me.directionX==1 and me.posH_new > me.pattern_move[1]) or (me.directionX==-1 and me.posH_new < me.pattern_move[0])) {
 				me.patternBar +=1;
 				me.directionX *= -1;
 				me.reverted = 1;
@@ -1064,6 +1065,16 @@ RadarViewBScope = {
 				.vert(-256)
 				.setStrokeLineWidth(2.5)
 				.setColor(1,1,1);
+		me.sweepA = me.rootCenter.createChild("path")
+				.moveTo(0,0)
+				.vert(-256)
+				.setStrokeLineWidth(1)
+				.setColor(0.5,0.5,1);
+		me.sweepB = me.rootCenter.createChild("path")
+				.moveTo(0,0)
+				.vert(-256)
+				.setStrokeLineWidth(1)
+				.setColor(0.5,0.5,1);
 		
 	    me.b = root.createChild("text")
 	      .setAlignment("left-center")
@@ -1080,6 +1091,8 @@ RadarViewBScope = {
 
 	loop: func {
 		me.sweep.setTranslation(128*exampleRadar.posH/60,0);
+		me.sweepA.setTranslation(128*exampleRadar.pattern_move[0]/60,0);
+		me.sweepB.setTranslation(128*exampleRadar.pattern_move[1]/60,0);
 		me.elapsed = getprop("sim/time/elapsed-sec");
 		me.rootCenterBleps.removeAllChildren();
 		foreach(contact; exampleRadar.vector_aicontacts_bleps) {
@@ -1309,9 +1322,9 @@ ExampleRadar = {
 		vr.fovRadius_deg  = 3.6;
 		vr.calcLoop();
 		vr.calcBars();
-		vr.pattern        = [-58,58,[1,2,3,4,5,6]];#6/8 bars
+		vr.pattern        = [-60,60,[1,2,3,4,5,6]];#6/8 bars
 		vr.forDist_m      = 15000;#range setting
-		vr.forRadius_deg  = 61.5;
+		vr.forRadius_deg  = 60;
 		vr.posE           = vr.bars[vr.pattern[2][vr.patternBar]];
 		vr.posH           = vr.pattern[0];
     	return vr;
