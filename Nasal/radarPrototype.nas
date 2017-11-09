@@ -288,6 +288,7 @@ AIContact = {
     	me.aalt = props.globals.getNode("position/altitude-ft");
     	me.alat = props.globals.getNode("position/latitude-deg");
     	me.alon = props.globals.getNode("position/longitude-deg");
+    	me.speed = me.prop.getNode("velocities/true-airspeed-kt");
 	},
 
 	update: func (newC) {
@@ -370,6 +371,11 @@ AIContact = {
 		return me.accoord.course_to(me.coordFrozen)-me.acHeading.getValue();
 	},
 
+	getBearing: func {
+		me.getAcCoord();
+		return me.accoord.course_to(me.getCoord());
+	},
+
 	getRangeDirectFrozen: func {# meters
 		me.getAcCoord();
 		return me.accoord.direct_distance_to(me.coordFrozen);
@@ -407,6 +413,13 @@ AIContact = {
 		} else {
 			return nil;
 		}
+	},
+
+	getSpeed: func {
+		if (me.speed == nil) {
+			return 0;
+		}
+		return me.speed.getValue();
 	},
 };
 
@@ -470,7 +483,7 @@ NoseRadar = {
 		nr.NoseRadarRecipient.radar = nr;
 		nr.NoseRadarRecipient.Receive = func(notification) {
 	        if (notification.NotificationType == "AINotification") {
-	        	printf("NoseRadar recv: %s", notification.NotificationType);
+	        	#printf("NoseRadar recv: %s", notification.NotificationType);
 	            if (me.radar.enabled == 1) {
 	    		    me.radar.vector_aicontacts = notification.vector;
 	    	    }
@@ -493,11 +506,12 @@ NoseRadar = {
 		# called every approx 5 seconds
 		me.vector_aicontacts_for = [];
 		foreach(contact ; me.vector_aicontacts) {
-			if (contact.getRangeDirect() > me.forDist_m) {
+			me.dev = contact.getDeviation();
+			if (math.abs(me.dev[0]) > me.forRadius_deg) {
 				continue;
-			} elsif (math.abs(contact.getDeviationHeading()) > me.forRadius_deg) {
+			} elsif (math.abs(me.dev[1]) > me.forRadius_deg) {
 				continue;
-			} elsif (math.abs(contact.getDeviationPitch()) > me.forRadius_deg) {
+			} elsif (contact.getRangeDirect() > me.forDist_m) {
 				continue;
 			}
 			append(me.vector_aicontacts_for, contact);
@@ -597,7 +611,7 @@ ActiveDiscRadar = {
 		ar.ActiveDiscRadarRecipient.radar = ar;
 		ar.ActiveDiscRadarRecipient.Receive = func(notification) {
 	        if (notification.NotificationType == "FORNotification") {
-	        	printf("DiscRadar recv: %s", notification.NotificationType);
+	        	#printf("DiscRadar recv: %s", notification.NotificationType);
 	            if (me.radar.enabled == 1) {
 	    		    me.radar.vector_aicontacts_for = notification.vector;
 	    		    me.radar.forWasScanned();
@@ -617,6 +631,7 @@ ActiveDiscRadar = {
 	},
 
 	calcLoop: func {
+		# must be called each time fovRadius_deg or discSpeed_dps is changed.
 		me.loopSpeed      = 1/(me.discSpeed_dps/(me.fovRadius_deg*2));
 		me.timer.restart(me.loopSpeed);
 		#print("loop: "~me.loopSpeed);
@@ -867,12 +882,6 @@ ActiveDiscRadar = {
 #   imaginary hard/soft lock
 #   link list of contacts of type LinkContact
 
-###RWR:
-# inherits from Radar
-# will check radar/transponder and ground occlusion.
-# will sort according to threat level
-# will detect launches (MLW) or (active) incoming missiles (MAW)
-# loop (0.5 sec)
 
 
 
@@ -926,12 +935,62 @@ ActiveDiscRadar = {
 
 
 
+var clamp = func(v, min, max) { v < min ? min : v > max ? max : v }
 
 
 
 
+var RWR = {
+# inherits from Radar
+# will check radar/transponder and ground occlusion.
+# will sort according to threat level
+# will detect launches (MLW) or (active) incoming missiles (MAW)
+# loop (0.5 sec)
+		new: func () {
+		var rr = {parents: [RWR, Radar]};
 
+		rr.vector_aicontacts = [];
+		rr.vector_aicontacts_threats = [];
+		rr.timer          = maketimer(2, rr, func rr.scan());
 
+		rr.RWRRecipient = emesary.Recipient.new("RWRRecipient");
+		rr.RWRRecipient.radar = rr;
+		rr.RWRRecipient.Receive = func(notification) {
+	        if (notification.NotificationType == "AINotification") {
+	        	#printf("RWR recv: %s", notification.NotificationType);
+	            if (me.radar.enabled == 1) {
+	    		    me.radar.vector_aicontacts = notification.vector;
+	    	    }
+	            return emesary.Transmitter.ReceiptStatus_OK;
+	        }
+	        return emesary.Transmitter.ReceiptStatus_NotProcessed;
+	    };
+		emesary.GlobalTransmitter.Register(rr.RWRRecipient);
+		#nr.FORNotification = VectorNotification.new("FORNotification");
+		#nr.FORNotification.updateV(nr.vector_aicontacts_for);
+		rr.timer.start();
+		return rr;
+	},
+
+	scan: func {
+		#iterate:
+		# check direct distance
+		# check field of regard
+		# sort in threat?
+		# called every approx 1 seconds
+		me.vector_aicontacts_threats = [];
+		foreach(contact ; me.vector_aicontacts) {
+			me.ber = contact.getBearing()+180-contact.getHeading();
+            if (math.abs(geo.normdeg180(me.ber)) < 60) {
+				me.threatInv = contact.getRangeDirect()*M2NM;
+				me.threatInv += 55-contact.getSpeed()*0.1;
+				append(me.vector_aicontacts_threats, [contact,me.threatInv]);
+			}
+		}		
+		#emesary.GlobalTransmitter.NotifyAll(me.FORNotification.updateV(me.vector_aicontacts_for));
+		#print("In Field of Regard: "~size(me.vector_aicontacts_for));
+	},
+};
 
 
 
@@ -947,6 +1006,7 @@ RadarViewPPI = {
 	new: func {
 		var window = canvas.Window.new([256, 256],"dialog")
 				.set('x', 256)
+				.set('y', 350)
                 .set('title', "Radar PPI");
 		var root = window.getCanvas(1).createGroup();
 		window.getCanvas(1).setColorBackground(0,0,0);
@@ -1252,7 +1312,7 @@ RadarViewCScope = {
 	},
 };
 
-var clamp = func(v, min, max) { v < min ? min : v > max ? max : v }
+
 RadarViewAScope = {
 # implements radar/RWR display on CRT/MFD
 # also slew cursor to select contacts.
@@ -1312,6 +1372,57 @@ RadarViewAScope = {
 		settimer(func me.loop(), exampleRadar.loopSpeed);
 	},
 };
+
+
+RWRView = {
+	new: func {
+		var window = canvas.Window.new([256, 256],"dialog")
+				.set('x', 550)
+				.set('y', 350)
+                .set('title', "RWR");
+		var root = window.getCanvas(1).createGroup();
+		window.getCanvas(1).setColorBackground(0,0,0);
+		me.rootCenter = root.createChild("group")
+				.setTranslation(128,128);
+		
+	    root.createChild("path")
+	       .moveTo(0, 128)
+           .arcSmallCW(128, 128, 0, 256, 0)
+           .arcSmallCW(128, 128, 0, -256, 0)
+           .setStrokeLineWidth(1)
+           .setColor(1, 1, 1);
+		me.loop();
+	},
+
+	loop: func {
+		me.rootCenter.removeAllChildren();
+		foreach(contact; exampleRWR.vector_aicontacts_threats) {
+			me.threat = clamp(contact[1]+30,30,500);
+			me.dev = -contact[0].getDeviationHeading()+90;
+			me.x = math.cos(me.dev*D2R)*me.threat;
+			me.y = -math.sin(me.dev*D2R)*me.threat;
+			me.rootCenter.createChild("text")
+				.setText("15")
+				.setTranslation(me.x,me.y)
+				.setAlignment("center-center")
+				.setColor(1,0,0)
+      	  		.setFontSize(10, 1.0);
+      	  	me.rootCenter.createChild("path")
+					.moveTo(0,-10)
+					.lineTo(7,-7)
+					.moveTo(0,-10)
+					.lineTo(-7,-7)
+					.setStrokeLineWidth(1)
+					.setColor(1,0,0)
+					.setTranslation(me.x,me.y)
+					.update();
+		}
+		
+
+		settimer(func me.loop(), 1);
+	},
+};
+
 
 ExampleRadar = {
 # test radar
@@ -1794,7 +1905,7 @@ var buttonWindow = func {
 	});
 	myLayout.addItem(button9);
 	var button10 = canvas.gui.widgets.Button.new(root, canvas.style, {})
-		.setText("SAM")
+		.setText("Select (SAM)")
 		.setFixedSize(75, 25);
 	button10.listen("clicked", func {
 		exampleRadar.sam();
@@ -1897,8 +2008,10 @@ var buttonWindow = func {
 AIToNasal.new();
 var nose = NoseRadar.new(15000,60,5);
 var exampleRadar = ExampleRadar.new();
+var exampleRWR   = RWR.new();
 RadarViewPPI.new();
 RadarViewBScope.new();
 RadarViewCScope.new();
 RadarViewAScope.new();
+RWRView.new();
 buttonWindow();
