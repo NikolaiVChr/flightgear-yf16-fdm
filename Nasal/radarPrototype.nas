@@ -9,7 +9,8 @@
 #     Weakness:
 #         1) Asking NoseRadar for a slice when locked, is very inefficient. Noticeable lag with 25 contacts around.
 #         2) If RWR should be feed realtime data, at least some properties needs to be read all the time for all aircraft. (damn it!)
-# v4: RadarSystem run in fast loop all the time.
+# v4: 10 Nov 2017 - Fixed issue 1 in v3.
+# v5: RadarSystem run in fast loop all the time.
 #     (This should be Richards original design, [AINasal & NoseRadar=>RadarSystem class])
 #
 # Notice that everything below test code line, is not decoupled, nor optimized in any way.
@@ -425,11 +426,11 @@ AIContact = {
 		#me.headingFrozen = me.getHeading();
 		me.azi = azimuth;# If azimuth is available (only lock and TWS gives it)
 		me.strength = strength;#rcs
-		if (lock) {
-			me.d = me.getDeviation();
-			me.storeDeviation([me.d[0], me.d[1], me.d[2], me.coord, me.getHeading(), me.getPitch(), me.getRoll()]);
-		}
-		me.coordFrozen = me.devStored[3]; #me.getCoord();
+		#if (lock) {
+		#	me.d = me.getDeviation();
+		#	me.storeDeviation([me.d[0], me.d[1], me.d[2], me.coord, me.getHeading(), me.getPitch(), me.getRoll()]);
+		#}
+		me.coordFrozen = me.devStored[3]; #me.getCoord(); this is just cause Im am too lazy to change methods.
 	},
 
 	# in the radars, only call methods below this line:
@@ -567,6 +568,12 @@ NoseRadar = {
 	    		    me.radar.scanFOR(notification.elev_from, notification.elev_to, notification.bear_from, notification.bear_to, notification.dist_m);
 	    	    }
 	            return emesary.Transmitter.ReceiptStatus_OK;
+	        } elsif (notification.NotificationType == "ContactNotification") {
+	        	#printf("NoseRadar recv: %s", notification.NotificationType);
+	            if (me.radar.enabled == 1) {
+	    		    me.radar.scanSingleContact(notification.vector[0]);
+	    	    }
+	            return emesary.Transmitter.ReceiptStatus_OK;
 	        }
 	        return emesary.Transmitter.ReceiptStatus_NotProcessed;
 	    };
@@ -597,6 +604,18 @@ NoseRadar = {
 			contact.storeDeviation([me.dev[0],me.dev[1],me.rng,contact.getCoord(),contact.getHeading(), contact.getPitch(), contact.getRoll()]);
 			append(me.vector_aicontacts_for, contact);
 		}		
+		emesary.GlobalTransmitter.NotifyAll(me.FORNotification.updateV(me.vector_aicontacts_for));
+		#print("In Field of Regard: "~size(me.vector_aicontacts_for));
+	},
+
+	scanSingleContact: func (contact) {
+		# called on demand
+		me.vector_aicontacts_for = [];
+		me.dev = contact.getDeviation();
+		me.rng = contact.getRangeDirect();
+		contact.storeDeviation([me.dev[0],me.dev[1],me.rng,contact.getCoord(),contact.getHeading(), contact.getPitch(), contact.getRoll()]);
+		append(me.vector_aicontacts_for, contact);
+
 		emesary.GlobalTransmitter.NotifyAll(me.FORNotification.updateV(me.vector_aicontacts_for));
 		#print("In Field of Regard: "~size(me.vector_aicontacts_for));
 	},
@@ -677,6 +696,7 @@ ActiveDiscRadar = {
 
 		# emesary
 		ar.SliceNotification = SliceNotification.new();
+		ar.ContactNotification = VectorNotification.new("ContactNotification");
 		ar.ActiveDiscRadarRecipient = emesary.Recipient.new("ActiveDiscRadarRecipient");
 		ar.ActiveDiscRadarRecipient.radar = ar;
 		ar.ActiveDiscRadarRecipient.Receive = func(notification) {
@@ -854,7 +874,8 @@ ActiveDiscRadar = {
 
 	sendLockNotification: func {
 		# this will update the lock unless its deviation angle rate is very very high, in which case we might lose the lock.
-		emesary.GlobalTransmitter.NotifyAll(me.SliceNotification.slice(me.locks[0].getDeviationPitchFrozen()-me.fovRadius_deg*1.5,me.locks[0].getDeviationPitchFrozen()+me.fovRadius_deg*1.5, me.locks[0].getDeviationHeadingFrozen()-me.fovRadius_deg*1.5,me.locks[0].getDeviationHeadingFrozen()+me.fovRadius_deg*1.5,me.forDist_m));
+		emesary.GlobalTransmitter.NotifyAll(me.ContactNotification.updateV(me.locks));
+		#emesary.GlobalTransmitter.NotifyAll(me.SliceNotification.slice(me.locks[0].getDeviationPitchFrozen()-me.fovRadius_deg*1.5,me.locks[0].getDeviationPitchFrozen()+me.fovRadius_deg*1.5, me.locks[0].getDeviationHeadingFrozen()-me.fovRadius_deg*1.5,me.locks[0].getDeviationHeadingFrozen()+me.fovRadius_deg*1.5,me.forDist_m));
 	},
 
 	checkBarValid: func {
@@ -1060,11 +1081,23 @@ var RWR = {
 	},
 
 	scan: func {
-		#iterate:
-		# check direct distance
-		# check field of regard
 		# sort in threat?
-		# called every approx 1 seconds
+		# called every approx 2 seconds
+		# mock up code, ultra simple threat index, is just here cause rwr have special needs:
+		# 1) It has almost no range restriction
+		# 2) Its omnidirectional
+		# 3) It might have to update fast (like 0.25 secs)
+		# 4) To build a proper threat index it needs at least these properties read:
+		#       closingSpeed
+		#       model type
+		#       class (AIR/SURFACE/MARINE)
+		#       lock on myself
+		#       missile launch
+		#       transponder on/off
+		#       bearing and heading
+		#       IFF info
+		#       ECM
+		#       radar on/off
 		me.vector_aicontacts_threats = [];
 		foreach(contact ; me.vector_aicontacts) {
 			me.ber = contact.getBearing()+180-contact.getHeading();
@@ -1073,9 +1106,7 @@ var RWR = {
 				me.threatInv += 55-contact.getSpeed()*0.1;
 				append(me.vector_aicontacts_threats, [contact,me.threatInv]);
 			}
-		}		
-		#emesary.GlobalTransmitter.NotifyAll(me.FORNotification.updateV(me.vector_aicontacts_for));
-		#print("In Field of Regard: "~size(me.vector_aicontacts_for));
+		}
 	},
 };
 
