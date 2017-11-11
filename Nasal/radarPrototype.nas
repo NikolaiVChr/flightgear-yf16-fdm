@@ -15,7 +15,7 @@
 #         2) If RWR should be feed almost realtime data, at least some properties needs to be read all the time for all aircraft. (damn it!)
 # v4: 10 Nov 2017 - Fixed weakness 1 in v3.
 # v5: 11 Nov 2017 - Fixed weakness 2 in v3. And added terrain checker.
-#
+# v5.1 test for shinobi
 #
 #
 #
@@ -642,7 +642,7 @@ NoseRadar = {
 		# called on demand
 		me.vector_aicontacts_for = [];
 		foreach(contact ; me.vector_aicontacts) {
-			if (!contact.isVisible()) {
+			if (!contact.isVisible()) {  # moved to nose radar
 				continue;
 			}
 			me.dev = contact.getDeviation();
@@ -704,9 +704,10 @@ OmniRadar = {
 	},
 
 	scan: func () {
+		if (!enableRWR) return;
 		me.vector_aicontacts_for = [];
 		foreach(contact ; me.vector_aicontacts) {
-			if (!contact.isVisible()) {
+			if (!contact.isVisible()) { # moved to omniradar
 				continue;
 			}
 			me.ber = contact.getBearing();
@@ -906,7 +907,7 @@ ActiveDiscRadar = {
 	},
 
 	loop: func {
-		if (!me.skipLoop) {#skipping loop while we wait for notification from NoseRadar. (I know its synchronious now, but it might change)
+		if (!me.skipLoop and me.enabled) {#skipping loop while we wait for notification from NoseRadar. (I know its synchronious now, but it might change)
 			me.moveDisc();
 			me.scanFOV();
 			if (me.lock == HARD) {
@@ -1271,8 +1272,9 @@ var RWR = {
 
 
 
-
-
+var enable = 1;
+var enableRWR = 1;
+var enableRWRs = 1;
 
 
 
@@ -1340,6 +1342,7 @@ RadarViewPPI = {
 	},
 
 	loop: func {
+		if (!enable) {settimer(func me.loop(), 0.3); return;}
 		me.sweep.setRotation(exampleRadar.posH*D2R);
 		if (exampleRadar.lock!=HARD) {
 			me.sweepA.show();
@@ -1461,6 +1464,7 @@ RadarViewBScope = {
 	},
 
 	loop: func {
+		if (!enable) {settimer(func me.loop(), 0.3); return;}
 		me.sweep.setTranslation(128*exampleRadar.posH/60,0);
 		if (exampleRadar.lock!=HARD) {
 			me.sweepA.show();
@@ -1578,6 +1582,7 @@ RadarViewCScope = {
 	},
 
 	loop: func {
+		if (!enable) {settimer(func me.loop(), 0.3); return;}
 		me.sweep.setTranslation(128*exampleRadar.posH/60,0);
 		me.sweep2.setTranslation(0, -128*exampleRadar.posE/60);
 		me.elapsed = getprop("sim/time/elapsed-sec");
@@ -1640,6 +1645,7 @@ RadarViewAScope = {
 #   link to Radar
 #   link to FireControl
 	new: func {
+		
 		var window = canvas.Window.new([256, 256],"dialog")
 				.set('x', 825)
 				.set('y', 350)
@@ -1661,6 +1667,7 @@ RadarViewAScope = {
 	},
 
 	loop: func {
+		if (!enable) {settimer(func me.loop(), 0.3); return;}
 		for (var i = 0;i<256;i+=1) {
 			me.values[i] = 0;
 		}
@@ -1725,6 +1732,7 @@ RWRView = {
 	},
 
 	loop: func {
+		if (!enableRWRs) {settimer(func me.loop(), 0.3); return;}
 		me.rootCenter.removeAllChildren();#print("threats:");
 		foreach(contact; exampleRWR.vector_aicontacts_threats) {
 			me.threat = contact[1];#print(me.threat);
@@ -2187,7 +2195,7 @@ myFireControl = {
 var window = nil;
 var buttonWindow = func {
 	# a test gui for radar modes
-	window = canvas.Window.new([200,450],"dialog").set('title',"Radar modes");
+	window = canvas.Window.new([200,475],"dialog").set('title',"Radar modes");
 	var myCanvas = window.createCanvas().set("background", canvas.style.getColor("bg_color"));
 	var root = myCanvas.createGroup();
 	var myLayout0 = canvas.HBoxLayout.new();
@@ -2364,9 +2372,47 @@ var buttonWindow = func {
 	button22.listen("clicked", func {
 		exampleRadar.a4();
 	});
-	myLayout2.addItem(button22);
+	button23 = canvas.gui.widgets.Button.new(root, canvas.style, {})
+		.setText("Screens")
+		.setFixedSize(75, 20);
+	button23.listen("clicked", func {
+		enable = !enable;
+		if (enable == 0) button23.setText("Scr OFF");
+		else button23.setText("Scr ON");
+	});
+	myLayout2.addItem(button23);
+	button24 = canvas.gui.widgets.Button.new(root, canvas.style, {})
+		.setText("RWRScreen")
+		.setFixedSize(75, 20);
+	button24.listen("clicked", func {
+		enableRWRs = !enableRWRs;
+		if (enableRWRs == 0) button24.setText("RWRscr OFF");
+		else button24.setText("RWRscr ON");
+	});
+	myLayout2.addItem(button24);
+	button25 = canvas.gui.widgets.Button.new(root, canvas.style, {})
+		.setText("RWR ON")
+		.setFixedSize(75, 20);
+	button25.listen("clicked", func {
+		enableRWR = !enableRWR;
+		if (enableRWR == 0) button25.setText("RWR OFF");
+		else button25.setText("RWR ON");
+	});
+	myLayout2.addItem(button25);
+	button26 = canvas.gui.widgets.Button.new(root, canvas.style, {})
+		.setText("Radar ON")
+		.setFixedSize(75, 20);
+	button26.listen("clicked", func {
+		exampleRadar.enabled = !exampleRadar.enabled;
+		if (exampleRadar.enabled == 0) button26.setText("RDR OFF");
+		else button26.setText("RDR ON");
+	});
+	myLayout2.addItem(button26);
 };
-
+var button23 = nil;
+var button24 = nil;
+var button25 = nil;
+var button26 = nil;
 AIToNasal.new();
 var nose = NoseRadar.new(15000,60,5);
 var omni = OmniRadar.new(0.25);
