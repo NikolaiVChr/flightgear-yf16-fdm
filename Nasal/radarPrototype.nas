@@ -15,8 +15,8 @@
 #         2) If RWR should be feed almost realtime data, at least some properties needs to be read all the time for all aircraft. (damn it!)
 # v4: 10 Nov 2017 - Fixed weakness 1 in v3.
 # v5: 11 Nov 2017 - Fixed weakness 2 in v3. And added terrain checker.
-# v5.1 test for shinobi
-#
+# v5.1 Added buttons to stop radars and their screens.
+# v5.2 Optimized the canvas displays a bit.
 #
 #
 # RCS check done in ActiveDiscRadar at detection time, so about every 5-10 seconds per contact.
@@ -1338,6 +1338,41 @@ RadarViewPPI = {
       	  .setFontSize(12, 1.0)
       	  .setTranslation(0,30)
 	      .setColor(1, 1, 1);
+
+	    me.blep = setsize([],200);
+        for (var i = 0;i<200;i+=1) {
+        	me.blep[i] = me.rootCenterBleps.createChild("path")
+					.moveTo(0,0)
+					.vert(2)
+					.setStrokeLineWidth(2)
+	      	  		.hide();
+        }
+        me.lock = setsize([],200);
+        for (var i = 0;i<200;i+=1) {
+        	me.lock[i] = me.rootCenterBleps.createChild("path")
+						.moveTo(-5,-5)
+							.vert(10)
+							.horiz(10)
+							.vert(-10)
+							.horiz(-10)
+							.moveTo(0,-5)
+							.vert(-5)
+							.setStrokeLineWidth(1)
+	      	  		.hide();
+        }
+        me.select = setsize([],200);
+        for (var i = 0;i<200;i+=1) {
+        	me.select[i] = me.rootCenterBleps.createChild("path")
+						.moveTo(-7,-7)
+						.vert(14)
+						.horiz(14)
+						.vert(-14)
+						.horiz(-14)
+						.setColor([0.5,0,1])
+						.setStrokeLineWidth(1)
+	      	  		.hide();
+        }
+
 		me.loop();
 	},
 
@@ -1354,53 +1389,48 @@ RadarViewPPI = {
 			me.sweepB.hide();
 		}
 		me.elapsed = getprop("sim/time/elapsed-sec");
-		me.rootCenterBleps.removeAllChildren();
+		#me.rootCenterBleps.removeAllChildren();
+		me.i = 0;
 		foreach(contact; exampleRadar.vector_aicontacts_bleps) {
 			if (me.elapsed - contact.blepTime < 5) {
 				me.distPixels = contact.getRangeFrozen()*(me.sweepDistance/exampleRadar.forDist_m);
 
-				me.rootCenterBleps.createChild("path")
-					.moveTo(0,0)
-					.vert(2)
-					.setStrokeLineWidth(2)
-					.setColor(1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps,1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps,1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps)
-					.setTranslation(-me.distPixels*math.cos(contact.getDeviationHeadingFrozen()*D2R+math.pi/2),-me.distPixels*math.sin(contact.getDeviationHeadingFrozen()*D2R+math.pi/2))
-					.update();
-
+				me.blep[me.i].setColor(1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps,1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps,1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps);
+				me.blep[me.i].setTranslation(-me.distPixels*math.cos(contact.getDeviationHeadingFrozen()*D2R+math.pi/2),-me.distPixels*math.sin(contact.getDeviationHeadingFrozen()*D2R+math.pi/2));
+				me.blep[me.i].show();
+				me.blep[me.i].update();
+					
 				if (exampleRadar.containsVector(exampleRadar.locks, contact)) {
 					me.rot = contact.getHeadingFrozen();
 					if (me.rot == nil) {
 						#can happen in transition between TWS to RWS
+						me.lock[me.i].hide();
 					} else {
 						me.rot = me.rot-getprop("orientation/heading-deg");
-						me.rootCenterBleps.createChild("path")
-							.moveTo(-5,-5)
-							.vert(10)
-							.horiz(10)
-							.vert(-10)
-							.horiz(-10)
-							.moveTo(0,-5)
-							.vert(-5)
-							.setStrokeLineWidth(1)
-							.setColor(exampleRadar.lock == HARD?[1,0,0]:[1,1,0])
-							.setTranslation(-me.distPixels*math.cos(contact.getDeviationHeadingFrozen()*D2R+math.pi/2),-me.distPixels*math.sin(contact.getDeviationHeadingFrozen()*D2R+math.pi/2))
-							.setRotation(me.rot*D2R)
-							.update();
+						me.lock[me.i].setRotation(me.rot*D2R);
+						me.lock[me.i].setColor(exampleRadar.lock == HARD?[1,0,0]:[1,1,0]);
+						me.lock[me.i].setTranslation(-me.distPixels*math.cos(contact.getDeviationHeadingFrozen()*D2R+math.pi/2),-me.distPixels*math.sin(contact.getDeviationHeadingFrozen()*D2R+math.pi/2));
+						me.lock[me.i].show();
+						me.lock[me.i].update();
 					}
+				} else {
+					me.lock[me.i].hide();
 				}
 				if (exampleRadar.containsVector(exampleRadar.follow, contact)) {
-					me.rootCenterBleps.createChild("path")
-						.moveTo(-7,-7)
-						.vert(14)
-						.horiz(14)
-						.vert(-14)
-						.horiz(-14)
-						.setStrokeLineWidth(1)
-						.setColor([0.5,0,1])
-						.setTranslation(-me.distPixels*math.cos(contact.getDeviationHeadingFrozen()*D2R+math.pi/2),-me.distPixels*math.sin(contact.getDeviationHeadingFrozen()*D2R+math.pi/2))
-						.update();
+					me.select[me.i].setTranslation(-me.distPixels*math.cos(contact.getDeviationHeadingFrozen()*D2R+math.pi/2),-me.distPixels*math.sin(contact.getDeviationHeadingFrozen()*D2R+math.pi/2));
+					me.select[me.i].show();
+					me.select[me.i].update();
+				} else {
+					me.select[me.i].hide();
 				}
+				me.i += 1;
+				if (me.i > 199) break;
 			}
+		}
+		for (;me.i<200;me.i+=1) {
+			me.blep[me.i].hide();
+			me.lock[me.i].hide();
+			me.select[me.i].hide();
 		}
 		if (exampleRadar.patternBar<size(exampleRadar.pattern[2])) {
 			# the if is due to just after changing bars and before radar loop has run, patternBar can be out of bounds of pattern.
@@ -1460,6 +1490,41 @@ RadarViewBScope = {
       	  .setFontSize(10, 1.0)
       	  .setTranslation(0,150)
 	      .setColor(1, 1, 1);
+
+	    me.blep = setsize([],200);
+        for (var i = 0;i<200;i+=1) {
+        	me.blep[i] = me.rootCenterBleps.createChild("path")
+					.moveTo(0,0)
+					.vert(2)
+					.setStrokeLineWidth(2)
+	      	  		.hide();
+        }
+        me.lock = setsize([],200);
+        for (var i = 0;i<200;i+=1) {
+        	me.lock[i] = me.rootCenterBleps.createChild("path")
+						.moveTo(-5,-5)
+							.vert(10)
+							.horiz(10)
+							.vert(-10)
+							.horiz(-10)
+							.moveTo(0,-5)
+							.vert(-5)
+							.setStrokeLineWidth(1)
+	      	  		.hide();
+        }
+        me.select = setsize([],200);
+        for (var i = 0;i<200;i+=1) {
+        	me.select[i] = me.rootCenterBleps.createChild("path")
+						.moveTo(-7,-7)
+						.vert(14)
+						.horiz(14)
+						.vert(-14)
+						.horiz(-14)
+						.setColor([0.5,0,1])
+						.setStrokeLineWidth(1)
+	      	  		.hide();
+        }
+
 		me.loop();
 	},
 
@@ -1476,52 +1541,47 @@ RadarViewBScope = {
 			me.sweepB.hide();
 		}
 		me.elapsed = getprop("sim/time/elapsed-sec");
-		me.rootCenterBleps.removeAllChildren();
+		#me.rootCenterBleps.removeAllChildren();
+		me.i=0;
 		foreach(contact; exampleRadar.vector_aicontacts_bleps) {
 			if (me.elapsed - contact.blepTime < 5) {
 				me.distPixels = contact.getRangeFrozen()*(256/exampleRadar.forDist_m);
 
-				me.rootCenterBleps.createChild("path")
-					.moveTo(0,0)
-					.vert(2)
-					.setStrokeLineWidth(2)
-					.setColor(1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps,1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps,1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps)
-					.setTranslation(128*contact.getDeviationHeadingFrozen()/60,-me.distPixels)
-					.update();
+				me.blep[me.i].setColor(1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps,1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps,1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps);
+				me.blep[me.i].setTranslation(128*contact.getDeviationHeadingFrozen()/60,-me.distPixels);
+				me.blep[me.i].show();
+				me.blep[me.i].update();
 				if (exampleRadar.containsVector(exampleRadar.locks, contact)) {
 					me.rot = contact.getHeadingFrozen();
 					if (me.rot == nil) {
 						#can happen in transition between TWS to RWS
+						me.lock[me.i].hide();
 					} else {
 						me.rot = me.rot-getprop("orientation/heading-deg")-contact.getDeviationHeadingFrozen();
-						me.rootCenterBleps.createChild("path")
-							.moveTo(-5,-5)
-							.vert(10)
-							.horiz(10)
-							.vert(-10)
-							.horiz(-10)
-							.moveTo(0,-5)
-							.vert(-5)
-							.setStrokeLineWidth(1)
-							.setColor(exampleRadar.lock == HARD?[1,0,0]:[1,1,0])
-							.setTranslation(128*contact.getDeviationHeadingFrozen()/60,-me.distPixels)
-							.setRotation(me.rot*D2R)
-							.update();
+						me.lock[me.i].setRotation(me.rot*D2R);
+						me.lock[me.i].setColor(exampleRadar.lock == HARD?[1,0,0]:[1,1,0]);
+						me.lock[me.i].setTranslation(128*contact.getDeviationHeadingFrozen()/60,-me.distPixels);
+						me.lock[me.i].show();
+						me.lock[me.i].update();
 					}
+				} else {
+					me.lock[me.i].hide();
 				}
 				if (exampleRadar.containsVector(exampleRadar.follow, contact)) {
-					me.rootCenterBleps.createChild("path")
-						.moveTo(-7,-7)
-						.vert(14)
-						.horiz(14)
-						.vert(-14)
-						.horiz(-14)
-						.setStrokeLineWidth(1)
-						.setColor([0.5,0,1])
-						.setTranslation(128*contact.getDeviationHeadingFrozen()/60,-me.distPixels)
-						.update();
+					me.select[me.i].setTranslation(128*contact.getDeviationHeadingFrozen()/60,-me.distPixels);
+					me.select[me.i].show();
+					me.select[me.i].update();
+				} else {
+					me.select[me.i].hide();
 				}
+				me.i += 1;
+				if (me.i > 199) break;
 			}
+		}
+		for (;me.i<200;me.i+=1) {
+			me.blep[me.i].hide();
+			me.lock[me.i].hide();
+			me.select[me.i].hide();
 		}
 		
 		var a = 0;
@@ -1578,6 +1638,40 @@ RadarViewCScope = {
            .arcSmallCW(128, 128, 0, -256, 0)
            .setStrokeLineWidth(1)
            .setColor(1, 1, 1);
+
+        me.blep = setsize([],200);
+        for (var i = 0;i<200;i+=1) {
+        	me.blep[i] = me.rootCenterBleps.createChild("path")
+					.moveTo(0,0)
+					.vert(2)
+					.setStrokeLineWidth(2)
+	      	  		.hide();
+        }
+        me.lock = setsize([],200);
+        for (var i = 0;i<200;i+=1) {
+        	me.lock[i] = me.rootCenterBleps.createChild("path")
+						.moveTo(-5,-5)
+						.vert(10)
+						.horiz(10)
+						.vert(-10)
+						.horiz(-10)
+						.setStrokeLineWidth(1)
+	      	  		.hide();
+        }
+        me.select = setsize([],200);
+        for (var i = 0;i<200;i+=1) {
+        	me.select[i] = me.rootCenterBleps.createChild("path")
+						.moveTo(-7,-7)
+						.vert(14)
+						.horiz(14)
+						.vert(-14)
+						.horiz(-14)
+						.setColor([0.5,0,1])
+						.setStrokeLineWidth(1)
+	      	  		.hide();
+        }
+		
+
 		me.loop();
 	},
 
@@ -1586,7 +1680,7 @@ RadarViewCScope = {
 		me.sweep.setTranslation(128*exampleRadar.posH/60,0);
 		me.sweep2.setTranslation(0, -128*exampleRadar.posE/60);
 		me.elapsed = getprop("sim/time/elapsed-sec");
-		me.rootCenterBleps.removeAllChildren();
+		#me.rootCenterBleps.removeAllChildren();
 		#me.rootCenterBleps.createChild("path")# thsi will show where the disc is pointed for debug purposes.
 		#			.moveTo(0,0)
 		#			.vert(2)
@@ -1594,40 +1688,36 @@ RadarViewCScope = {
 		#			.setColor(0.5,0.5,0.5)
 		#			.setTranslation(128*exampleRadar.posH/60,-128*exampleRadar.posE/60)
 		#			.update();
+		me.i = 0;
 		foreach(contact; exampleRadar.vector_aicontacts_bleps) {
 			if (me.elapsed - contact.blepTime < 5) {
-				me.rootCenterBleps.createChild("path")
-					.moveTo(0,0)
-					.vert(2)
-					.setStrokeLineWidth(2)
-					.setColor(1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps,1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps,1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps)
-					.setTranslation(128*contact.getDeviationHeadingFrozen()/60,-128*contact.getDeviationPitchFrozen()/60)
-					.update();
+				me.blep[me.i].setColor(1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps,1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps,1-(me.elapsed - contact.blepTime)/time_to_fadeout_bleps);
+				me.blep[me.i].setTranslation(128*contact.getDeviationHeadingFrozen()/60,-128*contact.getDeviationPitchFrozen()/60);
+				me.blep[me.i].show();
+				me.blep[me.i].update();
 				if (exampleRadar.containsVector(exampleRadar.locks, contact)) {
-					me.rootCenterBleps.createChild("path")
-						.moveTo(-5,-5)
-						.vert(10)
-						.horiz(10)
-						.vert(-10)
-						.horiz(-10)
-						.setStrokeLineWidth(1)
-						.setColor(exampleRadar.lock == HARD?[1,0,0]:[1,1,0])
-						.setTranslation(128*contact.getDeviationHeadingFrozen()/60,-128*contact.getDeviationPitchFrozen()/60)
-						.update();
+					me.lock[me.i].setColor(exampleRadar.lock == HARD?[1,0,0]:[1,1,0]);
+					me.lock[me.i].setTranslation(128*contact.getDeviationHeadingFrozen()/60,-128*contact.getDeviationPitchFrozen()/60);
+					me.lock[me.i].show();
+					me.lock[me.i].update();
+				} else {
+					me.lock[me.i].hide();
 				}
 				if (exampleRadar.containsVector(exampleRadar.follow, contact)) {
-					me.rootCenterBleps.createChild("path")
-						.moveTo(-7,-7)
-						.vert(14)
-						.horiz(14)
-						.vert(-14)
-						.horiz(-14)
-						.setStrokeLineWidth(1)
-						.setColor([0.5,0,1])
-						.setTranslation(128*contact.getDeviationHeadingFrozen()/60,-128*contact.getDeviationPitchFrozen()/60)
-						.update();
+					me.select[me.i].setTranslation(128*contact.getDeviationHeadingFrozen()/60,-128*contact.getDeviationPitchFrozen()/60);
+					me.select[me.i].show();
+					me.select[me.i].update();
+				} else {
+					me.select[me.i].hide();
 				}
+				me.i += 1;
+				if (me.i > 199) break;
 			}
+		}
+		for (;me.i<200;me.i+=1) {
+			me.blep[me.i].hide();
+			me.lock[me.i].hide();
+			me.select[me.i].hide();
 		}
 		
 
@@ -1728,12 +1818,44 @@ RWRView = {
            .arcSmallCW(85, 85, 0, -170, 0)
            .setStrokeLineWidth(1)
            .setColor(0.25, 0.25, 0.25);
+        me.texts = setsize([],200);
+        for (var i = 0;i<200;i+=1) {
+        	me.texts[i] = me.rootCenter.createChild("text")
+				.setText("15")
+				.setAlignment("center-center")
+				.setColor(1,0,0)
+      	  		.setFontSize(10, 1.0)
+      	  		.hide();
+
+        }
+        me.texts = setsize([],200);
+        for (var i = 0;i<200;i+=1) {
+        	me.texts[i] = me.rootCenter.createChild("text")
+				.setText(int(rand()*21))
+				.setAlignment("center-center")
+				.setColor(1,0,0)
+      	  		.setFontSize(10, 1.0)
+      	  		.hide();
+
+        }
+        me.symbol = setsize([],200);
+        for (var i = 0;i<200;i+=1) {
+        	me.symbol[i] = me.rootCenter.createChild("path")
+					.moveTo(0,-10)
+					.lineTo(7,-7)
+					.moveTo(0,-10)
+					.lineTo(-7,-7)
+					.setStrokeLineWidth(1)
+					.setColor(1,0,0)
+	      	  		.hide();
+        }
 		me.loop();
 	},
 
 	loop: func {
 		if (!enableRWRs) {settimer(func me.loop(), 0.3); return;}
-		me.rootCenter.removeAllChildren();#print("threats:");
+		#me.rootCenter.removeAllChildren();#print("threats:");
+		me.i = 0;
 		foreach(contact; exampleRWR.vector_aicontacts_threats) {
 			me.threat = contact[1];#print(me.threat);
 			if (me.threat < 5) {
@@ -1746,23 +1868,19 @@ RWRView = {
 			me.dev = -contact[0].getThreatStored()[5]+90;
 			me.x = math.cos(me.dev*D2R)*me.threat;
 			me.y = -math.sin(me.dev*D2R)*me.threat;
-			me.rootCenter.createChild("text")
-				.setText("15")
-				.setTranslation(me.x,me.y)
-				.setAlignment("center-center")
-				.setColor(1,0,0)
-      	  		.setFontSize(10, 1.0);
-      	  	me.rootCenter.createChild("path")
-					.moveTo(0,-10)
-					.lineTo(7,-7)
-					.moveTo(0,-10)
-					.lineTo(-7,-7)
-					.setStrokeLineWidth(1)
-					.setColor(1,0,0)
-					.setTranslation(me.x,me.y)
-					.update();
+			me.texts[me.i].setTranslation(me.x,me.y);
+      	  	me.texts[me.i].show();
+			me.texts[me.i].update();
+      	  	me.symbol[me.i].setTranslation(me.x,me.y);
+      	  	me.symbol[me.i].show();
+			me.symbol[me.i].update();
+			me.i += 1;
+			if (me.i > 199) break;
 		}
-		
+		for (;me.i<200;me.i+=1) {
+			me.symbol[me.i].hide();
+			me.texts[me.i].hide();
+		}
 
 		settimer(func me.loop(), 2);
 	},
@@ -2374,7 +2492,7 @@ var buttonWindow = func {
 	});
 	myLayout2.addItem(button22);
 	button23 = canvas.gui.widgets.Button.new(root, canvas.style, {})
-		.setText("Screens")
+		.setText("Scr ON")
 		.setFixedSize(75, 20);
 	button23.listen("clicked", func {
 		enable = !enable;
@@ -2383,12 +2501,12 @@ var buttonWindow = func {
 	});
 	myLayout2.addItem(button23);
 	button24 = canvas.gui.widgets.Button.new(root, canvas.style, {})
-		.setText("RWRScreen")
+		.setText("RWRsc ON")
 		.setFixedSize(75, 20);
 	button24.listen("clicked", func {
 		enableRWRs = !enableRWRs;
-		if (enableRWRs == 0) button24.setText("RWRscr OFF");
-		else button24.setText("RWRscr ON");
+		if (enableRWRs == 0) button24.setText("RWRsc OFF");
+		else button24.setText("RWRsc ON");
 	});
 	myLayout2.addItem(button24);
 	button25 = canvas.gui.widgets.Button.new(root, canvas.style, {})
@@ -2401,7 +2519,7 @@ var buttonWindow = func {
 	});
 	myLayout2.addItem(button25);
 	button26 = canvas.gui.widgets.Button.new(root, canvas.style, {})
-		.setText("Radar ON")
+		.setText("RDR ON")
 		.setFixedSize(75, 20);
 	button26.listen("clicked", func {
 		exampleRadar.enabled = !exampleRadar.enabled;
