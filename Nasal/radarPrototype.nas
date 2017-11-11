@@ -1,22 +1,37 @@
 #
 # Prototype to test Richard and radar-mafia's radar designs.
 #
+# In Richards design, the class called RadarSystem is being represented as AIToNasal, NoseRadar, OmniRadar & TerrainChecker classes.
+#                     the class called AircraftRadar is represented as ActiveDiscRadar & RWR.
+#                     the class called AIContact does allow for direct reading of properties, but this is forbidden outside RadarSystem. Except for Missile-code.
+#
 # v1: 7 Nov. 2017 - Modular
 # v2: 8 Nov 2017 - Decoupled via emesary
 # v3: 10 Nov 2017 - NoseRadar now finds everything inside an elevation bar on demand,
 #     and stuff is stored in Nasal.
 #     Most methods are reused from v2, and therefore the code is a bit messy now, especially method/variable names and AIContact.
 #     Weakness:
-#         1) Asking NoseRadar for a slice when locked, is very inefficient. Noticeable lag with 25 contacts around.
-#         2) If RWR should be feed realtime data, at least some properties needs to be read all the time for all aircraft. (damn it!)
-# v4: 10 Nov 2017 - Fixed issue 1 in v3.
-# v5: RadarSystem run in fast loop all the time.
-#     (This should be Richards original design, [AINasal & NoseRadar=>RadarSystem class])
+#         1) Asking NoseRadar for a slice when locked, is very inefficient.
+#         2) If RWR should be feed almost realtime data, at least some properties needs to be read all the time for all aircraft. (damn it!)
+# v4: 10 Nov 2017 - Fixed weakness 1 in v3.
+# v5: 11 Nov 2017 - Fixed weakness 2 in v3. And added terrain checker.
+#
+#
+#
+#
+# RCS check done in ActiveDiscRadar at detection time, so about every 5-10 seconds per contact.
+#      Faster for locks since its important to lose lock if it turns nose to us suddenly and can no longer be seen.
+# Terrain check done in TerrainChecker, 10 contacts per second. All contacts being evaluated due to rwr needs that.
+# Doppler is not being done.
+# Properties is only being read in the modules that represent RadarSystem.
+#
+#
+#
 #
 # Notice that everything below test code line, is not decoupled, nor optimized in any way.
 # Also notice that most comments at start of classes are old and not updated.
 #
-# Needs rcs.nas and vector.nas. Nothing else.
+# Needs rcs.nas and vector.nas. Nothing else. When run, it will display a couple of example canvas dialogs on screen.
 #
 # GPL 2.0
 
@@ -281,6 +296,7 @@ AIContact = {
 		c.pos_type = pos_type;
 		c.needInit = 1;
 		c.azi      = 0;
+		c.visible = 1;
 
 		# active radar:
 		c.blepTime = 0;
@@ -313,6 +329,8 @@ AIContact = {
     	me.alat = props.globals.getNode("position/latitude-deg");
     	me.alon = props.globals.getNode("position/longitude-deg");
     	me.speed = me.prop.getNode("velocities/true-airspeed-kt");
+    	me.tp = me.pos.getNode("instrumentation/transponder/inputs/mode");
+    	me.rdr = me.pos.getNode("sim/multiplay/generic/int[2]");
 	},
 
 	update: func (newC) {
@@ -411,8 +429,31 @@ AIContact = {
 		return [geo.normdeg180(me.accoord.course_to(me.coord)-me.acHeading.getValue()), vector.Math.getPitch(me.accoord, me.coord) - me.acPitch.getValue(),me.accoord.direct_distance_to(me.coord),me.coord];
 	},
 
+	isTransponderEnable: func {
+		if (me.tp == nil) {
+			return 1;
+		}
+		return me.tp.getValue() != 0;
+	},
+
+	isRadarEnable: func {
+		if (me.rdr == nil) {
+			return 1;
+		}
+		return me.rdr.getValue();
+	},
+
+	isVisible: func {#terrain check
+		return me.visible;
+	},
+
+	setVisible: func (vis) {
+		me.visible = vis;
+	},
+
 	storeDeviation: func (dev) {
 		# [bearingDev, elevationDev, distDirect, coord, heading, pitch, roll]
+		# should really be a hash instead of vector
 		me.devStored = dev;
 	},
 	
@@ -420,6 +461,15 @@ AIContact = {
 		return me.devStored;
 	},
 
+	storeThreat: func (threat) {
+		# [bearing,heading,coord,transponder,radar,devheading]
+		# should really be a hash instead of vector
+		me.threatStored = threat;
+	},
+	
+	getThreatStored: func {
+		return me.threatStored;
+	},
 
 	blep: func (time, azimuth, strength, lock) {
 		me.blepTime = time;
@@ -592,6 +642,9 @@ NoseRadar = {
 		# called on demand
 		me.vector_aicontacts_for = [];
 		foreach(contact ; me.vector_aicontacts) {
+			if (!contact.isVisible()) {
+				continue;
+			}
 			me.dev = contact.getDeviation();
 			me.rng = contact.getRangeDirect();
 			if (me.dev[0] < bear_from or me.dev[0] > bear_to) {
@@ -623,8 +676,126 @@ NoseRadar = {
 
 
 
+OmniRadar = {
+	new: func (rate) {
+		var nr = {parents: [OmniRadar, Radar]};
+
+		nr.vector_aicontacts = [];
+		nr.vector_aicontacts_for = [];
+		nr.timer          = maketimer(rate, nr, func nr.scan());
+
+		nr.OmniRadarRecipient = emesary.Recipient.new("OmniRadarRecipient");
+		nr.OmniRadarRecipient.radar = nr;
+		nr.OmniRadarRecipient.Receive = func(notification) {
+	        if (notification.NotificationType == "AINotification") {
+	        	#printf("NoseRadar recv: %s", notification.NotificationType);
+	            if (me.radar.enabled == 1) {
+	    		    me.radar.vector_aicontacts = notification.vector;
+	    	    }
+	            return emesary.Transmitter.ReceiptStatus_OK;
+	        }
+	        return emesary.Transmitter.ReceiptStatus_NotProcessed;
+	    };
+		emesary.GlobalTransmitter.Register(nr.OmniRadarRecipient);
+		nr.OmniNotification = VectorNotification.new("OmniNotification");
+		nr.OmniNotification.updateV(nr.vector_aicontacts_for);
+		nr.timer.start();
+		return nr;
+	},
+
+	scan: func () {
+		me.vector_aicontacts_for = [];
+		foreach(contact ; me.vector_aicontacts) {
+			if (!contact.isVisible()) {
+				continue;
+			}
+			me.ber = contact.getBearing();
+			me.head = contact.getHeading();
+			me.test = me.ber+180-me.head;
+			me.tp = contact.isTransponderEnable();
+			me.radar = contact.isRadarEnable();
+            if (math.abs(geo.normdeg180(me.test)) < 60 or me.tp) {
+            	contact.storeThreat([me.ber,me.head,contact.getCoord(),me.tp,me.radar,contact.getDeviationHeading(),contact.getRangeDirect()*M2NM]);
+				append(me.vector_aicontacts_for, contact);
+			}
+		}		
+		emesary.GlobalTransmitter.NotifyAll(me.OmniNotification.updateV(me.vector_aicontacts_for));
+		#print("In omni Field: "~size(me.vector_aicontacts_for));
+	},
+};
 
 
+
+
+TerrainChecker = {
+	new: func (rate) {
+		var nr = {parents: [TerrainChecker]};
+
+		nr.vector_aicontacts = [];
+		nr.timer          = maketimer(rate, nr, func nr.scan());
+
+		nr.TerrainCheckerRecipient = emesary.Recipient.new("TerrainCheckerRecipient");
+		nr.TerrainCheckerRecipient.radar = nr;
+		nr.TerrainCheckerRecipient.Receive = func(notification) {
+	        if (notification.NotificationType == "AINotification") {
+	        	#printf("NoseRadar recv: %s", notification.NotificationType);
+	    		me.radar.vector_aicontacts = notification.vector;
+	    		me.radar.index = 0;
+	            return emesary.Transmitter.ReceiptStatus_OK;
+	        }
+	        return emesary.Transmitter.ReceiptStatus_NotProcessed;
+	    };
+		emesary.GlobalTransmitter.Register(nr.TerrainCheckerRecipient);
+		nr.index = 0;
+		nr.timer.start();
+		return nr;
+	},
+
+	scan: func () {
+		#this loop is really fast. But we only check 1 contact per call
+		if (me.index > size(me.vector_aicontacts)-1) {
+			# will happen if there is no contacts
+			return;
+		}
+		me.contact = me.vector_aicontacts[me.index];
+        me.contact.setVisible(me.terrainCheck(me.contact));
+        me.index += 1;
+        if (me.index > size(me.vector_aicontacts)-1) {
+        	me.index = 0;
+        }
+	},
+
+	terrainCheck: func (contact) {
+		me.myOwnPos = contact.getAcCoord();
+		me.SelectCoord = contact.getCoord();
+		if(me.myOwnPos.alt() > 8900 and me.SelectCoord.alt() > 8900) {
+	      # both higher than mt. everest, so not need to check.
+	      return TRUE;
+	    }
+	    
+		me.xyz = {"x":me.myOwnPos.x(),                  "y":me.myOwnPos.y(),                 "z":me.myOwnPos.z()};
+		me.dir = {"x":me.SelectCoord.x()-me.myOwnPos.x(),  "y":me.SelectCoord.y()-me.myOwnPos.y(), "z":me.SelectCoord.z()-me.myOwnPos.z()};
+
+		# Check for terrain between own aircraft and other:
+		me.v = get_cart_ground_intersection(me.xyz, me.dir);
+		if (me.v == nil) {
+			return TRUE;
+			#printf("No terrain, planes has clear view of each other");
+		} else {
+			me.terrain = geo.Coord.new();
+			me.terrain.set_latlon(me.v.lat, me.v.lon, me.v.elevation);
+			me.maxDist = me.myOwnPos.direct_distance_to(me.SelectCoord);
+			me.terrainDist = me.myOwnPos.direct_distance_to(me.terrain);
+			if (me.terrainDist < me.maxDist) {
+		 		#print("terrain found between the planes");
+		 		return FALSE;
+			} else {
+		  		return TRUE;
+		  		#print("The planes has clear view of each other");
+			}
+		}
+	},
+};
 
 
 
@@ -980,6 +1151,69 @@ ActiveDiscRadar = {
 
 
 
+var RWR = {
+# inherits from Radar
+# will check radar/transponder and ground occlusion.
+# will sort according to threat level
+# will detect launches (MLW) or (active) incoming missiles (MAW)
+# loop (0.5 sec)
+	new: func () {
+		var rr = {parents: [RWR, Radar]};
+
+		rr.vector_aicontacts = [];
+		rr.vector_aicontacts_threats = [];
+		#rr.timer          = maketimer(2, rr, func rr.scan());
+
+		rr.RWRRecipient = emesary.Recipient.new("RWRRecipient");
+		rr.RWRRecipient.radar = rr;
+		rr.RWRRecipient.Receive = func(notification) {
+	        if (notification.NotificationType == "OmniNotification") {
+	        	#printf("RWR recv: %s", notification.NotificationType);
+	            if (me.radar.enabled == 1) {
+	    		    me.radar.vector_aicontacts = notification.vector;
+	    		    me.radar.scan();
+	    	    }
+	            return emesary.Transmitter.ReceiptStatus_OK;
+	        }
+	        return emesary.Transmitter.ReceiptStatus_NotProcessed;
+	    };
+		emesary.GlobalTransmitter.Register(rr.RWRRecipient);
+		#nr.FORNotification = VectorNotification.new("FORNotification");
+		#nr.FORNotification.updateV(nr.vector_aicontacts_for);
+		#rr.timer.start();
+		return rr;
+	},
+
+	scan: func {
+		# sort in threat?
+		# run by notification
+		# mock up code, ultra simple threat index, is just here cause rwr have special needs:
+		# 1) It has almost no range restriction
+		# 2) Its omnidirectional
+		# 3) It might have to update fast (like 0.25 secs)
+		# 4) To build a proper threat index it needs at least these properties read:
+		#       model type
+		#       class (AIR/SURFACE/MARINE)
+		#       lock on myself
+		#       missile launch
+		#       transponder on/off
+		#       bearing and heading
+		#       IFF info
+		#       ECM
+		#       radar on/off
+		me.vector_aicontacts_threats = [];
+		foreach(contact ; me.vector_aicontacts) {
+			me.t = contact.getThreatStored();#[bearing,heading,coord,transponder,radar,devBearing,dist_nm]
+			#me.threatInv = contact.getRangeDirect()*M2NM;
+			#me.threatInv = 55-contact.getSpeed()*0.1;
+			me.threatInv = me.t[6];# this is not serious, just testing code
+			append(me.vector_aicontacts_threats, [contact,me.threatInv]);# how about a setThreat on contact instead of this crap?
+		}
+	},
+};
+
+
+
 ###LinkRadar:
 # inherits from Radar, represents a fighter-link/link16.
 # Get contact name from other aircraft, and finds local RadarControl for it.
@@ -1048,67 +1282,7 @@ var clamp = func(v, min, max) { v < min ? min : v > max ? max : v }
 
 
 
-var RWR = {
-# inherits from Radar
-# will check radar/transponder and ground occlusion.
-# will sort according to threat level
-# will detect launches (MLW) or (active) incoming missiles (MAW)
-# loop (0.5 sec)
-	new: func () {
-		var rr = {parents: [RWR, Radar]};
 
-		rr.vector_aicontacts = [];
-		rr.vector_aicontacts_threats = [];
-		rr.timer          = maketimer(2, rr, func rr.scan());
-
-		rr.RWRRecipient = emesary.Recipient.new("RWRRecipient");
-		rr.RWRRecipient.radar = rr;
-		rr.RWRRecipient.Receive = func(notification) {
-	        if (notification.NotificationType == "AINotification") {
-	        	#printf("RWR recv: %s", notification.NotificationType);
-	            if (me.radar.enabled == 1) {
-	    		    me.radar.vector_aicontacts = notification.vector;
-	    	    }
-	            return emesary.Transmitter.ReceiptStatus_OK;
-	        }
-	        return emesary.Transmitter.ReceiptStatus_NotProcessed;
-	    };
-		emesary.GlobalTransmitter.Register(rr.RWRRecipient);
-		#nr.FORNotification = VectorNotification.new("FORNotification");
-		#nr.FORNotification.updateV(nr.vector_aicontacts_for);
-		rr.timer.start();
-		return rr;
-	},
-
-	scan: func {
-		# sort in threat?
-		# called every approx 2 seconds
-		# mock up code, ultra simple threat index, is just here cause rwr have special needs:
-		# 1) It has almost no range restriction
-		# 2) Its omnidirectional
-		# 3) It might have to update fast (like 0.25 secs)
-		# 4) To build a proper threat index it needs at least these properties read:
-		#       closingSpeed
-		#       model type
-		#       class (AIR/SURFACE/MARINE)
-		#       lock on myself
-		#       missile launch
-		#       transponder on/off
-		#       bearing and heading
-		#       IFF info
-		#       ECM
-		#       radar on/off
-		me.vector_aicontacts_threats = [];
-		foreach(contact ; me.vector_aicontacts) {
-			me.ber = contact.getBearing()+180-contact.getHeading();
-            if (math.abs(geo.normdeg180(me.ber)) < 60) {
-				me.threatInv = contact.getRangeDirect()*M2NM;
-				me.threatInv += 55-contact.getSpeed()*0.1;
-				append(me.vector_aicontacts_threats, [contact,me.threatInv]);
-			}
-		}
-	},
-};
 
 
 
@@ -1554,14 +1728,14 @@ RWRView = {
 		me.rootCenter.removeAllChildren();#print("threats:");
 		foreach(contact; exampleRWR.vector_aicontacts_threats) {
 			me.threat = contact[1];#print(me.threat);
-			if (me.threat < 15) {
+			if (me.threat < 5) {
 				me.threat = 43;# inner circle
 			} elsif (me.threat < 30) {
 				me.threat = 85;# outer circle
 			} else {
 				continue;
 			}
-			me.dev = -contact[0].getDeviationHeading()+90;
+			me.dev = -contact[0].getThreatStored()[5]+90;
 			me.x = math.cos(me.dev*D2R)*me.threat;
 			me.y = -math.sin(me.dev*D2R)*me.threat;
 			me.rootCenter.createChild("text")
@@ -2195,6 +2369,8 @@ var buttonWindow = func {
 
 AIToNasal.new();
 var nose = NoseRadar.new(15000,60,5);
+var omni = OmniRadar.new(0.25);
+var terrain = TerrainChecker.new(0.10);
 var exampleRadar = ExampleRadar.new();
 var exampleRWR   = RWR.new();
 RadarViewPPI.new();
