@@ -2195,7 +2195,7 @@ myFireControl = {
 var window = nil;
 var buttonWindow = func {
 	# a test gui for radar modes
-	window = canvas.Window.new([200,475],"dialog").set('title',"Radar modes");
+	window = canvas.Window.new([200,525],"dialog").set('title',"Radar modes");
 	var myCanvas = window.createCanvas().set("background", canvas.style.getColor("bg_color"));
 	var root = myCanvas.createGroup();
 	var myLayout0 = canvas.HBoxLayout.new();
@@ -2372,6 +2372,7 @@ var buttonWindow = func {
 	button22.listen("clicked", func {
 		exampleRadar.a4();
 	});
+	myLayout2.addItem(button22);
 	button23 = canvas.gui.widgets.Button.new(root, canvas.style, {})
 		.setText("Screens")
 		.setFixedSize(75, 20);
