@@ -192,16 +192,22 @@ AIToNasal = {
             } else {
             	me.callsign = me.callsign.getValue();
             }
+            me.id = me.prop_ai.getNode("id");
+            if (me.id == nil) {
+            	me.id = "0";
+            } else {
+            	me.id = me.id.getValue();
+            }
 
-            me.aicontact = AIContact.new(me.prop_ai, me.type, me.model, me.callsign, me.pos_type);#AIcontact needs 2 calls to work. new() [cheap] and init() [expensive]. Only new is called here, updateVector will do init().
+            me.aicontact = AIContact.new(me.prop_ai, me.type, me.model, me.callsign, me.pos_type, me.id);#AIcontact needs 2 calls to work. new() [cheap] and init() [expensive]. Only new is called here, updateVector will do init().
 
-            me.signLookup = me.lookupCallsignRaw[me.callsign];
+            me.signLookup = me.lookupCallsignRaw[sprintf("%s%04d",me.callsign,me.id)];
             if (me.signLookup == nil) {
             	me.signLookup = [me.aicontact];
             } else {
             	append(me.signLookup, me.aicontact);
             }
-            me.lookupCallsignRaw[me.callsign] = me.signLookup;
+            me.lookupCallsignRaw[sprintf("%s%04d",me.callsign,me.id)] = me.signLookup;
 		}
 
 		if (!me.updateInProgress) {
@@ -286,7 +292,7 @@ Contact = {
 AIContact = {
 # Attributes:
 #   replaceNode() [in AI tree]
-	new: func (prop, type, model, callsign, pos_type) {
+	new: func (prop, type, model, callsign, pos_type, ident) {
 		var c = {parents: [AIContact, Contact]};
 
 		# general:
@@ -298,6 +304,7 @@ AIContact = {
 		c.needInit = 1;
 		c.azi      = 0;
 		c.visible = 1;
+		c.id = ident;
 
 		# active radar:
 		c.blepTime = 0;
